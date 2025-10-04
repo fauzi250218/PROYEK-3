@@ -1,0 +1,71 @@
+/* Kotak Card */
+.form-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 30px;
+  margin-top: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+.form-card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* Judul form */
+h3 {
+  font-weight: 700;
+  color: #152259;
+}
+
+/* Label */
+.form-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  display: block;
+  color: #37474f;
+}
+
+/* Input dan Select */
+.form-control {
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border: 1px solid #ced4da;
+  transition: all 0.2s ease;
+}
+.form-control:focus {
+  border-color: #509CDB;
+  box-shadow: 0 0 0 0.2rem rgba(80,156,219,0.25);
+  outline: none;
+}
+
+/* Tombol Simpan */
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #218838);
+  border: none;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.btn-success:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+  transform: translateY(-2px);
+}
+
+/* Tombol Kembali */
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 8px;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}

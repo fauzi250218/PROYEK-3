@@ -1,0 +1,144 @@
+/* Font */
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;600;700&display=swap');
+
+.guru-index-page {
+  font-family: 'Kumbh Sans', sans-serif;
+  color: #2c3e50;
+}
+
+/* Header Atas */
+.guru-index-page .page-title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #152259;
+  margin: 0;
+}
+
+.guru-index-page .export-link {
+  color: #509CDB;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+.guru-index-page .export-link:hover {
+  color: #337ab7;
+  text-decoration: underline;
+}
+
+/* Tombol tambah guru */
+.guru-index-page .btn-primary {
+  background: linear-gradient(135deg, #509CDB, #345EAB);
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.guru-index-page .btn-primary:hover {
+  background: linear-gradient(135deg, #345EAB, #264b87);
+  transform: translateY(-2px);
+}
+
+/* Search box */
+.guru-index-page .search-wrapper {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.guru-index-page .search-box {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.guru-index-page .input-group-text {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-right: 0;
+  color: #6c757d;
+}
+
+.guru-index-page .search-box .form-control {
+  border: 1px solid #ddd;
+  border-left: 0;
+  box-shadow: none;
+  font-size: 0.95rem;
+  padding: 10px;
+}
+.guru-index-page .search-box .form-control:focus {
+  border-color: #509CDB;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(80,156,219,0.25);
+}
+
+/* Table */
+.guru-index-page table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #fff;
+}
+
+.guru-index-page thead {
+  background: #f5f7fb;
+  font-weight: 600;
+  color: #495057;
+}
+
+.guru-index-page tbody tr:hover {
+  background-color: #f0f6ff;
+  transition: 0.2s;
+}
+
+.guru-index-page td, 
+.guru-index-page th {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+/* Tombol aksi */
+.guru-index-page .btn-warning {
+  background-color: #f7b731;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.guru-index-page .btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.guru-index-page .btn-danger {
+  background-color: #eb4d4b;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.guru-index-page .btn-danger:hover {
+  background-color: #c23616;
+}
+
+/* Empty State */
+.guru-index-page .empty-box {
+  background: #fdfcfc;
+  border: 2px dashed #cfd8dc;
+  border-radius: 10px;
+  min-height: 250px;
+  margin-top: 50px;
+  padding: 50px 20px;
+  text-align: center;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.guru-index-page .empty-box h5 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.guru-index-page .empty-box p {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin: 0;
+}

@@ -1,0 +1,89 @@
+/* Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Background gradient */
+.login-container {
+  height: 100vh;
+  background: linear-gradient(135deg, #4e73df, #6f42c1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card login */
+.login-box {
+  background: #fff;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  text-align: center;
+  position: relative;
+  overflow: visible;
+}
+
+/* Logo toga menyatu */
+.login-logo {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.login-logo .circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 36px;
+  color: #4e73df;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Label kiri */
+.form-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  text-align: left;  /* pastikan label selalu kiri */
+  display: block;
+  color: #333;
+}
+
+/* Input */
+.input-style {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border: 1px solid #ccc;
+}
+.input-style:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 6px rgba(78,115,223,0.3);
+  outline: none;
+}
+
+/* Tombol login */
+.btn-login {
+  background: #4e73df;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+}
+.btn-login:hover {
+  background: #375ab7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(55,90,183,0.4);
+}
