@@ -2,9 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Kelas extends Model
 {
-    //
+    use HasFactory;
+
+    protected $table = 'kelas';
+
+    protected $fillable = [
+        'nama_kelas',
+        'wali_kelas',
+        'deskripsi',
+    ];
+
+    // Relasi ke murid
+    public function murids()
+    {
+        return $this->hasMany(Murid::class, 'kelas_id');
+    }
 }

@@ -3,23 +3,31 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Murid;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Kelas;
+use Illuminate\Http\Request;
 
 class MuridController extends Controller
 {
-    // Menampilkan semua murid
+    // Menampilkan daftar murid per kelas
     public function index()
     {
-        $murids = Murid::all();
-        return view('admin.murid.index', compact('murids'));
+        $kelasList = Kelas::with('murids')->get();
+
+        // Siapkan array untuk Blade: ['nama_kelas' => Collection of murid]
+        $muridPerKelas = [];
+        foreach ($kelasList as $kelas) {
+            $muridPerKelas[$kelas->nama_kelas] = $kelas->murids;
+        }
+
+        return view('admin.murid.index', compact('muridPerKelas'));
     }
 
-    // Form tambah murid
+    // Form tambah murid baru
     public function create()
     {
-        return view('admin.murid.create');
+        $kelasList = Kelas::all();
+        return view('admin.murid.create', compact('kelasList'));
     }
 
     // Simpan murid baru
@@ -27,60 +35,42 @@ class MuridController extends Controller
     {
         $request->validate([
             'nis' => 'required|unique:murids,nis',
-            'nama' => 'required',
-            'email' => 'required|email|unique:murids,email',
-            'kelas' => 'required',
-            'jenis_kelamin' => 'required',
-            'kata_sandi' => 'required|min:6',
+            'nama' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'nomer_whatsapp' => 'nullable|string|max:20',
+            'kelas_id' => 'nullable|exists:kelas,id',
         ]);
 
-        Murid::create([
-            'nis' => $request->nis,
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'kelas' => $request->kelas,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'kata_sandi' => Hash::make($request->kata_sandi),
-            'nomer_whatsapp' => $request->nomer_whatsapp,
-        ]);
+        Murid::create($request->all());
 
-        return redirect()->route('admin.murid.index')->with('success', 'Data murid berhasil ditambahkan');
+        return redirect()->route('admin.murid.index')->with('success', 'Murid berhasil ditambahkan.');
     }
 
     // Form edit murid
     public function edit($id)
     {
         $murid = Murid::findOrFail($id);
-        return view('admin.murid.edit', compact('murid'));
+        $kelasList = Kelas::all();
+        return view('admin.murid.edit', compact('murid', 'kelasList'));
     }
 
     // Update murid
     public function update(Request $request, $id)
     {
-        $murid = Murid::findOrFail($id);
-
         $request->validate([
             'nis' => 'required|unique:murids,nis,' . $id,
-            'nama' => 'required',
-            'email' => 'required|email|unique:murids,email,' . $id,
-            'kelas' => 'required',
-            'jenis_kelamin' => 'required',
+            'nama' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'nomer_whatsapp' => 'nullable|string|max:20',
+            'kelas_id' => 'nullable|exists:kelas,id',
         ]);
 
-        $murid->nis = $request->nis;
-        $murid->nama = $request->nama;
-        $murid->email = $request->email;
-        $murid->kelas = $request->kelas;
-        $murid->jenis_kelamin = $request->jenis_kelamin;
-        $murid->nomer_whatsapp = $request->nomer_whatsapp;
+        $murid = Murid::findOrFail($id);
+        $murid->update($request->all());
 
-        if ($request->filled('kata_sandi')) {
-            $murid->kata_sandi = Hash::make($request->kata_sandi);
-        }
-
-        $murid->save();
-
-        return redirect()->route('admin.murid.index')->with('success', 'Data murid berhasil diperbarui');
+        return redirect()->route('admin.murid.index')->with('success', 'Data murid berhasil diperbarui.');
     }
 
     // Hapus murid
@@ -89,6 +79,20 @@ class MuridController extends Controller
         $murid = Murid::findOrFail($id);
         $murid->delete();
 
-        return redirect()->route('admin.murid.index')->with('success', 'Data murid berhasil dihapus');
+        return redirect()->route('admin.murid.index')->with('success', 'Murid berhasil dihapus.');
+    }
+
+    // Pindahkan murid ke kelas tertentu (opsional)
+    public function pindahKelas(Request $request, $id)
+    {
+        $request->validate([
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
+
+        $murid = Murid::findOrFail($id);
+        $murid->kelas_id = $request->kelas_id;
+        $murid->save();
+
+        return redirect()->back()->with('success', 'Murid berhasil dipindahkan ke kelas baru.');
     }
 }

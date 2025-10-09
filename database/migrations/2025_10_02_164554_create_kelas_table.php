@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('kelas', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_kelas');        // Nama kelas (contoh: Kelas 7A)
+            $table->string('wali_kelas')->nullable(); // Nama guru wali kelas (opsional)
+            $table->text('deskripsi')->nullable();   // Deskripsi kelas (opsional)
             $table->timestamps();
         });
     }

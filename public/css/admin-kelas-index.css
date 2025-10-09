@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;600;700&display=swap');
+
+.kelas-index-page {
+  font-family: 'Kumbh Sans', sans-serif;
+  color: #2c3e50;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+/* Header */
+.kelas-index-page .page-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #152259;
+}
+
+/* Tombol Tambah */
+.kelas-index-page .btn-primary {
+  background: linear-gradient(135deg, #509CDB, #345EAB);
+  border: none;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 18px;
+  transition: all 0.3s ease;
+}
+.kelas-index-page .btn-primary:hover {
+  background: linear-gradient(135deg, #345EAB, #264b87);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(52, 94, 171, 0.25);
+}
+
+/* Card Kelas */
+.kelas-index-page .kelas-card {
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+.kelas-index-page .kelas-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.kelas-index-page .kelas-card .card-title {
+  font-weight: 700;
+  color: #345EAB;
+}
+.kelas-index-page .kelas-card p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Tombol Aksi */
+.kelas-index-page .btn-info {
+  background-color: #509CDB;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.kelas-index-page .btn-info:hover {
+  background-color: #345EAB;
+}
+
+.kelas-index-page .btn-warning {
+  background-color: #f7b731;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.kelas-index-page .btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.kelas-index-page .btn-danger {
+  background-color: #eb4d4b;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.kelas-index-page .btn-danger:hover {
+  background-color: #c23616;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .kelas-index-page .kelas-card {
+    font-size: 0.9rem;
+  }
+}

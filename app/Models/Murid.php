@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Murid extends Model
 {
+    use HasFactory;
+
     protected $table = 'murids';
-    protected $primaryKey = 'id';
-    public $timestamps = true;
 
     protected $fillable = [
-        'nis',
         'nama',
         'email',
-        'kelas',
         'jenis_kelamin',
-        'kata_sandi',
-        'nomer_whatsapp',
+        'nomor_whatsapp',
+        'kelas_id',
     ];
 
-    protected $hidden = ['kata_sandi']; // biar password tidak ikut ditampilkan
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
 }
