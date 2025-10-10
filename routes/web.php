@@ -7,6 +7,7 @@ use App\Http\Controllers\Guru\DashboardController as GuruDashboard;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\MuridController;
 use App\Http\Controllers\Admin\KelasController;
+use App\Http\Controllers\Admin\JadwalController;
 
 // 🔹 Route utama diarahkan ke login
 Route::get('/', function () {
@@ -38,18 +39,20 @@ Route::prefix('admin')
         // CRUD Murid
         Route::resource('murid', MuridController::class);
 
-        // CRUD Kelas (otomatis buat: index, create, store, show, edit, update, destroy)
+        // CRUD Kelas
         Route::resource('kelas', KelasController::class);
 
-        // ✅ Tambahan route untuk Kelola Murid di dalam kelas
+        // ✅ Kelola Murid di Kelas
         Route::get('kelas/{id}/kelola-murid', [KelasController::class, 'kelolaMurid'])
             ->name('kelas.kelolaMurid');
-
         Route::post('kelas/{id}/tambah-murid', [KelasController::class, 'tambahMurid'])
             ->name('kelas.tambahMurid');
-
         Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}', [KelasController::class, 'hapusMurid'])
             ->name('kelas.hapusMurid');
+
+        // ✅ Tambahan Route untuk Jadwal Pelajaran (FullCalendar)
+        Route::resource('jadwal', JadwalController::class)->except(['show']);
+        Route::get('jadwal/get', [JadwalController::class, 'getJadwal'])->name('jadwal.get'); // untuk API ke kalender
     });
 
 // 🔹 GURU ROUTES
@@ -57,6 +60,5 @@ Route::prefix('guru')
     ->name('guru.')
     ->middleware(['auth', 'role:guru'])
     ->group(function () {
-        // Dashboard Guru
         Route::get('/dashboard', [GuruDashboard::class, 'index'])->name('dashboard');
     });

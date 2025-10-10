@@ -72,6 +72,15 @@
         </a>
       </li>
 
+      <!-- 🗓️ Jadwal Pelajaran -->
+      <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('admin.jadwal.*') ? 'active' : '' }}" 
+          href="{{ route('admin.jadwal.index') }}">
+          <i class="bi bi-calendar-week"></i>
+          <span class="link-text ms-2">Jadwal Pelajaran</span>
+        </a>
+      </li>
+
       <!-- Pembayaran -->
       <li class="nav-item">
         <a class="nav-link" href="#">
@@ -133,6 +142,9 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('js/admin.js') }}"></script>
+
+<!-- ✅ Tambahkan ini agar script halaman seperti FullCalendar bisa dijalankan -->
+@yield('extra-js')
 
 </body>
 </html>

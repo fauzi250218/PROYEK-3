@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Data Murid')
+@section('title', 'Data Siswa')
 
 @section('extra-css')
 <link rel="stylesheet" href="{{ asset('css/admin-siswa-index.css') }}">
@@ -20,17 +20,17 @@
 
     <!-- Tab Navigasi -->
     <ul class="nav nav-tabs mb-3" id="kelasTabs" role="tablist">
-        @forelse($muridPerKelas as $kelas => $murids)
+        @forelse($muridPerJenjang as $jenjang => $murids)
             <li class="nav-item" role="presentation">
                 <button class="nav-link {{ $loop->first ? 'active' : '' }}" 
-                        id="tab-{{ $kelas }}" 
+                        id="tab-{{ $jenjang }}" 
                         data-bs-toggle="tab" 
-                        data-bs-target="#kelas-{{ $kelas }}" 
+                        data-bs-target="#kelas-{{ $jenjang }}" 
                         type="button" 
                         role="tab" 
-                        aria-controls="kelas-{{ $kelas }}" 
+                        aria-controls="kelas-{{ $jenjang }}" 
                         aria-selected="{{ $loop->first ? 'true' : 'false' }}">
-                    Kelas {{ $kelas }}
+                    Kelas {{ $jenjang }}
                 </button>
             </li>
         @empty
@@ -42,11 +42,11 @@
 
     <!-- Isi Tab -->
     <div class="tab-content" id="kelasTabsContent">
-        @forelse($muridPerKelas as $kelas => $murids)
+        @forelse($muridPerJenjang as $jenjang => $murids)
             <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" 
-                 id="kelas-{{ $kelas }}" 
+                 id="kelas-{{ $jenjang }}" 
                  role="tabpanel" 
-                 aria-labelledby="tab-{{ $kelas }}">
+                 aria-labelledby="tab-{{ $jenjang }}">
 
                 @if($murids->count())
                     <div class="table-responsive">
@@ -57,6 +57,7 @@
                                     <th>NIS</th>
                                     <th>Nama</th>
                                     <th>Email</th>
+                                    <th>Kelas</th>
                                     <th>Jenis Kelamin</th>
                                     <th>No. WhatsApp</th>
                                     <th>Aksi</th>
@@ -69,6 +70,7 @@
                                         <td>{{ $m->nis }}</td>
                                         <td>{{ $m->nama }}</td>
                                         <td>{{ $m->email }}</td>
+                                        <td>{{ $m->kelas }}</td>
                                         <td>{{ $m->jenis_kelamin }}</td>
                                         <td>{{ $m->nomer_whatsapp }}</td>
                                         <td>
@@ -90,7 +92,7 @@
                     </div>
                 @else
                     <div class="text-center text-muted py-4">
-                        Belum ada siswa di kelas {{ $kelas }}.
+                        Belum ada siswa di kelas {{ $jenjang }}.
                     </div>
                 @endif
             </div>
