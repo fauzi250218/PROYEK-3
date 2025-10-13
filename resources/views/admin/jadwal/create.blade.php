@@ -2,23 +2,28 @@
 
 @section('title', 'Tambah Jadwal')
 
+@section('extra-css')
+<link rel="stylesheet" href="{{ asset('css/admin-tambah-jadwal.css') }}">
+@endsection
+
 @section('content')
-<div class="container mt-5">
-    <!-- Header Section -->
-    <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary">Tambah Jadwal Pelajaran</h2>
-        <p class="text-muted">Lengkapi data di bawah untuk menambahkan jadwal baru</p>
+<div class="jadwal-wrapper container-fluid px-4 py-4">
+    <!-- HEADER -->
+    <div class="jadwal-header mb-4">
+        <h2 class="fw-bold">Tambah Jadwal Pelajaran</h2>
+        <p class="text-muted">Isi form berikut untuk menambahkan jadwal pelajaran baru</p>
     </div>
 
-    <!-- Form Card -->
-    <div class="card shadow border-0 rounded-4">
-        <div class="card-body p-4">
-            <form action="{{ route('admin.jadwal.store') }}" method="POST">
+    <!-- FORM CARD FULL WIDTH -->
+    <div class="card jadwal-card shadow-sm border-0">
+        <div class="card-body">
+            <form action="{{ route('admin.jadwal.store') }}" method="POST" autocomplete="off">
                 @csrf
+
                 <div class="row g-4">
                     <!-- Kelas -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold text-secondary">Kelas</label>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Kelas</label>
                         <select name="kelas_id" class="form-select" required>
                             <option value="">-- Pilih Kelas --</option>
                             @foreach($kelas as $k)
@@ -28,90 +33,52 @@
                     </div>
 
                     <!-- Mata Pelajaran -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold text-secondary">Mata Pelajaran</label>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Mata Pelajaran</label>
                         <input type="text" name="mata_pelajaran" class="form-control" placeholder="Contoh: Matematika" required>
                     </div>
 
                     <!-- Guru -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold text-secondary">Guru</label>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Guru Pengajar</label>
                         <input type="text" name="guru" class="form-control" placeholder="Nama Guru" required>
                     </div>
 
+                    <!-- Tanggal -->
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-control" required>
+                    </div>
+
                     <!-- Jam Mulai -->
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold text-secondary">Jam Mulai</label>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Jam Mulai</label>
                         <input type="time" name="jam_mulai" class="form-control" required>
                     </div>
 
                     <!-- Jam Selesai -->
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold text-secondary">Jam Selesai</label>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">Jam Selesai</label>
                         <input type="time" name="jam_selesai" class="form-control" required>
                     </div>
 
-                    <!-- Tanggal -->
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold text-secondary">Tanggal</label>
-                        <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-control" required>
-                    </div>
-
                     <!-- Keterangan -->
-                    <div class="col-md-3">
-                        <label class="form-label fw-semibold text-secondary">Keterangan</label>
-                        <input type="text" name="keterangan" class="form-control" placeholder="Opsional">
+                    <div class="col-12">
+                        <label class="form-label">Keterangan (Opsional)</label>
+                        <textarea name="keterangan" class="form-control" rows="3" placeholder="Tambahkan catatan jika perlu..."></textarea>
                     </div>
                 </div>
 
-                <div class="text-end mt-4">
-                    <button type="submit" class="btn btn-primary px-4 py-2">
-                        <i class="bi bi-save me-1"></i> Simpan Jadwal
-                    </button>
-                    <a href="{{ route('admin.jadwal.index') }}" class="btn btn-outline-secondary px-4 py-2">
+                <div class="d-flex justify-content-end mt-4 gap-3">
+                    <a href="{{ route('admin.jadwal.index') }}" class="btn btn-outline-secondary px-4">
                         <i class="bi bi-arrow-left me-1"></i> Kembali
                     </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-save me-1"></i> Simpan Jadwal
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-@endsection
-
-@section('extra-css')
-<!-- Tambahan Bootstrap Icons untuk ikon tombol -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-<style>
-    body {
-        background-color: #f8f9fa;
-    }
-
-    .card {
-        background: #ffffff;
-    }
-
-    .form-label {
-        font-size: 0.95rem;
-    }
-
-    input.form-control, select.form-select {
-        border-radius: 8px;
-        transition: 0.2s ease-in-out;
-    }
-
-    input.form-control:focus, select.form-select:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
-    }
-
-    .btn-primary {
-        border-radius: 8px;
-        font-weight: 500;
-    }
-
-    .btn-outline-secondary {
-        border-radius: 8px;
-    }
-</style>
 @endsection

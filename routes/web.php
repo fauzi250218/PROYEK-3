@@ -53,6 +53,8 @@ Route::prefix('admin')
         // ✅ Tambahan Route untuk Jadwal Pelajaran (FullCalendar)
         Route::resource('jadwal', JadwalController::class)->except(['show']);
         Route::get('jadwal/get', [JadwalController::class, 'getJadwal'])->name('jadwal.get'); // untuk API ke kalender
+        // ✅ API tambahan untuk ambil jadwal berdasarkan tanggal
+        Route::get('jadwal/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])->name('jadwal.hari');
     });
 
 // 🔹 GURU ROUTES
