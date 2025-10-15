@@ -8,14 +8,18 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('guru', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('email')->unique();
+            $table->unsignedBigInteger('user_id')->unique(); // relasi ke tabel users
             $table->string('kelas')->nullable();
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
-            $table->string('kata_sandi'); // simpan hash password
             $table->string('nomer_whatsapp')->nullable();
             $table->string('mata_pelajaran')->nullable();
             $table->timestamps();
+
+            // Hubungkan user_id ke tabel users
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
     }
 

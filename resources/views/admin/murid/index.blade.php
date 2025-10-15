@@ -13,7 +13,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="page-title">Data Siswa</h5>
         <div class="d-flex align-items-center">
-            <a href="#" class="export-link me-3">Export CSV</a>
+            <a href="#" class="export-link me-3 text-decoration-none">Export CSV</a>
             <a href="{{ route('admin.murid.create') }}" class="btn btn-primary">Tambahkan Siswa</a>
         </div>
     </div>
@@ -70,17 +70,25 @@
                                         <td>{{ $m->nis }}</td>
                                         <td>{{ $m->nama }}</td>
                                         <td>{{ $m->email }}</td>
-                                        <td>{{ $m->kelas }}</td>
+                                        
+                                        <!-- 🔧 Perbaikan utama: ambil nama_kelas, bukan objek kelas -->
+                                        <td>{{ $m->kelas->nama_kelas ?? '-' }}</td>
+
                                         <td>{{ $m->jenis_kelamin }}</td>
-                                        <td>{{ $m->nomer_whatsapp }}</td>
+                                        <td>{{ $m->nomer_whatsapp ?? '-' }}</td>
                                         <td>
-                                            <a href="{{ route('admin.murid.edit', $m->id) }}" class="btn btn-sm btn-warning">
+                                            <a href="{{ route('admin.murid.edit', $m->id) }}" 
+                                               class="btn btn-sm btn-warning">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
-                                            <form action="{{ route('admin.murid.destroy', $m->id) }}" method="POST" class="d-inline">
+
+                                            <form action="{{ route('admin.murid.destroy', $m->id) }}" 
+                                                  method="POST" 
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Yakin hapus siswa ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus siswa ini?')">
+                                                <button type="submit" class="btn btn-sm btn-danger">
                                                     <i class="bi bi-trash"></i> Hapus
                                                 </button>
                                             </form>

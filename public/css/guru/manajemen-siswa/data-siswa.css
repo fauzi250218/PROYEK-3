@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Kumbh Sans', sans-serif;
+  background-color: #f7faf8;
+  color: #1b4d3e;
+}
+
+/* Align heading sejajar dengan header layout */
+.align-with-header {
+  margin-left: 68px;
+}
+
+@media (max-width: 991px) {
+  .align-with-header {
+    margin-left: 0;
+    text-align: center;
+  }
+}
+
+/* Header */
+.section-header h3 {
+  font-weight: 700;
+  color: #1b4d3e;
+}
+
+.section-header p {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+/* Table Wrapper */
+.table-responsive {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+/* Table Head */
+.table-header {
+  background: #28a745;
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.table-header th {
+  padding: 14px 10px;
+  white-space: nowrap;
+}
+
+/* Table Row */
+.table-row {
+  transition: all 0.25s ease;
+  border-bottom: 1px solid #e6f2eb;
+}
+
+.table-row:hover {
+  background: #ecf7f0;
+  transform: scale(1.01);
+}
+
+/* Table Cell */
+.table td {
+  padding: 14px 10px;
+  vertical-align: middle;
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+/* Tombol Aksi */
+.btn-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #28a74510;
+  border: 1px solid #28a745;
+  color: #28a745;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.btn-view:hover {
+  background: #28a745;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(40,167,69,0.3);
+  transform: translateY(-1px);
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .table-header {
+    font-size: 0.8rem;
+  }
+  .table td {
+    font-size: 0.85rem;
+  }
+  .btn-view {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}

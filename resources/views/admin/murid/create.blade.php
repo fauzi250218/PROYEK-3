@@ -7,10 +7,9 @@
 @endsection
 
 @section('content')
-<div class="container mt-5 pt-5"> <!-- Tambah margin-top supaya turun -->
+<div class="container mt-5 pt-5">
     <h3 class="mb-4">Tambah Siswa</h3>
 
-    <!-- Kotak Card -->
     <div class="form-card shadow-sm p-4">
         <form action="{{ route('admin.murid.store') }}" method="POST">
             @csrf
@@ -21,7 +20,7 @@
                 <input type="text" name="nama" class="form-control" required>
             </div>
 
-            <!-- NISN -->
+            <!-- NIS -->
             <div class="mb-3">
                 <label class="form-label">NIS</label>
                 <input type="text" name="nis" class="form-control" required>
@@ -33,15 +32,17 @@
                     <label class="form-label">Alamat Email</label>
                     <input type="email" name="email" class="form-control" required>
                 </div>
+
                 <div class="col-md-3">
                     <label class="form-label">Kelas</label>
-                    <select name="kelas" class="form-control" required>
-                        <option value="">-- Pilih --</option>
-                        <option value="7">Kelas 7</option>
-                        <option value="8">Kelas 8</option>
-                        <option value="9">Kelas 9</option>
+                    <select name="kelas_id" class="form-control" required>
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach($kelas as $k)
+                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                        @endforeach
                     </select>
                 </div>
+
                 <div class="col-md-3">
                     <label class="form-label">Jenis Kelamin</label>
                     <select name="jenis_kelamin" class="form-control" required>

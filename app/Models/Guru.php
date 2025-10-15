@@ -12,17 +12,19 @@ class Guru extends Model
     protected $table = 'guru';
 
     protected $fillable = [
-        'nama',
-        'email',
-        'kelas',
+        'user_id',
         'jenis_kelamin',
-        'kata_sandi',
         'nomer_whatsapp',
         'mata_pelajaran',
     ];
 
-    // kalau mau otomatis hash password sebelum simpan
-    public function setKataSandiAttribute($value) {
-        $this->attributes['kata_sandi'] = bcrypt($value);
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function kelas()
+    {
+        return $this->hasOne(Kelas::class, 'user_id', 'user_id');
     }
 }

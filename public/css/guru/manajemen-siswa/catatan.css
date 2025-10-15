@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Kumbh Sans', sans-serif;
+  background-color: #f8faf9;
+  color: #1b4d3e;
+}
+
+/* Header sejajar dengan layout guru */
+.align-with-header {
+  margin-left: 68px;
+}
+@media (max-width: 991px) {
+  .align-with-header {
+    margin-left: 0;
+    text-align: center;
+  }
+}
+
+/* Section Header */
+.section-header h3 {
+  font-weight: 700;
+  color: #1b4d3e;
+}
+.section-header p {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+/* Tombol Tambah Catatan */
+.btn-add {
+  background: #28a745;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 3px 8px rgba(40,167,69,0.2);
+  transition: all 0.3s ease;
+}
+.btn-add:hover {
+  background: #1b4d3e;
+  box-shadow: 0 6px 12px rgba(27,77,62,0.25);
+}
+
+/* === TIMELINE === */
+.timeline {
+  position: relative;
+  margin-left: 20px;
+  padding-left: 25px;
+  border-left: 3px solid #e0f0e6;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  border-left: 3px solid #e0f0e6;
+}
+
+/* Timeline Item */
+.timeline-item {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+  border: 1px solid #ecf5ef;
+}
+.timeline-item:hover {
+  transform: translateX(6px);
+  box-shadow: 0 6px 12px rgba(27,77,62,0.12);
+}
+
+/* Marker Bulat di Kiri */
+.timeline-marker {
+  position: absolute;
+  left: -35px;
+  top: 20px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: #28a745;
+  box-shadow: 0 0 0 3px rgba(40,167,69,0.25);
+}
+.timeline-marker.prestasi {
+  background: #00b894;
+}
+.timeline-marker.perilaku {
+  background: #0984e3;
+}
+.timeline-marker.peringatan {
+  background: #d63031;
+}
+
+/* Isi Konten */
+.timeline-content {
+  padding-left: 10px;
+}
+.timeline-content h5 {
+  font-size: 1rem;
+  color: #1b4d3e;
+}
+.timeline-content p {
+  font-size: 0.9rem;
+}
+.timeline-content .tanggal {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+/* Badge Jenis */
+.badge-jenis {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.badge-jenis.prestasi {
+  background: #00b894;
+}
+.badge-jenis.perilaku {
+  background: #0984e3;
+}
+.badge-jenis.peringatan {
+  background: #d63031;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .timeline {
+    border-left: none;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  .timeline-marker {
+    display: none;
+  }
+  .timeline-item {
+    padding: 14px 16px;
+  }
+  .timeline-content h5 {
+    font-size: 0.95rem;
+  }
+}

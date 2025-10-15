@@ -14,7 +14,7 @@
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
             <p><strong>Nama Kelas:</strong> {{ $kelas->nama_kelas }}</p>
-            <p><strong>Wali Kelas:</strong> {{ $kelas->wali_kelas ?? '-' }}</p>
+            <p><strong>Wali Kelas:</strong> {{ $kelas->wali->name ?? '-' }}</p>
             <p><strong>Deskripsi:</strong> {{ $kelas->deskripsi ?? '-' }}</p>
         </div>
     </div>

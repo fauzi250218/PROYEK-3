@@ -8,8 +8,6 @@
 
 @section('content')
 <div class="container-fluid guru-index-page">
-
-    <!-- Header atas -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="page-title">Guru / Pengajar</h5>
         <div class="d-flex align-items-center">
@@ -18,7 +16,6 @@
         </div>
     </div>
 
-    <!-- Search dengan ikon -->
     <div class="mb-3 search-wrapper">
         <div class="input-group search-box">
             <span class="input-group-text">
@@ -28,7 +25,6 @@
         </div>
     </div>
 
-    <!-- Jika ada data -->
     @if($guru->count() > 0)
         <div class="table-responsive">
             <table class="table table-hover align-middle" id="guruTable">
@@ -37,7 +33,7 @@
                         <th>No</th>
                         <th>Nama</th>
                         <th>Email</th>
-                        <th>Kelas</th>
+                        <th>Kelas Binaan</th>
                         <th>Jenis Kelamin</th>
                         <th>No. WhatsApp</th>
                         <th>Mata Pelajaran</th>
@@ -48,12 +44,14 @@
                     @foreach($guru as $index => $g)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $g->nama }}</td>
-                            <td>{{ $g->email }}</td>
-                            <td>{{ $g->kelas }}</td>
-                            <td>{{ $g->jenis_kelamin }}</td>
-                            <td>{{ $g->nomer_whatsapp }}</td>
-                            <td>{{ $g->mata_pelajaran }}</td>
+                            <td>{{ $g->user->name ?? '-' }}</td>
+                            <td>{{ $g->user->email ?? '-' }}</td>
+                            <td>
+                                {{ $g->user->kelas->nama_kelas ?? '-' }}
+                            </td>
+                            <td>{{ $g->jenis_kelamin ?? '-' }}</td>
+                            <td>{{ $g->nomer_whatsapp ?? '-' }}</td>
+                            <td>{{ $g->mata_pelajaran ?? '-' }}</td>
                             <td>
                                 <a href="{{ route('admin.guru.edit', $g->id) }}" class="btn btn-sm btn-warning">
                                     <i class="bi bi-pencil"></i> Edit
@@ -72,7 +70,6 @@
             </table>
         </div>
     @else
-        <!-- Empty State -->
         <div class="empty-box text-center d-flex flex-column justify-content-center align-items-center">
             <h5 class="fw-bold">Tidak ada Guru saat ini!</h5>
             <p class="text-muted">Guru akan muncul disini setelah ditambahkan</p>

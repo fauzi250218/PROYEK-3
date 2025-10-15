@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Kumbh Sans', sans-serif;
+  background: #f9fafb;
+  color: #1b4d3e;
+}
+
+/* Header sejajar dengan layout */
+.align-with-header {
+  margin-left: 68px;
+}
+@media (max-width: 991px) {
+  .align-with-header { margin-left: 0; text-align: center; }
+}
+
+/* Statistik Cards */
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #fff;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+.stat-card .icon {
+  font-size: 2rem;
+  opacity: 0.9;
+}
+.stat-card .label {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-bottom: 3px;
+}
+.stat-card .value {
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-green {
+  background: linear-gradient(135deg, #3eb489, #1b4d3e);
+}
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #42a5f5, #1976d2);
+}
+.bg-gradient-yellow {
+  background: linear-gradient(135deg, #fbc02d, #f57f17);
+}
+.bg-gradient-red {
+  background: linear-gradient(135deg, #ef5350, #c62828);
+}
+
+/* Progress Card */
+.progress-card {
+  background: #fff;
+  border: 1px solid #e8ece8;
+  border-left: 6px solid #28a745;
+  transition: all 0.3s ease;
+}
+.progress-card:hover {
+  border-left-color: #1b4d3e;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.progress-row .label {
+  flex: 1;
+  font-weight: 600;
+  color: #1b4d3e;
+}
+.progress-row .progress {
+  flex: 3;
+  height: 8px;
+  border-radius: 10px;
+  background: #eaf5ee;
+}
+.progress-row .progress-bar {
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+.progress-row .percent {
+  width: 50px;
+  text-align: right;
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* Circular chart */
+.circle-chart {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(#28a745 0% 95%, #e0eae3 95%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+.circle-inner {
+  background: #fff;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+}
+.circle-inner small {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Summary Card */
+.summary-card {
+  background: #ffffff;
+  border-left: 5px solid #28a745;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+.summary-card:hover {
+  border-left-color: #1b4d3e;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+/* Tombol Unduh */
+.btn-modern-download {
+  background: linear-gradient(135deg, #28a745, #1b4d3e);
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 5px 12px rgba(27,77,62,0.25);
+  transition: all 0.3s ease;
+}
+.btn-modern-download:hover {
+  background: linear-gradient(135deg, #1b4d3e, #28a745);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(27,77,62,0.35);
+}

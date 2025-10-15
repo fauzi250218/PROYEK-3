@@ -1,11 +1,11 @@
-/* 🌈 ======= ADMIN JADWAL (STYLE MODERN DASHBOARD) ======= */
+/* Jadwal */
 body {
     background: linear-gradient(135deg, #eef2f7, #ffffff);
     font-family: 'Poppins', sans-serif;
     color: #2b2d42;
 }
 
-/* 🗓️ Kalender Container */
+/* Kalender Container */
 #calendar {
     background: #ffffff;
     padding: 30px;
@@ -58,10 +58,7 @@ body {
     transition: background 0.2s;
 }
 
-/* =============================
-   🎨 KUSTOMISASI FULLCALENDAR
-   ============================= */
-
+/* KUSTOMISASI FULLCALENDAR */
 /* Header (bulan & tombol navigasi) */
 .fc-toolbar {
     margin-bottom: 1.5rem !important;
@@ -173,7 +170,7 @@ body {
 }
 
 
-/* ✨ Modal Styling */
+/* Modal Styling */
 .modal-content {
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -199,7 +196,7 @@ body {
     to { transform: translateY(0); opacity: 1; }
 }
 
-/* 🧾 Daftar Jadwal (List) */
+/* Daftar Jadwal (List) */
 .jadwal-list {
     list-style: none;
     padding-left: 0;
@@ -247,7 +244,7 @@ body {
     color: white;
 }
 
-/* 🌟 Animasi Hover */
+/* Animasi Hover */
 .btn {
     transition: all 0.25s ease;
 }
@@ -256,7 +253,7 @@ body {
     transform: translateY(-1px);
 }
 
-/* 🎨 Tombol Tambahan */
+/* Tombol Tambahan */
 .btn-success {
     background: linear-gradient(90deg, #16a34a, #22c55e);
     border: none;
