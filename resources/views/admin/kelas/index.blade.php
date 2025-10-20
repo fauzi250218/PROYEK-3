@@ -21,7 +21,7 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h5 class="text-primary">{{ $k->nama_kelas }}</h5>
-                            <p><strong>Wali Kelas:</strong> {{ $k->wali->name ?? 'Belum ada wali' }}</p>
+                            <p><strong>Wali Kelas:</strong> {{ $k->guru->user->name ?? 'Belum ada wali' }}</p>
                             <p><strong>Deskripsi:</strong> {{ $k->deskripsi ?? '-' }}</p>
 
                             <div class="d-flex justify-content-between">

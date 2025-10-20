@@ -12,26 +12,28 @@ use App\Models\Kelas;
 class GuruController extends Controller
 {
     /**
-     * 🔹 Tampilkan semua data guru
+     * Tampilkan semua data guru
      */
     public function index()
     {
-        $guru = Guru::with(['user', 'user.kelas'])->get(); // tambahkan user.kelas agar kolom kelas muncul
+        // Sudah bisa pakai 'kelas' karena alias disediakan di model
+        $guru = Guru::with(['user', 'kelas'])->get();
+
         return view('admin.guru.index', compact('guru'));
     }
 
     /**
-     * 🔹 Form tambah guru baru
+     * Form tambah guru baru
      */
     public function create()
     {
-        // hanya kelas yang belum punya wali
-        $kelas = Kelas::whereNull('user_id')->get();
+        // Ambil kelas yang belum punya wali (guru)
+        $kelas = Kelas::whereNull('guru_id')->get();
         return view('admin.guru.create', compact('kelas'));
     }
 
     /**
-     * 🔹 Simpan data guru baru
+     * Simpan data guru baru
      */
     public function store(Request $request)
     {
@@ -45,7 +47,7 @@ class GuruController extends Controller
             'mata_pelajaran' => 'nullable|string|max:100',
         ]);
 
-        // buat akun user
+        // Buat akun user
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
@@ -53,7 +55,7 @@ class GuruController extends Controller
             'role'     => 'guru',
         ]);
 
-        // buat data guru
+        // Buat data guru
         $guru = Guru::create([
             'user_id'        => $user->id,
             'jenis_kelamin'  => $request->jenis_kelamin,
@@ -61,9 +63,9 @@ class GuruController extends Controller
             'mata_pelajaran' => $request->mata_pelajaran,
         ]);
 
-        // tetapkan kelas jika dipilih
-        if ($request->kelas_id) {
-            Kelas::find($request->kelas_id)->update(['user_id' => $user->id]);
+        // Tetapkan kelas binaan (jika ada)
+        if ($request->filled('kelas_id')) {
+            Kelas::where('id', $request->kelas_id)->update(['guru_id' => $guru->id]);
         }
 
         return redirect()->route('admin.guru.index')
@@ -71,19 +73,20 @@ class GuruController extends Controller
     }
 
     /**
-     * 🔹 Form edit guru
+     * Form edit guru
      */
     public function edit(Guru $guru)
     {
-        $kelas = Kelas::whereNull('user_id')
-                      ->orWhere('user_id', $guru->user_id)
+        // Ambil kelas yang belum punya wali atau kelas milik guru ini
+        $kelas = Kelas::whereNull('guru_id')
+                      ->orWhere('guru_id', $guru->id)
                       ->get();
 
         return view('admin.guru.edit', compact('guru', 'kelas'));
     }
 
     /**
-     * 🔹 Update data guru
+     * Update data guru
      */
     public function update(Request $request, Guru $guru)
     {
@@ -97,45 +100,48 @@ class GuruController extends Controller
             'mata_pelajaran' => 'nullable|string|max:100',
         ]);
 
-        // update user
+        // Update user
         $user = $guru->user;
         $user->update([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => $request->filled('password')
-                ? Hash::make($request->password)
-                : $user->password,
+            'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
         ]);
 
-        // update guru
+        // Update data guru
         $guru->update([
             'jenis_kelamin'  => $request->jenis_kelamin,
             'nomer_whatsapp' => $request->nomer_whatsapp,
             'mata_pelajaran' => $request->mata_pelajaran,
         ]);
 
-        // update kelas (hapus wali lama dulu)
-        Kelas::where('user_id', $guru->user_id)->update(['user_id' => null]);
+        // Reset dan update kelas binaan
+        Kelas::where('guru_id', $guru->id)->update(['guru_id' => null]);
 
-        if ($request->kelas_id) {
-            Kelas::find($request->kelas_id)->update(['user_id' => $guru->user_id]);
+        if ($request->filled('kelas_id')) {
+            Kelas::where('id', $request->kelas_id)->update(['guru_id' => $guru->id]);
         }
 
+        $guru->load('kelas');
+
         return redirect()->route('admin.guru.index')
-            ->with('success', 'Data guru berhasil diperbarui.');
+            ->with('success', 'Data guru dan kelas binaan berhasil diperbarui.');
     }
 
     /**
-     * 🔹 Hapus guru dan akun login-nya
+     * Hapus guru dan akun login-nya
      */
     public function destroy(Guru $guru)
     {
-        Kelas::where('user_id', $guru->user_id)->update(['user_id' => null]);
+        // Lepaskan relasi kelas binaan
+        Kelas::where('guru_id', $guru->id)->update(['guru_id' => null]);
 
+        // Hapus akun user
         if ($guru->user) {
             $guru->user->delete();
         }
 
+        // Hapus data guru
         $guru->delete();
 
         return redirect()->route('admin.guru.index')

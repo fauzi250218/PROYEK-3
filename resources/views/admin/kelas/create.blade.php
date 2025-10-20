@@ -16,10 +16,10 @@
 
         <div class="mb-3">
             <label>Wali Kelas (opsional)</label>
-            <select name="user_id" class="form-control">
+            <select name="guru_id" class="form-control">
                 <option value="">-- Tidak Ada Wali Kelas --</option>
                 @foreach($guru as $g)
-                    <option value="{{ $g->id }}">{{ $g->name }}</option>
+                    <option value="{{ $g->id }}">{{ $g->user->name ?? 'Tanpa Nama' }}</option>
                 @endforeach
             </select>
         </div>

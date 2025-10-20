@@ -12,24 +12,28 @@
 
         <div class="mb-3">
             <label>Nama Kelas</label>
-            <input type="text" name="nama_kelas" class="form-control" value="{{ $kelas->nama_kelas }}" required>
+            <input type="text" name="nama_kelas" class="form-control" value="{{ old('nama_kelas', $kelas->nama_kelas) }}" required>
         </div>
 
         <div class="mb-3">
-            <label>Wali Kelas</label>
-            <select name="user_id" class="form-control">
+            <label>Wali Kelas (opsional)</label>
+            <!-- GANTI: name menjadi guru_id dan tampilkan nama lewat relasi user -->
+            <select name="guru_id" class="form-control">
                 <option value="">-- Tidak Ada --</option>
                 @foreach($guru as $g)
-                    <option value="{{ $g->id }}" {{ $kelas->user_id == $g->id ? 'selected' : '' }}>
-                        {{ $g->name }}
+                    <option value="{{ $g->id }}" {{ (int) old('guru_id', $kelas->guru_id) === (int) $g->id ? 'selected' : '' }}>
+                        {{ $g->user->name ?? 'Tanpa Nama' }}
                     </option>
                 @endforeach
             </select>
+            @error('guru_id')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
         </div>
 
         <div class="mb-3">
             <label>Deskripsi</label>
-            <textarea name="deskripsi" class="form-control">{{ $kelas->deskripsi }}</textarea>
+            <textarea name="deskripsi" class="form-control">{{ old('deskripsi', $kelas->deskripsi) }}</textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Perbarui</button>

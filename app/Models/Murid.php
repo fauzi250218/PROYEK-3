@@ -21,8 +21,19 @@ class Murid extends Model
         'nomer_whatsapp',
     ];
 
+    /**
+     * Relasi ke kelas tempat murid ini belajar
+     */
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    /**
+     * Relasi ke nilai-nilai milik murid ini
+     */
+    public function nilai()
+    {
+        return $this->hasMany(Nilai::class, 'murid_id');
     }
 }
