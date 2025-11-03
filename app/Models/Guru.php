@@ -19,38 +19,31 @@ class Guru extends Model
         'jenis_kelamin',
         'nomer_whatsapp',
         'mata_pelajaran',
+        'foto_profil',
     ];
 
-    /**
-     * Relasi ke tabel users (akun login guru)
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Relasi 1:1 - Wali kelas dari satu kelas binaan
-     */
     public function kelasBinaan()
     {
         return $this->hasOne(Kelas::class, 'guru_id');
     }
 
-    /**
-     * Relasi alias supaya kompatibel dengan kode lama
-     * (agar "with(['user','kelas'])" di controller tidak error)
-     */
     public function kelas()
     {
         return $this->kelasBinaan();
     }
 
-    /**
-     * Relasi 1:N - Guru bisa mengajar dan memberi banyak nilai ke siswa
-     */
     public function nilai()
     {
         return $this->hasMany(Nilai::class, 'guru_id');
+    }
+
+    public function getNamaLengkapAttribute()
+    {
+        return $this->user->name ?? '-';
     }
 }

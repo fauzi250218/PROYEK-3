@@ -1,0 +1,125 @@
+/* ==================================================
+   STYLE: FORM TAMBAH / EDIT MURID
+   Desain profesional & konsisten dengan form guru
+   ================================================== */
+
+body {
+    background-color: #f8f9fb !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+.murid-form-page h3 {
+    font-weight: 700;
+    color: #2e3a59;
+    letter-spacing: 0.5px;
+}
+
+.form-card {
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.form-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+/* Label dan Input */
+label.form-label {
+    color: #495057;
+    font-weight: 600;
+}
+
+.form-control, 
+.form-select {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    padding: 10px 14px;
+    transition: 0.2s ease-in-out;
+    font-size: 15px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.15rem rgba(40, 167, 69, 0.25);
+}
+
+/* Tombol */
+.btn-success {
+    background-color: #4e73df;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.btn-success:hover {
+    background-color: #4e73df;
+    transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+    border-radius: 10px;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+    color: #495057;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f1f3f5;
+    color: #212529;
+}
+
+/* Upload Box */
+.upload-box {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-box:hover {
+    background: #f3f9f5;
+    border-color: #4e73df;
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    color: #4e73df;
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.file-input {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+    .form-card {
+        padding: 1.5rem;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

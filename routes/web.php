@@ -37,13 +37,16 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
+        // Dashboard
         Route::get('/', fn() => redirect()->route('admin.dashboard'));
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+        // CRUD Data Guru, Murid, dan Kelas
         Route::resource('guru', GuruController::class);
         Route::resource('murid', MuridController::class);
         Route::resource('kelas', KelasController::class);
 
+        // Kelola murid dalam kelas
         Route::get('kelas/{id}/kelola-murid', [KelasController::class, 'kelolaMurid'])
             ->whereNumber('id')->name('kelas.kelolaMurid');
         Route::post('kelas/{id}/tambah-murid', [KelasController::class, 'tambahMurid'])
@@ -51,9 +54,19 @@ Route::prefix('admin')
         Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}', [KelasController::class, 'hapusMurid'])
             ->whereNumber('kelas_id')->whereNumber('murid_id')->name('kelas.hapusMurid');
 
-        Route::resource('jadwal', JadwalController::class)->except(['show']);
-        Route::get('jadwal/get', [JadwalController::class, 'getJadwal'])->name('jadwal.get');
-        Route::get('jadwal/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])->name('jadwal.hari');
+        // ==================================================
+        // ============== JADWAL (AJAX & CRUD) ===============
+        // ==================================================
+        Route::prefix('jadwal')->name('jadwal.')->group(function () {
+            Route::get('/', [JadwalController::class, 'index'])->name('index');
+            Route::get('/get', [JadwalController::class, 'getJadwal'])->name('get');
+            Route::get('/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])->name('hari');
+            Route::get('/{id}', [JadwalController::class, 'show'])->name('show');
+            Route::post('/', [JadwalController::class, 'store'])->name('store');
+            Route::put('/{id}', [JadwalController::class, 'update'])->name('update');
+            Route::delete('/{id}', [JadwalController::class, 'destroy'])->name('destroy');
+            Route::delete('/hapus-semester/{mata_pelajaran}', [JadwalController::class, 'deleteSemester'])->name('deleteSemester');
+        });
     });
 
 // ==================================================
@@ -74,11 +87,16 @@ Route::prefix('guru')
             // ---------- KELAS BINAAN ----------
             Route::prefix('binaan')->name('binaan.')->group(function () {
                 Route::get('/', [KelasBinaanController::class, 'index'])->name('index');
-                Route::get('/{id}/data-siswa', [KelasBinaanController::class, 'dataSiswa'])->whereNumber('id')->name('dataSiswa');
-                Route::get('/{id}/perkembangan', [KelasBinaanController::class, 'perkembangan'])->whereNumber('id')->name('perkembangan');
-                Route::get('/{id}/kehadiran', [KelasBinaanController::class, 'kehadiran'])->whereNumber('id')->name('kehadiran');
-                Route::get('/{id}/catatan', [KelasBinaanController::class, 'catatan'])->whereNumber('id')->name('catatan');
-                Route::get('/{id}/laporan', [KelasBinaanController::class, 'laporan'])->whereNumber('id')->name('laporan');
+                Route::get('/{id}/data-siswa', [KelasBinaanController::class, 'dataSiswa'])
+                    ->whereNumber('id')->name('dataSiswa');
+                Route::get('/{id}/perkembangan', [KelasBinaanController::class, 'perkembangan'])
+                    ->whereNumber('id')->name('perkembangan');
+                Route::get('/{id}/kehadiran', [KelasBinaanController::class, 'kehadiran'])
+                    ->whereNumber('id')->name('kehadiran');
+                Route::get('/{id}/catatan', [KelasBinaanController::class, 'catatan'])
+                    ->whereNumber('id')->name('catatan');
+                Route::get('/{id}/laporan', [KelasBinaanController::class, 'laporan'])
+                    ->whereNumber('id')->name('laporan');
             });
 
             // ---------- KELAS AJARAN ----------
@@ -88,16 +106,15 @@ Route::prefix('guru')
         // =======================
         // MANAJEMEN NILAI
         // =======================
-        // 🔹 Redirect otomatis ke /semua-kelas
         Route::get('/nilai', fn() => redirect()->route('guru.nilai.semuaKelas'));
 
         Route::prefix('nilai')->name('nilai.')->group(function () {
-            Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas'); // file 1
-            Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index'); // file 2
-            Route::get('/murid/{id}', [NilaiController::class, 'detail'])->name('detail'); // file 3
-            Route::get('/murid/{id}/create', [NilaiController::class, 'create'])->name('create'); // file 4
+            Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
+            Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index');
+            Route::get('/murid/{id}', [NilaiController::class, 'detail'])->name('detail');
+            Route::get('/murid/{id}/create', [NilaiController::class, 'create'])->name('create');
             Route::post('/murid/{id}', [NilaiController::class, 'store'])->name('store');
-            Route::get('/edit/{id}', [NilaiController::class, 'edit'])->name('edit'); // file 5
+            Route::get('/edit/{id}', [NilaiController::class, 'edit'])->name('edit');
             Route::put('/update/{id}', [NilaiController::class, 'update'])->name('update');
             Route::delete('/hapus/{id}', [NilaiController::class, 'destroy'])->name('destroy');
         });

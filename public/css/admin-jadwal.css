@@ -1,271 +1,328 @@
-/* Jadwal */
+/* 🌙 Style Kalender Jadwal Admin
+   Dibuat modern dengan efek glassmorphism dan gaya dashboard profesional
+*/
+
+:root {
+  --primary: #3B7AC6;
+  --primary-dark: #2c5da4;
+  --accent: #0d6efd;
+  --text-dark: #1e293b;
+  --bg-soft: #f1f5f9;
+  --white: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --border-soft: rgba(0, 0, 0, 0.1);
+  --radius-lg: 16px;
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 🌤️ Struktur Utama */
 body {
-    background: linear-gradient(135deg, #eef2f7, #ffffff);
-    font-family: 'Poppins', sans-serif;
-    color: #2b2d42;
+  background: linear-gradient(135deg, #dceeff 0%, #eef6ff 100%);
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Kalender Container */
-#calendar {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    min-height: 650px;
-    transition: 0.3s ease;
-    border: 1px solid #e4e7ec;
+.calendar-page-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 25px;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-soft);
 }
 
-#calendar:hover {
-    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.1);
+/* 🔵 Filter dan Header */
+.filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 15px 20px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 25px;
+  gap: 10px;
 }
 
-/* Header Calendar */
-.fc-toolbar-title {
-    font-weight: 700;
-    color: #1d4ed8;
-    letter-spacing: 0.5px;
+.filter-section h4 {
+  color: var(--text-dark);
+  font-weight: 600;
 }
 
-.fc-button-primary {
-    background: linear-gradient(90deg, #1d4ed8, #3b82f6) !important;
-    border: none !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-    transition: all 0.2s ease-in-out;
+/* 🎯 Perbaikan Tampilan Dropdown Filter Angkatan */
+.filter-section label {
+  font-weight: 500;
+  color: #334155;
+  margin-right: 8px;
 }
 
-.fc-button-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+.filter-section select {
+  border-radius: 10px;
+  border: 1px solid #d0d7e2;
+  background: #ffffff;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%233B7AC6' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/ %3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  transition: all 0.25s ease;
 }
 
-/* Hari Ini */
-.fc-daygrid-day.fc-day-today {
-    background: #e0edff !important;
-    border-radius: 6px;
-    transition: 0.3s;
+.filter-section select:hover {
+  border-color: var(--primary);
 }
 
-.fc-daygrid-day.fc-day-today:hover {
-    background: #d6e4ff !important;
+.filter-section select:focus {
+  outline: none;
+  border-color: #3B7AC6;
+  box-shadow: 0 0 0 3px rgba(59, 122, 198, 0.2);
 }
 
-/* Hover per hari */
-.fc-day:hover {
-    background-color: #f5f8ff !important;
-    cursor: pointer;
-    transition: background 0.2s;
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-section select {
+    width: 100%;
+  }
 }
 
-/* KUSTOMISASI FULLCALENDAR */
-/* Header (bulan & tombol navigasi) */
-.fc-toolbar {
-    margin-bottom: 1.5rem !important;
+/* 📅 Kalender */
+.calendar-container {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
 }
 
-.fc-toolbar-title {
-    font-weight: 700;
-    font-size: 1.4rem;
-    color: #1d4ed8 !important;
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--bg-soft);
+  padding-bottom: 10px;
 }
 
-/* Header tombol prev, next, today */
-.fc .fc-button {
-    border-radius: 10px !important;
-    padding: 6px 14px !important;
-    font-weight: 500;
-    background: linear-gradient(90deg, #2563eb, #3b82f6) !important;
-    border: none !important;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
-    transition: 0.2s;
+.month-year {
+  color: var(--primary-dark);
+  font-weight: 700;
 }
 
-.fc .fc-button:hover {
-    transform: scale(1.05);
+.nav-btn {
+  border-radius: 50%;
+  border: none;
+  transition: all 0.2s ease;
 }
 
-/* Grid kalender (tiap kotak tanggal) */
-.fc-theme-standard td,
-.fc-theme-standard th {
-    border-color: #e5e7eb !important;
+.nav-btn:hover {
+  background-color: var(--primary);
+  color: var(--white);
+  transform: scale(1.1);
 }
 
-.fc-daygrid-day {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    position: relative;
+/* 🗓️ Mini Calendar */
+.mini-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 20px;
 }
 
-/* Tanggal (angka di pojok kanan atas) */
-.fc-daygrid-day-number {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #334155;
-    margin-right: 6px;
-    margin-top: 4px;
-    transition: color 0.2s;
+.day-header {
+  text-align: center;
+  font-weight: 600;
+  color: var(--primary-dark);
+  padding: 8px 0;
+  background: #eef4ff;
+  border-radius: 8px;
 }
 
-.fc-daygrid-day:hover .fc-daygrid-day-number {
-    color: #1d4ed8;
+.day-cell {
+  position: relative;
+  min-height: 80px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  border: 1px solid #e2e8f0;
+  text-align: right;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Warna background hari */
-.fc-daygrid-day-frame {
-    border-radius: 12px;
-    padding: 8px;
-    transition: all 0.3s ease;
+.day-cell:hover {
+  background: #dbeafe;
+  transform: scale(1.03);
+  box-shadow: 0 4px 8px rgba(59, 122, 198, 0.2);
 }
 
-.fc-daygrid-day:hover {
-    background-color: #f3f7ff !important;
-    transform: scale(1.02);
+.day-cell.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
 }
 
-/* Warna hari ini */
-.fc-day-today {
-    background: linear-gradient(120deg, #dbeafe, #eff6ff) !important;
-    border: 1px solid #3b82f6 !important;
+.date-number {
+  font-weight: 600;
+  color: var(--text-dark);
 }
 
-/* Weekend highlight */
-.fc-day-sat,
-.fc-day-sun {
-    background-color: #f9fafb;
+/* 🌟 Hari Ini */
+.day-cell.today {
+  border: 2px solid var(--primary);
+  background: linear-gradient(135deg, #f0faff, #dbeafe);
 }
 
-/* Event (mapel di kalender) */
-.fc-event {
-    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-    border: none !important;
-    color: #fff !important;
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 3px 6px;
-    border-radius: 8px !important;
-    transition: 0.3s ease;
+/* 🔔 Hari dengan Jadwal */
+.day-cell.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
 }
 
-.fc-event:hover {
-    background: linear-gradient(135deg, #1d4ed8, #3b82f6) !important;
-    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
-    transform: translateY(-1px);
+/* ✨ Tanggal Terpilih */
+.day-cell.selected {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(59, 122, 198, 0.4);
 }
 
-/* Animasi muncul event */
-.fc-event {
-    animation: fadeIn 0.4s ease;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+.day-cell.selected .date-number {
+  color: white;
 }
 
-/* Tooltip fullcalendar */
-.fc-popover {
-    border-radius: 10px !important;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15) !important;
-    border: none !important;
+/* 🗂️ Agenda (Daftar Jadwal) */
+.agenda-section {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+  margin-top: 25px;
 }
 
+.agenda-title {
+  font-weight: 600;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-/* Modal Styling */
+.agenda-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.agenda-item {
+  background: linear-gradient(135deg, #f8fbff, #e9f1ff);
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.agenda-item:hover {
+  background: linear-gradient(135deg, #e0f0ff, #cfe0ff);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(59, 122, 198, 0.2);
+}
+
+.agenda-empty {
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* 🪟 Modal */
 .modal-content {
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    animation: fadeInUp 0.3s ease;
+  border-radius: 14px !important;
+  overflow: hidden;
 }
 
 .modal-header {
-    background: linear-gradient(90deg, #1d4ed8, #3b82f6);
-    color: white;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+  padding: 15px 20px;
 }
 
-.modal-footer {
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
-    border-bottom-left-radius: 16px;
-    border-bottom-right-radius: 16px;
+.modal-header.bg-primary {
+  background: var(--primary) !important;
 }
 
-@keyframes fadeInUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.modal-header.bg-warning {
+  background: #ffe79a !important;
 }
 
-/* Daftar Jadwal (List) */
-.jadwal-list {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
+.modal-title {
+  font-weight: 600;
 }
 
-.jadwal-list li {
-    background: #f9fafb;
-    border-left: 5px solid #2563eb;
-    margin-bottom: 10px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    position: relative;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.25s ease-in-out;
+/* 🧾 Form */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  box-shadow: none;
+  transition: all 0.2s ease;
 }
 
-.jadwal-list li:hover {
-    transform: translateY(-2px);
-    background: #f1f5ff;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(59, 122, 198, 0.25);
 }
 
-.jadwal-list strong {
-    color: #1e40af;
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-.jadwal-list small {
-    color: #6b7280;
-}
-
-.jadwal-list .btn {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    font-size: 0.85rem;
-    border-radius: 8px;
-    transition: 0.2s;
-}
-
-.jadwal-list .btn-outline-primary:hover {
-    background: #2563eb;
-    color: white;
-}
-
-/* Animasi Hover */
+/* 🧠 Tombol */
 .btn {
-    transition: all 0.25s ease;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
+.btn-primary {
+  background: var(--primary);
+  border: none;
 }
 
-/* Tombol Tambahan */
-.btn-success {
-    background: linear-gradient(90deg, #16a34a, #22c55e);
-    border: none;
-    box-shadow: 0 3px 6px rgba(34, 197, 94, 0.25);
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
-.btn-outline-primary {
-    border-color: #2563eb;
-    color: #2563eb;
+.btn-outline-danger:hover {
+  color: white;
+  background: #dc3545;
 }
 
-.btn-outline-primary:hover {
-    background: #2563eb;
-    color: white;
+.btn-danger:hover {
+  transform: scale(1.02);
+}
+
+/* 🕊️ Responsif */
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .calendar-page-container {
+    padding: 15px;
+  }
+
+  .mini-calendar {
+    grid-template-columns: repeat(7, 1fr);
+    font-size: 0.85rem;
+  }
 }

@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('kata_sandi');
             $table->string('nomer_whatsapp')->nullable();
+            $table->string('foto_profil')->nullable();
             $table->timestamps();
 
             // foreign key relasi

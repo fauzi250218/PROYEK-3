@@ -19,6 +19,7 @@ class Murid extends Model
         'jenis_kelamin',
         'kata_sandi',
         'nomer_whatsapp',
+        'foto_profil',
     ];
 
     /**

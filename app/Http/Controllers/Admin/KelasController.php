@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Kelas;
 use App\Models\Murid;
 use App\Models\Guru;
+use App\Models\Jadwal;
 
 class KelasController extends Controller
 {
@@ -52,11 +53,7 @@ class KelasController extends Controller
             'deskripsi'  => $request->deskripsi,
         ]);
 
-        /**
-         * 🔹 Perbaikan inti:
-         * Pastikan relasi guru → kelas langsung sinkron,
-         * supaya di halaman Guru kolom "Kelas Binaan" langsung muncul.
-         */
+        // 🔹 Sinkronkan dengan guru jika dipilih
         if ($request->guru_id) {
             $guru = Guru::find($request->guru_id);
             if ($guru) {
@@ -100,14 +97,10 @@ class KelasController extends Controller
             'deskripsi'  => $request->deskripsi,
         ]);
 
-        /**
-         * 🔹 Perbaikan tambahan:
-         * Pastikan perubahan wali kelas ikut update di tabel Guru.
-         */
+        // 🔹 Perbarui wali kelas jika diubah
         if ($request->guru_id) {
             $guru = Guru::find($request->guru_id);
             if ($guru) {
-                // Hubungkan ulang relasi guru → kelas
                 $guru->kelas()->save($kelas);
             }
         }
@@ -129,13 +122,14 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Halaman Kelola Siswa di Dalam Kelas
+     * 🔹 Halaman Kelola Siswa & Jadwal Kelas
      */
     public function kelolaMurid($id)
     {
-        $kelas = Kelas::with(['murids', 'guru.user'])->findOrFail($id);
+        // Ambil kelas + relasi guru, murid, dan jadwal
+        $kelas = Kelas::with(['murids', 'guru.user', 'jadwals'])->findOrFail($id);
 
-        // Ambil murid yang belum punya kelas
+        // Murid yang belum punya kelas
         $muridBelumMasukKelas = Murid::whereNull('kelas_id')
             ->orderBy('nama')
             ->get()
@@ -143,9 +137,20 @@ class KelasController extends Controller
                 return substr($murid->nis, 0, 1);
             });
 
+        // Murid dalam kelas saat ini
         $muridDalamKelas = $kelas->murids;
 
-        return view('admin.kelas.kelola-murid', compact('kelas', 'muridBelumMasukKelas', 'muridDalamKelas'));
+        // 🔹 Ambil jadwal khusus kelas ini (bukan jadwal guru)
+        $jadwalKelas = $kelas->jadwals
+            ->sortBy(['hari', 'jam_mulai'])
+            ->values();
+
+        return view('admin.kelas.kelola-murid', compact(
+            'kelas',
+            'muridBelumMasukKelas',
+            'muridDalamKelas',
+            'jadwalKelas'
+        ));
     }
 
     /**

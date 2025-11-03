@@ -1,4 +1,4 @@
-// Efek masuk lembut tiap tile
+
 document.addEventListener('DOMContentLoaded', () => {
     const tiles = document.querySelectorAll('.kelas-tile');
 

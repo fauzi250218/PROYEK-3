@@ -33,32 +33,61 @@ class GuruDashboardController extends Controller
         // Hitung total nilai yang sudah diinput oleh guru
         $jumlahNilai = Nilai::where('guru_id', $guru->id)->count();
 
-        // Grafik jumlah laporan perkembangan per bulan (1–12)
-        $laporanPerBulan = Perkembangan::select(
-                DB::raw('MONTH(created_at) as bulan'),
-                DB::raw('COUNT(*) as total')
-            )
-            ->where('guru_id', $guru->id)
+        // ==============================
+        // 📊 Grafik Jumlah Laki-Laki & Perempuan per Bulan
+        // ==============================
+
+        // Pastikan hanya murid dari kelas binaan guru yang diambil
+        $muridQuery = $kelas ? Murid::where('kelas_id', $kelas->id) : Murid::query();
+
+        // Ambil data jumlah murid laki-laki dan perempuan per bulan (berdasarkan tanggal dibuat)
+        $muridLaki = $muridQuery->where('jenis_kelamin', 'L')
+            ->select(DB::raw('MONTH(created_at) as bulan'), DB::raw('COUNT(*) as total'))
             ->groupBy('bulan')
-            ->orderBy('bulan')
             ->pluck('total', 'bulan')
             ->toArray();
 
-        // Label bulan (Jan - Des)
+        $muridPerempuan = $muridQuery->where('jenis_kelamin', 'P')
+            ->select(DB::raw('MONTH(created_at) as bulan'), DB::raw('COUNT(*) as total'))
+            ->groupBy('bulan')
+            ->pluck('total', 'bulan')
+            ->toArray();
+
+        // ==============================
+        // 📈 Grafik Jumlah Nilai Diinput per Bulan
+        // ==============================
+        $nilaiPerBulan = Nilai::select(DB::raw('MONTH(created_at) as bulan'), DB::raw('COUNT(*) as total'))
+            ->where('guru_id', $guru->id)
+            ->groupBy('bulan')
+            ->pluck('total', 'bulan')
+            ->toArray();
+
+        // ==============================
+        // 🔖 Bentuk Label Bulan & Data per Bulan (Jan - Des)
+        // ==============================
         $labelsBulan = [];
-        $dataBulan = [];
+        $dataLaki = [];
+        $dataPerempuan = [];
+        $dataNilai = [];
+
         for ($i = 1; $i <= 12; $i++) {
-            $labelsBulan[] = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan dalam bahasa Inggris
-            $dataBulan[] = $laporanPerBulan[$i] ?? 0;           // Jika kosong isi 0
+            $labelsBulan[] = date('F', mktime(0, 0, 0, $i, 1)); // Nama bulan
+            $dataLaki[] = $muridLaki[$i] ?? 0;
+            $dataPerempuan[] = $muridPerempuan[$i] ?? 0;
+            $dataNilai[] = $nilaiPerBulan[$i] ?? 0;
         }
 
-        // Kirim semua data ke view
+        // ==============================
+        // 🚀 Kirim semua data ke view
+        // ==============================
         return view('guru.dashboard.index', [
             'jumlahMuridKelas' => $jumlahMuridKelas,
             'jumlahPerkembangan' => $jumlahPerkembangan,
             'jumlahNilai' => $jumlahNilai,
             'labelsBulan' => $labelsBulan,
-            'dataBulan' => $dataBulan,
+            'dataLaki' => $dataLaki,
+            'dataPerempuan' => $dataPerempuan,
+            'dataNilai' => $dataNilai,
         ]);
     }
 }

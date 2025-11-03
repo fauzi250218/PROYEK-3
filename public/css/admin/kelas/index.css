@@ -1,0 +1,111 @@
+/* ===================================================
+   HALAMAN DATA KELAS (ADMIN)
+   Tema: Soft Elegant Minimal
+   =================================================== */
+
+body {
+    background-color: #f7f9fb !important;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+}
+
+/* ======== Header ======== */
+.btn-main {
+    background-color: #5d87ff;
+    color: #fff;
+    border: none;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.btn-main:hover {
+    background-color: #496fde;
+    transform: translateY(-1px);
+}
+
+.alert-success {
+    background-color: #e9f9ee;
+    color: #256c3a;
+    border-left: 4px solid #28a745;
+    font-weight: 500;
+}
+
+/* ======== Card ======== */
+.kelas-card {
+    transition: all 0.3s ease;
+    border: 1px solid #eef1f5;
+}
+
+.kelas-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+/* ======== Ikon Kelas ======== */
+.kelas-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background-color: #eef3ff;
+    color: #5d87ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+}
+
+/* ======== Tombol ======== */
+.btn-outline-main {
+    border: 1px solid #5d87ff;
+    color: #5d87ff;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.btn-outline-main:hover {
+    background-color: #5d87ff;
+    color: #fff;
+}
+
+.btn-outline-warning {
+    border: 1px solid #ffb300;
+    color: #ffb300;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ffb300;
+    color: #fff;
+}
+
+.btn-outline-danger {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* ======== Font & Spacing ======== */
+.kelas-card h5 {
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+}
+
+.kelas-card p {
+    line-height: 1.5;
+}
+
+/* ======== Responsive ======== */
+@media (max-width: 992px) {
+    .kelas-card-body {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .kelas-card {
+        margin-bottom: 1rem;
+    }
+}
