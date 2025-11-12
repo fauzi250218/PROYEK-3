@@ -12,7 +12,7 @@
         <h2 class="title-page fw-bold mb-2">
             <i class="bi bi-mortarboard-fill text-success me-2"></i>Daftar Semua Kelas
         </h2>
-        <p class="subtitle">Kelola nilai dan perkembangan siswa dengan tampilan modern & interaktif.</p>
+        <p class="subtitle">Kelola nilai dan perkembangan siswa</p>
     </div>
 
     @if($kelasList->isEmpty())

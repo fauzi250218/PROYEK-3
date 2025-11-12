@@ -11,7 +11,8 @@
     <!-- Header -->
     <div class="header-section mb-4">
         <h2 class="fw-bold text-dark mb-1">Edit Nilai</h2>
-        <p class="text-muted">Perbarui data nilai untuk siswa: 
+        <p class="text-muted">
+            Perbarui data nilai untuk siswa: 
             <strong>{{ $nilai->murid->nama ?? 'Tidak Diketahui' }}</strong>
         </p>
     </div>
@@ -26,6 +27,7 @@
             <div class="mb-3">
                 <label class="form-label fw-semibold">Mata Pelajaran</label>
                 <select name="mata_pelajaran" class="form-select custom-input" required>
+                    <option value="">-- Pilih Mata Pelajaran --</option>
                     @foreach($mapelList as $mapel)
                         <option value="{{ $mapel }}" {{ $nilai->mata_pelajaran == $mapel ? 'selected' : '' }}>
                             {{ $mapel }}
@@ -34,34 +36,38 @@
                 </select>
             </div>
 
-            {{-- Jenis Nilai --}}
+            {{-- Nilai Tugas --}}
             <div class="mb-3">
-                <label class="form-label fw-semibold">Keterangan</label>
-                <select name="keterangan" class="form-select custom-input" required>
-                    <option value="tugas" {{ $nilai->tugas ? 'selected' : '' }}>Tugas</option>
-                    <option value="ulangan_harian" {{ $nilai->ulangan_harian ? 'selected' : '' }}>Ulangan Harian</option>
-                    <option value="uts" {{ $nilai->uts ? 'selected' : '' }}>UTS</option>
-                    <option value="uas" {{ $nilai->uas ? 'selected' : '' }}>UAS</option>
-                </select>
+                <label class="form-label fw-semibold">Nilai Tugas</label>
+                <input type="number" name="tugas" class="form-control custom-input" 
+                    value="{{ $nilai->tugas }}" min="0" max="100" required placeholder="Masukkan nilai tugas">
             </div>
 
-            {{-- Nilai --}}
+            {{-- Nilai Ulangan Harian --}}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Nilai Ulangan Harian</label>
+                <input type="number" name="ulangan_harian" class="form-control custom-input" 
+                    value="{{ $nilai->ulangan_harian }}" min="0" max="100" required placeholder="Masukkan nilai ulangan harian">
+            </div>
+
+            {{-- Nilai UTS --}}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Nilai UTS</label>
+                <input type="number" name="uts" class="form-control custom-input" 
+                    value="{{ $nilai->uts }}" min="0" max="100" required placeholder="Masukkan nilai UTS">
+            </div>
+
+            {{-- Nilai UAS --}}
             <div class="mb-4">
-                <label class="form-label fw-semibold">Nilai</label>
-                <input 
-                    type="number" 
-                    name="nilai" 
-                    class="form-control custom-input" 
-                    value="{{ $nilai->tugas ?? $nilai->ulangan_harian ?? $nilai->uts ?? $nilai->uas }}" 
-                    min="0" max="100" 
-                    required
-                    placeholder="Masukkan nilai (0 - 100)">
+                <label class="form-label fw-semibold">Nilai UAS</label>
+                <input type="number" name="uas" class="form-control custom-input" 
+                    value="{{ $nilai->uas }}" min="0" max="100" required placeholder="Masukkan nilai UAS">
             </div>
 
             {{-- Tombol --}}
             <div class="d-flex justify-content-start gap-3">
                 <button type="submit" class="btn btn-save">
-                    <i class="bi bi-arrow-repeat me-1"></i> Perbarui Nilai
+                    <i class="bi bi-check-circle me-1"></i> Perbarui Nilai
                 </button>
                 <a href="{{ route('guru.nilai.detail', $nilai->murid_id) }}" class="btn btn-cancel">
                     <i class="bi bi-arrow-left me-1"></i> Kembali

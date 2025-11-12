@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('nilai', function (Blueprint $table) {
             $table->id();
 
-            // ✅ Relasi ke murid (pastikan tabel 'murids' benar, bukan 'murid')
+            // ✅ Relasi ke murid
             $table->foreignId('murid_id')
                   ->constrained('murids')
                   ->onDelete('cascade');
 
-            // ✅ Relasi ke guru (pastikan tabelnya 'guru', bukan 'gurus')
+            // ✅ Relasi ke guru
             $table->foreignId('guru_id')
                   ->constrained('guru')
                   ->onDelete('cascade');
@@ -36,6 +36,9 @@ return new class extends Migration
             $table->integer('uts')->nullable();
             $table->integer('uas')->nullable();
 
+            // ✅ Kolom rata-rata
+            $table->float('rata_rata')->nullable();
+
             $table->timestamps();
         });
     }
@@ -45,7 +48,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Tidak perlu disable constraint, cukup dropIfExists
         Schema::dropIfExists('nilai');
     }
 };

@@ -37,4 +37,28 @@ class Murid extends Model
     {
         return $this->hasMany(Nilai::class, 'murid_id');
     }
+
+    /**
+     * ✅ Relasi ke data kehadiran
+     */
+    public function kehadiran()
+    {
+        return $this->hasMany(Kehadiran::class, 'murid_id');
+    }
+
+    /**
+     * ✅ Relasi ke catatan perkembangan murid
+     */
+    public function catatan()
+    {
+        return $this->hasMany(CatatanPerilaku::class, 'murid_id');
+    }
+
+    /**
+     * ✅ Relasi ke laporan (opsional)
+     */
+    public function laporan()
+    {
+        return $this->hasMany(Laporan::class, 'murid_id');
+    }
 }
