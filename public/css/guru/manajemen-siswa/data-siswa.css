@@ -1,108 +1,128 @@
-@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700&display=swap');
+/* =======================================================
+   STYLE PROFESIONAL - DATA SISWA GURU
+   ======================================================= */
 
-body {
-  font-family: 'Kumbh Sans', sans-serif;
-  background-color: #f7faf8;
-  color: #1b4d3e;
+/* Container utama */
+.container {
+    max-width: 1150px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Align heading sejajar dengan header layout */
-.align-with-header {
-  margin-left: 68px;
+/* Judul halaman */
+h3 {
+    font-weight: 700;
+    color: #1e293b;
+    border-left: 5px solid #16a34a;
+    padding-left: 12px;
+    letter-spacing: 0.3px;
 }
 
-@media (max-width: 991px) {
-  .align-with-header {
-    margin-left: 0;
+/* Card utama */
+.card {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: none;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Tabel gaya profesional */
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    margin-bottom: 0;
+}
+
+/* Header tabel */
+.table thead {
+    background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.table thead th {
+    padding: 14px 12px;
     text-align: center;
-  }
 }
 
-/* Header */
-.section-header h3 {
-  font-weight: 700;
-  color: #1b4d3e;
+/* Isi tabel */
+.table tbody td {
+    text-align: center;
+    padding: 12px 10px;
+    font-size: 15px;
+    color: #334155;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.section-header p {
-  color: #6c757d;
-  font-size: 0.95rem;
+/* Row dengan warna bergantian */
+.table tbody tr:nth-child(odd) {
+    background-color: #f8fafc;
 }
 
-/* Table Wrapper */
-.table-responsive {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
+.table tbody tr:nth-child(even) {
+    background-color: #ffffff;
 }
 
-/* Table Head */
-.table-header {
-  background: #28a745;
-  color: #fff;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.9rem;
+/* Efek hover tiap baris */
+.table tbody tr:hover {
+    background-color: #dcfce7 !important;
+    color: #14532d;
+    box-shadow: inset 0 0 0 9999px rgba(0, 128, 0, 0.05);
+    cursor: pointer;
 }
 
-.table-header th {
-  padding: 14px 10px;
-  white-space: nowrap;
+/* Border lembut antar baris */
+.table-bordered > :not(caption) > * {
+    border-width: 0 0 1px 0;
+    border-color: #e2e8f0;
 }
 
-/* Table Row */
-.table-row {
-  transition: all 0.25s ease;
-  border-bottom: 1px solid #e6f2eb;
+/* Alert saat kosong */
+.alert-warning {
+    background-color: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 10px;
+    color: #78350f;
+    font-weight: 500;
+    padding: 18px;
 }
 
-.table-row:hover {
-  background: #ecf7f0;
-  transform: scale(1.01);
+/* Animasi fade in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* Table Cell */
-.table td {
-  padding: 14px 10px;
-  vertical-align: middle;
-  color: #2c3e50;
-  font-size: 0.95rem;
-}
-
-/* Tombol Aksi */
-.btn-view {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #28a74510;
-  border: 1px solid #28a745;
-  color: #28a745;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: all 0.25s ease;
-}
-
-.btn-view:hover {
-  background: #28a745;
-  color: #fff;
-  box-shadow: 0 4px 8px rgba(40,167,69,0.3);
-  transform: translateY(-1px);
-}
-
-/* Responsif */
+/* Responsif mobile */
 @media (max-width: 768px) {
-  .table-header {
-    font-size: 0.8rem;
-  }
-  .table td {
-    font-size: 0.85rem;
-  }
-  .btn-view {
-    padding: 5px 10px;
-    font-size: 0.8rem;
-  }
+    h3 {
+        font-size: 1.2rem;
+        border-left-width: 3px;
+    }
+
+    .table thead {
+        font-size: 13px;
+    }
+
+    .table tbody td {
+        font-size: 13px;
+        padding: 8px;
+    }
 }

@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('nomer_whatsapp')->nullable();
             $table->string('mata_pelajaran')->nullable();
+            $table->string('foto_profil')->nullable();
             $table->timestamps();
 
             // Hubungkan user_id ke tabel users

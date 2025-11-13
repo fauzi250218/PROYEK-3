@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="{{ asset('css/guru/guru.css') }}">
   @yield('extra-css')
 </head>
-<body class="guru">
 
+<body class="guru">
 <div class="d-flex" id="app">
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
@@ -28,7 +28,7 @@
 
     <ul class="nav flex-column">
 
-      <!-- Beranda -->
+      <!-- Dashboard -->
       <li class="nav-item">
         <a class="nav-link main-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" 
            href="{{ route('guru.dashboard') }}">
@@ -50,13 +50,13 @@
         <div class="collapse {{ request()->routeIs('guru.kelas.*') ? 'show' : '' }} submenu" id="kelasMenu">
           <ul class="nav flex-column mt-1">
             <li class="nav-item">
-              <a class="nav-link {{ request()->routeIs('guru.kelas.binaan.index') ? 'active' : '' }}"
+              <a class="nav-link {{ request()->routeIs('guru.kelas.binaan.*') ? 'active' : '' }}"
                  href="{{ route('guru.kelas.binaan.index') }}">
                 <i class="bi bi-circle me-2"></i> Kelas Binaan
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{ request()->routeIs('guru.kelas.ajaran.index') ? 'active' : '' }}"
+              <a class="nav-link {{ request()->routeIs('guru.kelas.ajaran.*') ? 'active' : '' }}"
                  href="{{ route('guru.kelas.ajaran.index') }}">
                 <i class="bi bi-circle me-2"></i> Kelas Ajaran
               </a>
@@ -65,19 +65,27 @@
         </div>
       </li>
 
-      <!-- Pembayaran -->
+      <!-- ✅ Manajemen Nilai (DIPERBAIKI DI SINI) -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.pembayaran.*') ? 'active' : '' }}" 
-           href="{{ route('guru.pembayaran.index') }}">
-          <i class="bi bi-cash-stack me-2"></i> Pembayaran
+        <a class="nav-link main-link {{ request()->routeIs('guru.nilai.*') ? 'active' : '' }}"
+           href="{{ route('guru.nilai.semuaKelas') }}">
+          <i class="bi bi-journal-check me-2"></i> Manajemen Nilai
         </a>
       </li>
 
-      <!-- Perkembangan -->
+      <!-- Obrolan -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.perkembangan.*') ? 'active' : '' }}" 
-           href="{{ route('guru.perkembangan.index') }}">
-          <i class="bi bi-bar-chart-line me-2"></i> Perkembangan
+        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}" 
+           href="{{ route('guru.obrolan.index') }}">
+          <i class="bi bi-chat-dots-fill me-2"></i> Obrolan
+        </a>
+      </li>
+
+      <!-- Laporan -->
+      <li class="nav-item">
+        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}" 
+           href="{{ route('guru.obrolan.index') }}">
+          <i class="bi bi-file-earmark-text"></i> Laporan
         </a>
       </li>
     </ul>
@@ -87,7 +95,7 @@
   <div class="flex-grow-1 p-4">
     <div class="d-flex justify-content-between align-items-center mb-4 header-top">
       <div class="d-flex align-items-center">
-        <button class="btn btn-outline-primary me-3" id="sidebarToggle">
+        <button class="sidebar-toggle-btn me-3" id="sidebarToggle" aria-label="Toggle sidebar">
           <i class="bi bi-list"></i>
         </button>
         <div>
@@ -103,34 +111,19 @@
       </div>
     </div>
 
+    <!-- Page Content -->
     @yield('content')
   </div>
 </div>
 
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- caret animasi dan hover fix -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const links = document.querySelectorAll('.main-link');
-    links.forEach(link => {
-      link.addEventListener('click', () => {
-        links.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-      });
-    });
+<!-- Sidebar JS -->
+<script src="{{ asset('js/guru/sidebar.js') }}"></script>
 
-    // caret rotation animation
-    const collapseEl = document.getElementById('kelasMenu');
-    const caretIcon = document.querySelector('.caret-icon');
-    collapseEl.addEventListener('show.bs.collapse', () => {
-      caretIcon.style.transform = 'rotate(180deg)';
-    });
-    collapseEl.addEventListener('hide.bs.collapse', () => {
-      caretIcon.style.transform = 'rotate(0deg)';
-    });
-  });
-</script>
+<!-- Extra JS per halaman -->
+@yield('extra-js')
 
 </body>
 </html>

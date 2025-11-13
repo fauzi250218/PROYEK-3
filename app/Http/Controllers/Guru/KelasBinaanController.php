@@ -4,96 +4,79 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\Guru;
+use App\Models\Murid;
 use Illuminate\Support\Facades\Auth;
 
 class KelasBinaanController extends Controller
 {
-    /**
-     * 🔹 Tampilkan semua kelas yang dibina oleh guru yang sedang login.
-     */
     public function index()
     {
-        // Ambil ID user (guru) yang sedang login
-        $userId = Auth::id();
+        $guru = Guru::where('user_id', Auth::id())->first();
 
-        // Ambil semua kelas di mana user_id = id guru login
-        $kelasBinaan = Kelas::with('murids', 'wali')
-            ->where('user_id', $userId)
-            ->get();
-
-        // Jika tidak ada kelas binaan
-        if ($kelasBinaan->isEmpty()) {
+        if (!$guru) {
             return view('guru.manajemen-kelas.kelas-binaan.index', [
-                'kelasBinaan' => collect(), // biar tidak error di view
-                'error' => 'Anda belum memiliki kelas binaan atau data belum diatur oleh admin.'
+                'kelasBinaan' => collect(),
+                'error' => 'Data guru tidak ditemukan atau belum diatur oleh admin.'
             ]);
         }
+
+        $kelasBinaan = Kelas::with(['murids', 'guru.user'])
+            ->where('guru_id', $guru->id)
+            ->get();
 
         return view('guru.manajemen-kelas.kelas-binaan.index', compact('kelasBinaan'));
     }
 
-    /**
-     * 🔹 Menampilkan daftar siswa dalam kelas binaan.
-     */
     public function dataSiswa($id)
     {
-        $kelas = $this->getKelasBinaan($id);
+        $guru = Guru::where('user_id', Auth::id())->first();
 
-        // Muat juga relasi murid dan wali agar tampil di view
-        $kelas->load(['murids', 'wali']);
+        if (!$guru) {
+            abort(403, 'Akses ditolak: guru tidak ditemukan.');
+        }
+
+        $kelas = Kelas::with(['murids', 'guru.user'])
+            ->where('guru_id', $guru->id)
+            ->where('id', $id)
+            ->firstOrFail();
 
         return view('guru.manajemen-kelas.kelas-binaan.data_siswa', compact('kelas'));
     }
 
-    /**
-     * 🔹 Menampilkan halaman perkembangan siswa di kelas binaan.
-     */
+    // ✅ Menampilkan perkembangan belajar siswa
     public function perkembangan($id)
     {
-        $kelas = $this->getKelasBinaan($id);
+        $guru = Guru::where('user_id', Auth::id())->first();
+        $kelas = Kelas::with(['murids.nilai'])->where('id', $id)->where('guru_id', $guru->id)->firstOrFail();
+
         return view('guru.manajemen-kelas.kelas-binaan.perkembangan', compact('kelas'));
     }
 
-    /**
-     * 🔹 Menampilkan halaman rekap kehadiran siswa.
-     */
+    // ✅ Menampilkan data kehadiran siswa
     public function kehadiran($id)
     {
-        $kelas = $this->getKelasBinaan($id);
+        $guru = Guru::where('user_id', Auth::id())->first();
+        $kelas = Kelas::with(['murids.kehadiran'])->where('id', $id)->where('guru_id', $guru->id)->firstOrFail();
+
         return view('guru.manajemen-kelas.kelas-binaan.kehadiran', compact('kelas'));
     }
 
-    /**
-     * 🔹 Menampilkan catatan perilaku siswa.
-     */
+    // ✅ Menampilkan catatan guru untuk siswa
     public function catatan($id)
     {
-        $kelas = $this->getKelasBinaan($id);
+        $guru = Guru::where('user_id', Auth::id())->first();
+        $kelas = Kelas::with(['murids.catatan'])->where('id', $id)->where('guru_id', $guru->id)->firstOrFail();
+
         return view('guru.manajemen-kelas.kelas-binaan.catatan', compact('kelas'));
     }
 
-    /**
-     * 🔹 Menampilkan laporan akhir kelas.
-     */
+    // ✅ Menampilkan laporan keseluruhan
     public function laporan($id)
     {
-        $kelas = $this->getKelasBinaan($id);
+        $guru = Guru::where('user_id', Auth::id())->first();
+        $kelas = Kelas::with(['murids.nilai', 'murids.kehadiran'])->where('id', $id)->where('guru_id', $guru->id)->firstOrFail();
+
         return view('guru.manajemen-kelas.kelas-binaan.laporan', compact('kelas'));
-    }
-
-    /**
-     * 🧩 Helper
-     * Pastikan kelas yang diakses memang milik guru yang sedang login.
-     * Kalau tidak, akan lempar error 403.
-     */
-    private function getKelasBinaan($id)
-    {
-        $kelas = Kelas::with('murids')->findOrFail($id);
-
-        if ($kelas->user_id !== Auth::id()) {
-            abort(403, 'Anda tidak memiliki akses ke kelas ini.');
-        }
-
-        return $kelas;
     }
 }

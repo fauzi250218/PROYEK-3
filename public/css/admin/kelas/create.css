@@ -1,0 +1,125 @@
+/* =========================================
+   FORM TAMBAH KELAS (FULL WIDTH)
+   DESAIN: PROFESIONAL MODERN BIRU
+   ========================================= */
+
+body {
+    background-color: #f7f9fb !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ======== LAYOUT ======== */
+.kelas-create-page {
+    width: 100%;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.06);
+    border: 1px solid #eef1f5;
+    transition: all 0.3s ease;
+    animation: fadeInSoft 0.6s ease-in-out;
+}
+
+.form-wrapper:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ======== HEADER ======== */
+.icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    background-color: #eef3ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-box i {
+    color: #5d87ff;
+}
+
+h3 {
+    font-size: 1.7rem;
+}
+
+/* ======== LABEL ======== */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* ======== INPUT ======== */
+.form-control,
+.form-select,
+textarea {
+    border-radius: 10px !important;
+    border: 1px solid #dbe1e7;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+    border-color: #5d87ff;
+    box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.15);
+}
+
+/* ======== BUTTON ======== */
+.btn-primary-blue {
+    background-color: #5d87ff !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-blue:hover {
+    background-color: #466de2 !important;
+    transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+    border: 1px solid #d1d5db;
+    color: #555;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f3f4f6;
+    color: #333;
+}
+
+/* ======== ANIMASI ======== */
+@keyframes fadeInSoft {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 992px) {
+    .form-wrapper {
+        padding: 2rem;
+        border-radius: 12px;
+    }
+
+    h3 {
+        font-size: 1.4rem;
+    }
+}

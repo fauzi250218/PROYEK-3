@@ -2,84 +2,118 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
-use App\Http\Controllers\Guru\DashboardController as GuruDashboard;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\MuridController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\JadwalController;
+use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\Guru\KelasBinaanController;
 use App\Http\Controllers\Guru\KelasAjaranController;
-use App\Http\Controllers\Guru\NilaiController as GuruNilai;
-use App\Http\Controllers\Guru\PembayaranController as GuruPembayaran;
-use App\Http\Controllers\Guru\PerkembanganController as GuruPerkembangan;
+use App\Http\Controllers\Guru\NilaiController;
+use App\Http\Controllers\Guru\PembayaranController;
+use App\Http\Controllers\Guru\PerkembanganController;
+use App\Http\Controllers\Guru\ObrolanController;
 
-// 🔹 Route utama diarahkan ke login
+// ==================================================
+// ================ ROUTE UTAMA =====================
+// ==================================================
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// 🔹 Login & Logout
+// ==================================================
+// ================ AUTH ROUTE ======================
+// ==================================================
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// 🔹 ADMIN ROUTES
+// ==================================================
+// ================= ADMIN AREA =====================
+// ==================================================
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
-        // Redirect /admin → /admin/dashboard
-        Route::get('/', function () {
-            return redirect()->route('admin.dashboard');
-        });
+        // Dashboard
+        Route::get('/', fn() => redirect()->route('admin.dashboard'));
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // Dashboard Admin
-        Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
-
-        // CRUD Guru
+        // CRUD Data Guru, Murid, dan Kelas
         Route::resource('guru', GuruController::class);
-
-        // CRUD Murid
         Route::resource('murid', MuridController::class);
-
-        // CRUD Kelas
         Route::resource('kelas', KelasController::class);
 
-        // Kelola Murid di Kelas
+        // Kelola murid dalam kelas
         Route::get('kelas/{id}/kelola-murid', [KelasController::class, 'kelolaMurid'])
-            ->name('kelas.kelolaMurid');
+            ->whereNumber('id')->name('kelas.kelolaMurid');
         Route::post('kelas/{id}/tambah-murid', [KelasController::class, 'tambahMurid'])
-            ->name('kelas.tambahMurid');
+            ->whereNumber('id')->name('kelas.tambahMurid');
         Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}', [KelasController::class, 'hapusMurid'])
-            ->name('kelas.hapusMurid');
+            ->whereNumber('kelas_id')->whereNumber('murid_id')->name('kelas.hapusMurid');
 
-        // Tambahan Route untuk Jadwal Pelajaran (FullCalendar)
-        Route::resource('jadwal', JadwalController::class)->except(['show']);
-        Route::get('jadwal/get', [JadwalController::class, 'getJadwal'])->name('jadwal.get'); // untuk API ke kalender
-        // API tambahan untuk ambil jadwal berdasarkan tanggal
-        Route::get('jadwal/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])->name('jadwal.hari');
+
+        // ==================================================
+        // ================== JADWAL ========================
+        // ==================================================
+        Route::prefix('jadwal')->name('jadwal.')->group(function () {
+
+            // halaman utama kalender
+            Route::get('/', [JadwalController::class, 'index'])->name('index');
+
+            // ambil seluruh jadwal (mendukung filter angkatan ?angkatan=7)
+            Route::get('/get', [JadwalController::class, 'getJadwal'])->name('get');
+
+            // ambil jadwal berdasarkan tanggal
+            Route::get('/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])
+                ->name('hari');
+
+            // tambah jadwal
+            Route::post('/', [JadwalController::class, 'store'])->name('store');
+
+            // update jadwal
+            Route::put('/{id}', [JadwalController::class, 'update'])
+                ->whereNumber('id')
+                ->name('update');
+
+            // hapus 1 jadwal
+            Route::delete('/{id}', [JadwalController::class, 'destroy'])
+                ->whereNumber('id')
+                ->name('destroy');
+
+            // hapus semua jadwal 1 mapel per semester
+            Route::delete('/hapus-semester/{mata_pelajaran}', [JadwalController::class, 'deleteSemester'])
+                ->name('deleteSemester');
+
+            // DETAIL jadwal (dipindah agar tidak nabrak GET/HARI)
+            Route::get('/detail/{id}', [JadwalController::class, 'show'])
+                ->whereNumber('id')
+                ->name('show');
+        });
     });
 
+
+// ==================================================
+// ================== GURU AREA ======================
+// ==================================================
 Route::prefix('guru')
     ->name('guru.')
     ->middleware(['auth', 'role:guru'])
     ->group(function () {
 
         // Dashboard Guru
-        Route::get('/dashboard', [\App\Http\Controllers\Guru\DashboardController::class, 'index'])
-            ->name('dashboard');
+        Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
 
-        // 🔹 MANAJEMEN KELAS
+        // =======================
+        // MANAJEMEN KELAS
+        // =======================
         Route::prefix('kelas')->name('kelas.')->group(function () {
 
-            // 🔹 KELAS BINAAN
+            // ---------- KELAS BINAAN ----------
             Route::prefix('binaan')->name('binaan.')->group(function () {
-                Route::get('/', [KelasBinaanController::class, 'index'])
-                    ->name('index');
-
-                // Semua route berdasarkan ID kelas
+                Route::get('/', [KelasBinaanController::class, 'index'])->name('index');
                 Route::get('/{id}/data-siswa', [KelasBinaanController::class, 'dataSiswa'])
                     ->whereNumber('id')->name('dataSiswa');
                 Route::get('/{id}/perkembangan', [KelasBinaanController::class, 'perkembangan'])
@@ -92,18 +126,33 @@ Route::prefix('guru')
                     ->whereNumber('id')->name('laporan');
             });
 
-            // 🔹 KELAS AJARAN
-            Route::prefix('ajaran')->name('ajaran.')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Guru\KelasAjaranController::class, 'index'])
-                    ->name('index');
-            });
+            // ---------- KELAS AJARAN ----------
+            Route::get('/ajaran', [KelasAjaranController::class, 'index'])->name('ajaran.index');
         });
 
-        // 🔹 MENU TAMBAHAN
-        Route::get('/nilai', [\App\Http\Controllers\Guru\NilaiController::class, 'index'])
-            ->name('nilai.index');
-        Route::get('/pembayaran', [\App\Http\Controllers\Guru\PembayaranController::class, 'index'])
-            ->name('pembayaran.index');
-        Route::get('/perkembangan', [\App\Http\Controllers\Guru\PerkembanganController::class, 'index'])
-            ->name('perkembangan.index');
+
+        // =======================
+        // MANAJEMEN NILAI
+        // =======================
+        Route::get('/nilai', fn() => redirect()->route('guru.nilai.semuaKelas'));
+
+        Route::prefix('nilai')->name('nilai.')->group(function () {
+            Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
+            Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index');
+            Route::get('/kelas/{kelasId}/mapel/{mapel}', [NilaiController::class, 'muridPerMapel'])->name('mapel.murid');
+
+            Route::get('/murid/{id}', [NilaiController::class, 'detail'])->name('detail');
+            Route::get('/murid/{id}/create', [NilaiController::class, 'create'])->name('create');
+            Route::post('/murid/{id}', [NilaiController::class, 'store'])->name('store');
+            Route::get('/edit/{id}', [NilaiController::class, 'edit'])->name('edit');
+            Route::put('/update/{id}', [NilaiController::class, 'update'])->name('update');
+            Route::delete('/hapus/{id}', [NilaiController::class, 'destroy'])->name('destroy');
+        });
+
+        // =======================
+        // MENU TAMBAHAN GURU
+        // =======================
+        Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
+        Route::get('/perkembangan', [PerkembanganController::class, 'index'])->name('perkembangan.index');
+        Route::get('/obrolan', [ObrolanController::class, 'index'])->name('obrolan.index');
     });

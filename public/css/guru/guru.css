@@ -1,138 +1,211 @@
+/* =======================================================
+   LAYOUT GURU - HOVER EFFECT UNIFORM VERSION
+   ======================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700&display=swap');
+
 :root {
   --guru-sidebar-w: 250px;
   --guru-sidebar-bg: #1b4d3e;
   --guru-sidebar-active: #28a745;
   --guru-sidebar-hover: #218838;
-  --guru-hover-light: #d0e7ff;
+  --guru-hover-light: #f0f5f0;
   --guru-content-bg: #f4f9f4;
   --guru-text-light: #e5eaf0;
 }
 
-/* Global */
+/* =======================================================
+   GLOBAL
+   ======================================================= */
 body.guru {
   background: var(--guru-content-bg);
   font-family: 'Kumbh Sans', sans-serif;
   color: #2c3e50;
 }
 
-/* Sidebar */
+/* =======================================================
+   SIDEBAR
+   ======================================================= */
 .guru .sidebar {
   background: var(--guru-sidebar-bg);
   width: var(--guru-sidebar-w);
   height: 100vh;
   position: fixed;
-  top: 0; left: 0;
-  padding: 20px 15px;
+  top: 0;
+  left: 0;
+  padding: 20px 14px;
   overflow-y: auto;
   color: var(--guru-text-light);
-  box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
 }
 
-/* Logo */
-.guru .logo-wrapper { text-align:center; margin-bottom:25px; }
+/* LOGO AREA */
+.guru .logo-wrapper {
+  text-align: center;
+  margin-bottom: 25px;
+}
 .guru .logo-circle {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  overflow:hidden;
+  overflow: hidden;
   margin: 0 auto 12px;
   border: 3px solid #fff;
-  padding: 3px;
-  background:#fff;
-  box-shadow: 0 0 8px rgba(0,0,0,0.15);
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 .guru .logo-title {
   color: var(--guru-text-light);
-  text-align:center;
-  margin: 5px 0 15px;
+  text-align: center;
+  margin: 5px 0 10px;
   font-weight: 600;
 }
+.sidebar-divider {
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
-/* ===================== */
-/*      MENU UTAMA       */
-/* ===================== */
+/* =======================================================
+   MENU UTAMA
+   ======================================================= */
+.guru .sidebar .nav > .nav-item {
+  margin-bottom: 6px;
+  position: relative;
+}
+
 .guru .sidebar .nav-link.main-link {
   color: var(--guru-text-light);
   border-radius: 6px;
-  padding: 10px 16px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
-  transition: background 0.25s ease, color 0.25s ease;
-  white-space: nowrap;
-}
-.guru .sidebar .nav-link.main-link i {
-  font-size: 1.1rem;
-  margin-right: 8px;
-}
-.guru .sidebar .nav-link.main-link:hover {
-  background: var(--guru-sidebar-hover);
-  color: #fff;
-}
-.guru .sidebar .nav-link.main-link.active {
-  background: var(--guru-sidebar-active);
-  color: #fff;
-  box-shadow: inset 2px 0 0 #fff;
+  gap: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* caret animasi */
+.guru .sidebar .nav-link.main-link i {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+/* 🌿 Hover efek sama seperti submenu */
+.guru .sidebar .nav-link.main-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.guru .sidebar .nav-link.main-link:hover::before {
+  width: 100%;
+}
+
+.guru .sidebar .nav-link.main-link:hover {
+  color: #fff;
+  transform: translateX(3px);
+}
+
+/* Aktif */
+.guru .sidebar .nav-link.main-link.active {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #fff;
+  transform: none;
+}
+
+/* caret icon */
 .caret-icon {
+  margin-left: auto;
+  font-size: 0.75rem;
   transition: transform 0.3s ease;
 }
-.collapse.show + .caret-icon,
 .guru .sidebar .nav-link[aria-expanded="true"] .caret-icon {
   transform: rotate(180deg);
 }
 
-/* ===================== */
-/*      SUBMENU AREA     */
-/* ===================== */
+/* =======================================================
+   SUBMENU
+   ======================================================= */
 .guru .submenu {
-  margin-left: 0;
+  margin-top: 3px;
+  padding-left: 10px;
 }
+
 .guru .submenu .nav-link {
-  padding: 8px 16px;
+  color: #e0e0e0;
+  font-size: 0.92rem;
+  padding: 8px 14px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  font-size: 0.95rem;
   gap: 8px;
-  color: #e0e0e0;
-  border-radius: 6px;
+  margin-bottom: 3px;
+  position: relative;
   transition: all 0.25s ease;
 }
+
 .guru .submenu .nav-link i {
-  font-size: 0.55rem;
+  font-size: 0.6rem;
+  width: 12px;
+  text-align: center;
 }
+
+/* 🌿 Hover */
+.guru .submenu .nav-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.guru .submenu .nav-link:hover::before {
+  width: 100%;
+}
+
 .guru .submenu .nav-link:hover {
-  background: var(--guru-hover-light);
-  color: #000;
+  color: #fff;
+  transform: translateX(3px);
 }
+
+/* 🌟 Submenu Aktif */
 .guru .submenu .nav-link.active {
-  background: var(--guru-hover-light);
+  background: #fff;
   color: #000;
   font-weight: 600;
+  transform: none;
+  box-shadow: inset 3px 0 0 var(--guru-sidebar-active);
 }
 
-/* Menandai parent menu aktif saat submenu terbuka */
-.guru .sidebar .nav-link.active-parent {
-  background: var(--guru-sidebar-active);
-  color: #fff !important;
+/* Saat parent collapse terbuka */
+.guru .sidebar .nav-item:has(.collapse.show) > .main-link {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
 }
 
-/* Animasi transisi halus */
-.guru .sidebar .nav-link.main-link,
-.guru .submenu .nav-link {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* ===================== */
-/*       HEADER TOP      */
-/* ===================== */
+/* =======================================================
+   HEADER TOP
+   ======================================================= */
 .guru .header-top {
   background: #fff;
   border-radius: 8px;
   padding: 15px 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 .guru .header-top h4 {
   font-weight: 700;
@@ -142,9 +215,9 @@ body.guru {
   color: #6c757d;
 }
 
-/* ===================== */
-/*      BUTTON STYLE     */
-/* ===================== */
+/* =======================================================
+   BUTTON
+   ======================================================= */
 .guru .btn {
   border-radius: 8px;
   font-weight: 500;
@@ -152,22 +225,12 @@ body.guru {
 }
 .guru .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Notifikasi */
-.guru .btn-outline-secondary {
-  border: none;
-  color: #495057;
-}
-.guru .btn-outline-secondary:hover {
-  background: #f0f2f6;
-  color: var(--guru-sidebar-bg);
-}
-
-/* ===================== */
-/*       KONTEN AREA     */
-/* ===================== */
+/* =======================================================
+   KONTEN AREA
+   ======================================================= */
 .guru .flex-grow-1 {
   margin-left: var(--guru-sidebar-w);
   transition: margin-left 0.3s ease;
@@ -176,24 +239,38 @@ body.guru {
   padding: 20px;
 }
 
-/* Overlay */
-.guru .overlay { display:none; }
-.guru .overlay.show {
-  display:block;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  z-index:1040;
+/* =======================================================
+   SIDEBAR TOGGLER
+   ======================================================= */
+.sidebar-toggle-btn {
+  background-color: var(--guru-sidebar-bg);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.sidebar-toggle-btn:hover {
+  background-color: var(--guru-sidebar-active);
+  transform: scale(1.05);
 }
 
-/* ===================== */
-/*       RESPONSIF       */
-/* ===================== */
+/* =======================================================
+   RESPONSIVE
+   ======================================================= */
 @media (max-width: 991px) {
   .guru .sidebar {
     position: fixed;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    z-index: 1050;
   }
   .guru .sidebar.open {
     transform: translateX(0);

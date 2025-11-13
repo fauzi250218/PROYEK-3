@@ -9,16 +9,17 @@ return new class extends Migration {
     {
         Schema::create('murids', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('kelas_id')->nullable(); // ✅ relasi ke kelas
+            $table->unsignedBigInteger('kelas_id')->nullable(); 
             $table->string('nis')->unique();
             $table->string('nama');
             $table->string('email')->unique();
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('kata_sandi');
             $table->string('nomer_whatsapp')->nullable();
+            $table->string('foto_profil')->nullable();
             $table->timestamps();
 
-            // ✅ foreign key relasi
+            // foreign key relasi
             $table->foreign('kelas_id')
                   ->references('id')
                   ->on('kelas')

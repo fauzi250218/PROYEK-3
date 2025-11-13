@@ -10,8 +10,6 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    public $timestamps = true;
-
     protected $fillable = [
         'name',
         'email',
@@ -32,25 +30,34 @@ class User extends Authenticatable
         ];
     }
 
-    /** 🔹 Relasi: satu user (guru) punya satu kelas binaan */
-    public function kelas()
-    {
-        return $this->hasOne(Kelas::class, 'user_id');
-    }
-
-    /** 🔹 Relasi: satu user juga punya detail guru */
+    /**
+     * Relasi ke model Guru (1 user = 1 guru)
+     */
     public function guru()
     {
-        return $this->hasOne(Guru::class, 'user_id');
+        return $this->hasOne(\App\Models\Guru::class, 'user_id');
     }
 
-    /** 🔹 Helper: cek role user */
-    public function isGuru()
+    /**
+     * Relasi ke model Kelas (1 guru = 1 kelas binaan)
+     */
+    public function kelas()
+    {
+        return $this->hasOne(\App\Models\Kelas::class, 'guru_id');
+    }
+
+    /**
+     * Cek apakah user adalah guru
+     */
+    public function isGuru(): bool
     {
         return $this->role === 'guru';
     }
 
-    public function isAdmin()
+    /**
+     * Cek apakah user adalah admin
+     */
+    public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }

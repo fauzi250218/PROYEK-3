@@ -6,31 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Jalankan perubahan tabel.
-     */
     public function up(): void
     {
         Schema::table('kelas', function (Blueprint $table) {
-            // Tambahkan kolom user_id agar relasi ke guru bisa dilakukan
-            $table->unsignedBigInteger('user_id')->nullable()->after('id');
+            // Tambahkan kolom guru_id agar relasi ke tabel guru
+            $table->unsignedBigInteger('guru_id')->nullable()->after('id');
 
-            // Jadikan foreign key ke tabel users
-            $table->foreign('user_id')
+            // Foreign key ke tabel guru
+            $table->foreign('guru_id')
                   ->references('id')
-                  ->on('users')
+                  ->on('guru')
                   ->onDelete('cascade');
         });
     }
 
-    /**
-     * Kembalikan perubahan jika rollback.
-     */
     public function down(): void
     {
         Schema::table('kelas', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+            $table->dropForeign(['guru_id']);
+            $table->dropColumn('guru_id');
         });
     }
 };

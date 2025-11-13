@@ -1,161 +1,214 @@
+/* =======================================================
+   ADMIN LAYOUT - WARNA BIRU ADMIN LAMA + HOVER SEPERTI GURU
+   ======================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;500;600;700&display=swap');
+
 :root {
-  --sidebar-w: 220px;
-  --sidebar-collapsed-w: 70px;
-  --sidebar-bg: #152259;
-  --sidebar-active: #509CDB;
-  --sidebar-hover: #3B7AC6;
-  --content-bg: #f8f9fc;
-  --text-light: #e5eaf0;
+  --admin-sidebar-w: 220px;
+  --admin-sidebar-bg: #152259;
+  --admin-sidebar-gradient: linear-gradient(180deg, #152259, #1a2d5c);
+  --admin-sidebar-active: #509CDB;
+  --admin-sidebar-hover: #3B7AC6;
+  --admin-content-bg: #f8f9fc;
+  --admin-text-light: #e5eaf0;
 }
 
-/* Global */
-body {
-  background: var(--content-bg);
+/* =======================================================
+   GLOBAL
+   ======================================================= */
+body.admin {
+  background: var(--admin-content-bg);
   font-family: 'Kumbh Sans', sans-serif;
   color: #2c3e50;
 }
 
-/* Sidebar */
-.sidebar {
-  background: linear-gradient(180deg, #152259, #1a2d5c);
-  width: var(--sidebar-w);
+/* =======================================================
+   SIDEBAR
+   ======================================================= */
+.admin .sidebar {
+  background: var(--admin-sidebar-gradient);
+  width: var(--admin-sidebar-w);
   height: 100vh;
   position: fixed;
-  top: 0; left: 0;
-  transition: width .25s ease, transform .25s ease;
-  padding: 20px 15px;
-  z-index: 1050;
+  top: 0;
+  left: 0;
+  padding: 20px 14px;
   overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+  color: var(--admin-text-light);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 1050;
 }
 
-/* Init state */
-.sidebar-init-collapsed .sidebar { width: var(--sidebar-collapsed-w); }
-.sidebar-init-collapsed .sidebar .link-text,
-.sidebar-init-collapsed .sidebar .logo-title { display:none; }
-.sidebar-init-collapsed .sidebar .nav-link { justify-content: center; }
-.sidebar-init-collapsed .sidebar .logo-circle { width: 45px; height: 45px; }
-
-/* Mobile init */
-.sidebar-init-open .sidebar { transform: translateX(0); }
-.sidebar-init-open .overlay { display: block; }
-
-/* Collapse (desktop) */
-.sidebar.collapsed { width: var(--sidebar-collapsed-w); }
-.sidebar.collapsed .link-text, 
-.sidebar.collapsed .logo-title { display: none; }
-.sidebar.collapsed .nav-link { justify-content: center; }
-.sidebar.collapsed .logo-circle { width: 45px; height: 45px; }
-
-/* Shift content */
-.flex-grow-1 {
-  margin-left: var(--sidebar-w);
-  transition: margin-left .25s ease, background .3s ease;
-  background: var(--content-bg);
-  min-height: 100vh;
-  padding: 20px;
+/* LOGO AREA */
+.admin .logo-wrapper {
+  text-align: center;
+  margin-bottom: 25px;
 }
-.sidebar.collapsed ~ .flex-grow-1,
-.sidebar-init-collapsed .flex-grow-1 { margin-left: var(--sidebar-collapsed-w); }
-
-/* Logo */
-.logo-wrapper { text-align:center; margin-bottom:25px; }
-.logo-circle {
+.admin .logo-circle {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  overflow:hidden;
+  overflow: hidden;
   margin: 0 auto 12px;
   border: 3px solid #fff;
-  padding: 3px;
-  background:#fff;
-  box-shadow: 0 0 8px rgba(0,0,0,0.15);
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
-.logo-circle img { width:100%; height:100%; object-fit:cover; }
-.logo-title {
-  color: var(--text-light);
-  text-align:center;
-  margin: 5px 0 15px;
+.admin .logo-title {
+  color: var(--admin-text-light);
+  text-align: center;
   font-weight: 600;
-  letter-spacing: 0.5px;
+}
+.sidebar-divider {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Menu */
-.sidebar .nav-link {
-  color: var(--text-light);
-  border-radius: 8px;
-  padding: 10px;
-  display:flex;
-  align-items:center;
-  margin-bottom: 8px;
-  transition: background .2s ease, transform .15s ease;
+/* =======================================================
+   MENU UTAMA
+   ======================================================= */
+.admin .sidebar .nav-item {
+  margin-bottom: 6px;
+  position: relative;
 }
-.sidebar .nav-link i {
+
+.admin .sidebar .nav-link.main-link {
+  color: var(--admin-text-light);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ICON */
+.admin .sidebar .nav-link.main-link i {
   font-size: 1.1rem;
-}
-.sidebar .nav-link:hover {
-  background: var(--sidebar-hover);
-  transform: translateX(4px);
-}
-.sidebar .nav-link.active {
-  background: var(--sidebar-active);
-  font-weight: 600;
-  box-shadow: inset 2px 0 0 #fff;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
 }
 
-/* Header */
-.header-top {
-  padding: 15px 0;
-  border-bottom: 1px solid #ddd;
+/* 🌊 Hover Efek ala Guru */
+.admin .sidebar .nav-link.main-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.admin .sidebar .nav-link.main-link:hover::before {
+  width: 100%;
+}
+
+.admin .sidebar .nav-link.main-link:hover {
+  color: #fff;
+  transform: translateX(3px);
+}
+
+/* Aktif (tetap biru solid khas admin) */
+.admin .sidebar .nav-link.main-link.active {
+  background: var(--admin-sidebar-active);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #fff;
+  transform: none;
+}
+
+/* =======================================================
+   HEADER TOP
+   ======================================================= */
+.admin .header-top {
   background: #fff;
   border-radius: 8px;
-  padding-left: 20px;
-  padding-right: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  padding: 15px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
-.header-top h4 {
+.admin .header-top h4 {
   font-weight: 700;
-  color: #152259;
+  color: var(--admin-sidebar-bg);
 }
-.header-top small {
+.admin .header-top small {
   color: #6c757d;
 }
 
-/* Buttons */
-.btn {
+/* =======================================================
+   BUTTON
+   ======================================================= */
+.admin .btn {
   border-radius: 8px;
   font-weight: 500;
   transition: all 0.2s ease;
 }
-.btn:hover {
+.admin .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Notifikasi */
-.btn-outline-secondary {
+/* =======================================================
+   KONTEN AREA
+   ======================================================= */
+.admin .flex-grow-1 {
+  margin-left: var(--admin-sidebar-w);
+  transition: margin-left 0.3s ease;
+  background: var(--admin-content-bg);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* =======================================================
+   SIDEBAR TOGGLER
+   ======================================================= */
+.sidebar-toggle-btn {
+  background-color: var(--admin-sidebar-active);
+  color: #fff;
   border: none;
-  color: #495057;
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-.btn-outline-secondary:hover {
-  background: #f0f2f6;
-  color: #152259;
+.sidebar-toggle-btn:hover {
+  background-color: var(--admin-sidebar-hover);
+  transform: scale(1.05);
 }
 
-/* Overlay */
-.overlay { display:none; }
-.overlay.show {
-  display:block;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  z-index:1040;
-}
-
-/* Mobile Drawer */
-@media (max-width:991px){
-  .sidebar { transform:translateX(-110%); position:fixed; width: var(--sidebar-w); }
-  .sidebar.open { transform:translateX(0); }
-  .flex-grow-1 { margin-left:0 !important; }
-  #sidebarToggle { position:fixed; top:12px; left:12px; z-index:1100; }
+/* =======================================================
+   RESPONSIVE
+   ======================================================= */
+@media (max-width: 991px) {
+  .admin .sidebar {
+    position: fixed;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1050;
+  }
+  .admin .sidebar.open {
+    transform: translateX(0);
+  }
+  .admin .flex-grow-1 {
+    margin-left: 0 !important;
+  }
+  .admin #sidebarToggle {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1100;
+  }
 }
