@@ -12,15 +12,16 @@ class Nilai extends Model
     protected $table = 'nilai';
 
     protected $fillable = [
-        'murid_id',
-        'guru_id',
-        'kelas_id',
-        'mata_pelajaran',
-        'tugas',
-        'ulangan_harian',
-        'uts',
-        'uas'
-    ];
+    'murid_id',
+    'guru_id',
+    'kelas_id',
+    'mata_pelajaran',
+    'tugas',
+    'ulangan_harian',
+    'uts',
+    'uas',
+    'rata_rata',
+];
 
     /**
      * Relasi ke murid yang memiliki nilai ini

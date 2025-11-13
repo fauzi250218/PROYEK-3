@@ -28,8 +28,11 @@
                 <tr>
                     <th>No</th>
                     <th>Mata Pelajaran</th>
-                    <th>Keterangan</th>
-                    <th>Nilai</th>
+                    <th>Tugas</th>
+                    <th>Ulangan Harian</th>
+                    <th>UTS</th>
+                    <th>UAS</th>
+                    <th>Rata-rata</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -38,21 +41,28 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="fw-semibold text-dark">{{ $nilai->mata_pelajaran }}</td>
-                    <td class="keterangan-cell">
-                        <div class="keterangan-wrapper">
-                            @if($nilai->tugas) <span>Tugas</span> @endif
-                            @if($nilai->ulangan_harian) <span>Ulangan Harian</span> @endif
-                            @if($nilai->uts) <span>UTS</span> @endif
-                            @if($nilai->uas) <span>UAS</span> @endif
-                        </div>
+
+                    <!-- Nilai-nilai -->
+                    <td>{{ $nilai->tugas ?? '-' }}</td>
+                    <td>{{ $nilai->ulangan_harian ?? '-' }}</td>
+                    <td>{{ $nilai->uts ?? '-' }}</td>
+                    <td>{{ $nilai->uas ?? '-' }}</td>
+
+                    <!-- Rata-rata -->
+                    <td>
+                        <strong>
+                            {{ $nilai->rata_rata ? number_format($nilai->rata_rata, 2) : '-' }}
+                        </strong>
                     </td>
-                    <td><strong>{{ $nilai->tugas ?? $nilai->ulangan_harian ?? $nilai->uts ?? $nilai->uas ?? '-' }}</strong></td>
+
+                    <!-- Aksi -->
                     <td>
                         <a href="{{ route('guru.nilai.edit', $nilai->id) }}" class="btn btn-edit">
                             <i class="bi bi-pencil"></i>
                         </a>
                         <form action="{{ route('guru.nilai.destroy', $nilai->id) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
+                            @csrf 
+                            @method('DELETE')
                             <button type="submit" class="btn btn-delete" onclick="return confirm('Hapus nilai ini?')">
                                 <i class="bi bi-trash3"></i>
                             </button>
@@ -61,7 +71,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-muted py-4">Belum ada nilai yang diinput.</td>
+                    <td colspan="8" class="text-muted py-4">Belum ada nilai yang diinput.</td>
                 </tr>
                 @endforelse
             </tbody>

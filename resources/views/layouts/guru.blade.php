@@ -73,27 +73,19 @@
         </a>
       </li>
 
-      <!-- Pembayaran -->
-      <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.pembayaran.*') ? 'active' : '' }}" 
-           href="{{ route('guru.pembayaran.index') }}">
-          <i class="bi bi-cash-stack me-2"></i> Pembayaran
-        </a>
-      </li>
-
-      <!-- Perkembangan -->
-      <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.perkembangan.*') ? 'active' : '' }}" 
-           href="{{ route('guru.perkembangan.index') }}">
-          <i class="bi bi-bar-chart-line me-2"></i> Perkembangan
-        </a>
-      </li>
-
       <!-- Obrolan -->
       <li class="nav-item">
         <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}" 
            href="{{ route('guru.obrolan.index') }}">
           <i class="bi bi-chat-dots-fill me-2"></i> Obrolan
+        </a>
+      </li>
+
+      <!-- Laporan -->
+      <li class="nav-item">
+        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}" 
+           href="{{ route('guru.obrolan.index') }}">
+          <i class="bi bi-file-earmark-text"></i> Laporan
         </a>
       </li>
     </ul>

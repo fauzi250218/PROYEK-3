@@ -111,6 +111,10 @@ Route::prefix('guru')
         Route::prefix('nilai')->name('nilai.')->group(function () {
             Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
             Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index');
+
+            // Tambahan untuk menampilkan daftar murid berdasarkan mapel
+            Route::get('/kelas/{kelasId}/mapel/{mapel}', [NilaiController::class, 'muridPerMapel'])->name('mapel.murid');
+
             Route::get('/murid/{id}', [NilaiController::class, 'detail'])->name('detail');
             Route::get('/murid/{id}/create', [NilaiController::class, 'create'])->name('create');
             Route::post('/murid/{id}', [NilaiController::class, 'store'])->name('store');
