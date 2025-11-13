@@ -51,42 +51,22 @@
                                 </div>
 
                                 <!-- Deskripsi -->
-                                <p class="text-secondary small mb-4">{{ $k->deskripsi ?? 'Tidak ada deskripsi kelas.' }}</p>
+                                <p class="text-secondary small mb-4">
+                                    {{ $k->deskripsi ?? 'Tidak ada deskripsi kelas.' }}
+                                </p>
 
-                                <!-- ✨ Jadwal Mini List -->
-                                <div class="kelas-jadwal-box mb-4">
-                                    <h6 class="fw-semibold text-dark small mb-2">
-                                        <i class="bi bi-calendar-check me-1"></i> Jadwal Hari Ini
-                                    </h6>
-
-                                    @php
-                                        $today = \Carbon\Carbon::now()->toDateString();
-                                        $jadwalHariIni = $k->jadwals->where('tanggal', $today);
-                                    @endphp
-
-                                    @if($jadwalHariIni->count() == 0)
-                                        <p class="text-muted small fst-italic">Tidak ada jadwal.</p>
-                                    @else
-                                        @foreach($jadwalHariIni as $j)
-                                            <div class="jadwal-item small">
-                                                <div>
-                                                    <strong>{{ $j->mata_pelajaran }}</strong><br>
-                                                    <span class="text-muted">{{ $j->jam_mulai }} - {{ $j->jam_selesai }}</span>
-                                                </div>
-                                                <span class="badge bg-main-light">{{ $j->guru }}</span>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
+                                {{-- Jadwal Hari Ini DIHAPUS --}}
 
                                 <!-- Tombol Aksi -->
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <a href="{{ route('admin.kelas.kelolaMurid', $k->id) }}" class="btn btn-sm btn-outline-main px-3">
+                                    <a href="{{ route('admin.kelas.kelolaMurid', $k->id) }}" 
+                                       class="btn btn-sm btn-outline-main px-3">
                                         <i class="bi bi-people-fill me-1"></i> Siswa
                                     </a>
 
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('admin.kelas.edit', $k->id) }}" class="btn btn-sm btn-outline-warning px-2">
+                                        <a href="{{ route('admin.kelas.edit', $k->id) }}" 
+                                           class="btn btn-sm btn-outline-warning px-2">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
 
@@ -106,6 +86,7 @@
                 @endforeach
             </div>
         </div>
+
     @empty
         <div class="text-center text-muted py-5">
             <i class="bi bi-journal-x display-5 d-block mb-3"></i>

@@ -174,6 +174,24 @@ body {
   background: linear-gradient(135deg, #f0faff, #dbeafe);
 }
 
+.event-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  right: 6px;
+  padding: 2px 4px;
+  background: #3B7AC6;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.60rem;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
 /* 🔔 Ada Jadwal */
 .day-cell.has-event::after {
   content: '';

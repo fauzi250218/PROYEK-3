@@ -54,20 +54,46 @@ Route::prefix('admin')
         Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}', [KelasController::class, 'hapusMurid'])
             ->whereNumber('kelas_id')->whereNumber('murid_id')->name('kelas.hapusMurid');
 
+
         // ==================================================
-        // ============== JADWAL (AJAX & CRUD) ===============
+        // ================== JADWAL ========================
         // ==================================================
         Route::prefix('jadwal')->name('jadwal.')->group(function () {
+
+            // halaman utama kalender
             Route::get('/', [JadwalController::class, 'index'])->name('index');
+
+            // ambil seluruh jadwal (mendukung filter angkatan ?angkatan=7)
             Route::get('/get', [JadwalController::class, 'getJadwal'])->name('get');
-            Route::get('/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])->name('hari');
-            Route::get('/{id}', [JadwalController::class, 'show'])->name('show');
+
+            // ambil jadwal berdasarkan tanggal
+            Route::get('/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])
+                ->name('hari');
+
+            // tambah jadwal
             Route::post('/', [JadwalController::class, 'store'])->name('store');
-            Route::put('/{id}', [JadwalController::class, 'update'])->name('update');
-            Route::delete('/{id}', [JadwalController::class, 'destroy'])->name('destroy');
-            Route::delete('/hapus-semester/{mata_pelajaran}', [JadwalController::class, 'deleteSemester'])->name('deleteSemester');
+
+            // update jadwal
+            Route::put('/{id}', [JadwalController::class, 'update'])
+                ->whereNumber('id')
+                ->name('update');
+
+            // hapus 1 jadwal
+            Route::delete('/{id}', [JadwalController::class, 'destroy'])
+                ->whereNumber('id')
+                ->name('destroy');
+
+            // hapus semua jadwal 1 mapel per semester
+            Route::delete('/hapus-semester/{mata_pelajaran}', [JadwalController::class, 'deleteSemester'])
+                ->name('deleteSemester');
+
+            // DETAIL jadwal (dipindah agar tidak nabrak GET/HARI)
+            Route::get('/detail/{id}', [JadwalController::class, 'show'])
+                ->whereNumber('id')
+                ->name('show');
         });
     });
+
 
 // ==================================================
 // ================== GURU AREA ======================
@@ -84,6 +110,7 @@ Route::prefix('guru')
         // MANAJEMEN KELAS
         // =======================
         Route::prefix('kelas')->name('kelas.')->group(function () {
+
             // ---------- KELAS BINAAN ----------
             Route::prefix('binaan')->name('binaan.')->group(function () {
                 Route::get('/', [KelasBinaanController::class, 'index'])->name('index');
@@ -103,6 +130,7 @@ Route::prefix('guru')
             Route::get('/ajaran', [KelasAjaranController::class, 'index'])->name('ajaran.index');
         });
 
+
         // =======================
         // MANAJEMEN NILAI
         // =======================
@@ -111,8 +139,6 @@ Route::prefix('guru')
         Route::prefix('nilai')->name('nilai.')->group(function () {
             Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
             Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index');
-
-            // Tambahan untuk menampilkan daftar murid berdasarkan mapel
             Route::get('/kelas/{kelasId}/mapel/{mapel}', [NilaiController::class, 'muridPerMapel'])->name('mapel.murid');
 
             Route::get('/murid/{id}', [NilaiController::class, 'detail'])->name('detail');

@@ -26,21 +26,38 @@ class JadwalController extends Controller
     }
 
     /** ===========================
-     * Ambil semua jadwal (fullCalendar / kalender)
+     * Ambil semua jadwal (kalender)
      * =========================== */
     public function getJadwal(Request $request)
     {
+        $angkatan = $request->angkatan;
+
         $jadwal = Jadwal::with('kelas')
+            ->when($angkatan, function ($q) use ($angkatan) {
+                $q->whereHas('kelas', function ($qq) use ($angkatan) {
+                    $qq->where('angkatan', $angkatan);
+                });
+            })
             ->orderBy('tanggal')
             ->orderBy('jam_mulai')
             ->get();
 
+        // KIRIM DATA KOMPLIT agar JS tidak undefined
         $events = $jadwal->map(function ($item) {
             return [
-                'id'    => $item->id,
-                'title' => "{$item->kelas->nama_kelas} - {$item->mata_pelajaran} ({$item->guru})",
-                'start' => "{$item->tanggal}T{$item->jam_mulai}",
-                'end'   => "{$item->tanggal}T{$item->jam_selesai}",
+                'id'             => $item->id,
+                'guru'           => $item->guru,
+                'mata_pelajaran' => $item->mata_pelajaran,
+                'kelas_id'       => $item->kelas_id,
+                'kelas_nama'     => $item->kelas->nama_kelas ?? '',
+                'tanggal'        => $item->tanggal,
+                'jam_mulai'      => $item->jam_mulai,
+                'jam_selesai'    => $item->jam_selesai,
+
+                // dipakai oleh kalender
+                'title'          => "{$item->kelas->nama_kelas} - {$item->mata_pelajaran}",
+                'start'          => "{$item->tanggal}T{$item->jam_mulai}",
+                'end'            => "{$item->tanggal}T{$item->jam_selesai}",
             ];
         });
 
@@ -50,21 +67,29 @@ class JadwalController extends Controller
     /** ===========================
      * Ambil jadwal berdasarkan tanggal
      * =========================== */
-    public function getByTanggal($tanggal)
+    public function getByTanggal($tanggal, Request $request)
     {
+        $angkatan = $request->angkatan;
+
         $jadwal = Jadwal::with('kelas')
+            ->when($angkatan, function ($q) use ($angkatan) {
+                $q->whereHas('kelas', function ($qq) use ($angkatan) {
+                    $qq->where('angkatan', $angkatan);
+                });
+            })
             ->whereDate('tanggal', $tanggal)
             ->orderBy('jam_mulai')
             ->get()
             ->map(function ($item) {
                 return [
-                    'id'           => $item->id,
-                    'mata_pelajaran'=> $item->mata_pelajaran,
-                    'guru'         => $item->guru,
-                    'jam_mulai'    => $item->jam_mulai,
-                    'jam_selesai'  => $item->jam_selesai,
-                    'kelas_nama'   => $item->kelas->nama_kelas ?? '-',
-                    'tanggal'      => $item->tanggal,
+                    'id'             => $item->id,
+                    'mata_pelajaran' => $item->mata_pelajaran,
+                    'guru'           => $item->guru,
+                    'jam_mulai'      => $item->jam_mulai,
+                    'jam_selesai'    => $item->jam_selesai,
+                    'kelas_nama'     => $item->kelas->nama_kelas ?? '-',
+                    'kelas_id'       => $item->kelas_id,
+                    'tanggal'        => $item->tanggal,
                 ];
             });
 
@@ -72,22 +97,22 @@ class JadwalController extends Controller
     }
 
     /** ===========================
-     * Store jadwal (sekali atau 1 semester)
+     * Store jadwal (sekali / semester)
      * =========================== */
     public function store(Request $request)
     {
         try {
             $request->validate([
-                'kelas_id'      => 'required|exists:kelas,id',
-                'mata_pelajaran'=> 'required|string|max:100',
-                'guru'          => 'required|string|max:100',
-                'tanggal'       => 'required|date',
-                'jam_mulai'     => 'required',
-                'jam_selesai'   => 'required|after:jam_mulai',
-                'ulang'         => 'required|in:sekali,semester',
+                'kelas_id'       => 'required|exists:kelas,id',
+                'mata_pelajaran' => 'required|string|max:100',
+                'guru'           => 'required|string|max:100',
+                'tanggal'        => 'required|date',
+                'jam_mulai'      => 'required',
+                'jam_selesai'    => 'required|after:jam_mulai',
+                'ulang'          => 'required|in:sekali,semester',
             ]);
 
-            /** Normalisasi jam untuk format H:i */
+            // normalisasi jam
             $request->merge([
                 'jam_mulai'   => date('H:i', strtotime($request->jam_mulai)),
                 'jam_selesai' => date('H:i', strtotime($request->jam_selesai)),
@@ -95,18 +120,16 @@ class JadwalController extends Controller
 
             $tanggalMulai = Carbon::parse($request->tanggal);
 
-            /** ============ SEKALI SAJA ============ */
+            // jika hanya sekali
             if ($request->ulang === 'sekali') {
                 return $this->buatJadwal($request, $tanggalMulai, true);
             }
 
-            /** ============ SEMESTER (setiap minggu 6 bulan) ============ */
-
+            // jika semester (mingguan 6 bulan)
             $tanggalAkhir = $tanggalMulai->copy()->addMonths(6);
             $createdCount = 0;
 
             while ($tanggalMulai <= $tanggalAkhir) {
-
                 $result = $this->buatJadwal($request, $tanggalMulai, false);
 
                 // minggu pertama bentrok → batalkan semua
@@ -117,7 +140,6 @@ class JadwalController extends Controller
                     ], 422);
                 }
 
-                // minggu selanjutnya bentrok → skip (tetap lanjut)
                 if ($result === true) {
                     $createdCount++;
                 }
@@ -161,7 +183,7 @@ class JadwalController extends Controller
         $mulai      = $request->jam_mulai;
         $selesai    = $request->jam_selesai;
 
-        /** Cek bentrok */
+        // cek bentrok
         $bentrok = Jadwal::where('kelas_id', $request->kelas_id)
             ->whereDate('tanggal', $tanggalStr)
             ->where(function ($q) use ($mulai, $selesai) {
@@ -180,7 +202,6 @@ class JadwalController extends Controller
             return false;
         }
 
-        /** Simpan */
         Jadwal::create([
             'kelas_id'       => $request->kelas_id,
             'mata_pelajaran' => $request->mata_pelajaran,
@@ -249,7 +270,7 @@ class JadwalController extends Controller
     }
 
     /** ===========================
-     * Hapus Semua Jadwal Satu Mapel (Semester)
+     * Hapus Semua Jadwal 1 Mapel
      * =========================== */
     public function deleteSemester($mataPelajaran)
     {
