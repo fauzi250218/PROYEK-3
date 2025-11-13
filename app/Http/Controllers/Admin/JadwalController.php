@@ -14,33 +14,42 @@ use Carbon\Carbon;
 
 class JadwalController extends Controller
 {
-    /** 🗓️ Halaman utama kalender jadwal */
+    /** ===========================
+     * Halaman Kalender
+     * =========================== */
     public function index()
     {
         $kelas = Kelas::orderBy('nama_kelas')->get();
-        $guru = Guru::with('user')->get();
+        $guru  = Guru::with('user')->get();
+
         return view('admin.jadwal.index', compact('kelas', 'guru'));
     }
 
-    /** 📅 Mengambil semua jadwal (untuk kalender) */
-    public function getJadwal()
+    /** ===========================
+     * Ambil semua jadwal (fullCalendar / kalender)
+     * =========================== */
+    public function getJadwal(Request $request)
     {
-        $jadwal = Jadwal::with('kelas')->get();
+        $jadwal = Jadwal::with('kelas')
+            ->orderBy('tanggal')
+            ->orderBy('jam_mulai')
+            ->get();
 
         $events = $jadwal->map(function ($item) {
             return [
-                'id' => $item->id,
+                'id'    => $item->id,
                 'title' => "{$item->kelas->nama_kelas} - {$item->mata_pelajaran} ({$item->guru})",
                 'start' => "{$item->tanggal}T{$item->jam_mulai}",
-                'end' => "{$item->tanggal}T{$item->jam_selesai}",
-                'backgroundColor' => '#' . substr(md5($item->mata_pelajaran), 0, 6),
+                'end'   => "{$item->tanggal}T{$item->jam_selesai}",
             ];
         });
 
         return response()->json($events);
     }
 
-    /** 📆 Mengambil jadwal berdasarkan tanggal */
+    /** ===========================
+     * Ambil jadwal berdasarkan tanggal
+     * =========================== */
     public function getByTanggal($tanggal)
     {
         $jadwal = Jadwal::with('kelas')
@@ -49,80 +58,115 @@ class JadwalController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->id,
-                    'mata_pelajaran' => $item->mata_pelajaran,
-                    'guru' => $item->guru,
-                    'jam_mulai' => $item->jam_mulai,
-                    'jam_selesai' => $item->jam_selesai,
-                    'kelas_nama' => $item->kelas->nama_kelas ?? '-',
-                    'tanggal' => $item->tanggal,
+                    'id'           => $item->id,
+                    'mata_pelajaran'=> $item->mata_pelajaran,
+                    'guru'         => $item->guru,
+                    'jam_mulai'    => $item->jam_mulai,
+                    'jam_selesai'  => $item->jam_selesai,
+                    'kelas_nama'   => $item->kelas->nama_kelas ?? '-',
+                    'tanggal'      => $item->tanggal,
                 ];
             });
 
         return response()->json($jadwal);
     }
 
-    /** 💾 Simpan jadwal baru — bisa berulang 1 semester */
+    /** ===========================
+     * Store jadwal (sekali atau 1 semester)
+     * =========================== */
     public function store(Request $request)
     {
         try {
             $request->validate([
-                'kelas_id' => 'required|exists:kelas,id',
-                'mata_pelajaran' => 'required|string|max:100',
-                'guru' => 'required|string|max:100',
-                'tanggal' => 'required|date',
-                'jam_mulai' => 'required',
-                'jam_selesai' => 'required|after:jam_mulai',
-                'ulang' => 'nullable|string|in:sekali,semester', // tambahan
+                'kelas_id'      => 'required|exists:kelas,id',
+                'mata_pelajaran'=> 'required|string|max:100',
+                'guru'          => 'required|string|max:100',
+                'tanggal'       => 'required|date',
+                'jam_mulai'     => 'required',
+                'jam_selesai'   => 'required|after:jam_mulai',
+                'ulang'         => 'required|in:sekali,semester',
             ]);
 
-            $ulang = $request->ulang ?? 'semester'; // default semester
+            /** Normalisasi jam untuk format H:i */
+            $request->merge([
+                'jam_mulai'   => date('H:i', strtotime($request->jam_mulai)),
+                'jam_selesai' => date('H:i', strtotime($request->jam_selesai)),
+            ]);
+
             $tanggalMulai = Carbon::parse($request->tanggal);
 
-            // kalau "sekali", cukup buat 1 jadwal saja
-            if ($ulang === 'sekali') {
-                return $this->buatJadwal($request, $tanggalMulai);
+            /** ============ SEKALI SAJA ============ */
+            if ($request->ulang === 'sekali') {
+                return $this->buatJadwal($request, $tanggalMulai, true);
             }
 
-            // kalau "semester" → ulang tiap minggu selama 6 bulan
+            /** ============ SEMESTER (setiap minggu 6 bulan) ============ */
+
             $tanggalAkhir = $tanggalMulai->copy()->addMonths(6);
             $createdCount = 0;
 
             while ($tanggalMulai <= $tanggalAkhir) {
-                $buat = $this->buatJadwal($request, $tanggalMulai, false);
-                if ($buat) $createdCount++;
-                $tanggalMulai->addWeek(); // tambah 7 hari
+
+                $result = $this->buatJadwal($request, $tanggalMulai, false);
+
+                // minggu pertama bentrok → batalkan semua
+                if ($result === false && $createdCount === 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Jadwal minggu pertama bentrok. Tidak ada yang disimpan.',
+                    ], 422);
+                }
+
+                // minggu selanjutnya bentrok → skip (tetap lanjut)
+                if ($result === true) {
+                    $createdCount++;
+                }
+
+                $tanggalMulai->addWeek();
+            }
+
+            if ($createdCount === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada jadwal yang disimpan.',
+                ], 422);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => "Jadwal berhasil disimpan dan diulang setiap minggu selama 1 semester ($createdCount kali)."
+                'message' => "Jadwal berhasil disimpan ($createdCount kali).",
             ]);
-        } 
-        catch (ValidationException $e) {
-            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
-        } 
-        catch (Throwable $e) {
-            Log::error('💥 Gagal menyimpan jadwal: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server.'], 500);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $e->errors(),
+            ], 422);
+
+        } catch (Throwable $e) {
+            Log::error("Gagal menyimpan jadwal: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Kesalahan server.',
+            ], 500);
         }
     }
 
-    /** 🔧 Fungsi bantu untuk menyimpan jadwal dan cek bentrok */
-    private function buatJadwal(Request $request, $tanggal, $returnResponse = true)
+    /** ===========================
+     * Helper: cek bentrok + simpan
+     * =========================== */
+    private function buatJadwal(Request $request, Carbon $tanggal, $returnResponse = true)
     {
         $tanggalStr = $tanggal->format('Y-m-d');
+        $mulai      = $request->jam_mulai;
+        $selesai    = $request->jam_selesai;
 
-        // cek bentrok
+        /** Cek bentrok */
         $bentrok = Jadwal::where('kelas_id', $request->kelas_id)
             ->whereDate('tanggal', $tanggalStr)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
-                    ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
-                    ->orWhere(function ($q) use ($request) {
-                        $q->where('jam_mulai', '<=', $request->jam_mulai)
-                          ->where('jam_selesai', '>=', $request->jam_selesai);
-                    });
+            ->where(function ($q) use ($mulai, $selesai) {
+                $q->where('jam_mulai', '<', $selesai)
+                  ->where('jam_selesai', '>', $mulai);
             })
             ->exists();
 
@@ -130,88 +174,90 @@ class JadwalController extends Controller
             if ($returnResponse) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Jadwal bentrok pada tanggal $tanggalStr."
+                    'message' => "Jadwal bentrok pada tanggal $tanggalStr.",
                 ], 422);
             }
             return false;
         }
 
+        /** Simpan */
         Jadwal::create([
-            'kelas_id' => $request->kelas_id,
+            'kelas_id'       => $request->kelas_id,
             'mata_pelajaran' => $request->mata_pelajaran,
-            'guru' => $request->guru,
-            'tanggal' => $tanggalStr,
-            'jam_mulai' => $request->jam_mulai,
-            'jam_selesai' => $request->jam_selesai,
+            'guru'           => $request->guru,
+            'tanggal'        => $tanggalStr,
+            'jam_mulai'      => $mulai,
+            'jam_selesai'    => $selesai,
         ]);
 
         if ($returnResponse) {
-            return response()->json(['success' => true, 'message' => 'Jadwal berhasil disimpan!']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Jadwal berhasil disimpan.',
+            ]);
         }
 
         return true;
     }
 
-    /** ✏️ Mengambil detail satu jadwal */
-    public function show($id)
-    {
-        $jadwal = Jadwal::with('kelas')->findOrFail($id);
-        return response()->json($jadwal);
-    }
-
-    /** 🔄 Update jadwal (via modal edit) */
+    /** ===========================
+     * Update Jadwal
+     * =========================== */
     public function update(Request $request, $id)
     {
         try {
             $jadwal = Jadwal::findOrFail($id);
 
             $request->validate([
-                'mata_pelajaran' => 'required|string|max:100',
-                'guru' => 'required|string|max:100',
-                'jam_mulai' => 'required',
-                'jam_selesai' => 'required|after:jam_mulai',
+                'mata_pelajaran' => 'required|string',
+                'guru'           => 'required|string',
+                'jam_mulai'      => 'required',
+                'jam_selesai'    => 'required|after:jam_mulai',
             ]);
 
             $jadwal->update([
                 'mata_pelajaran' => $request->mata_pelajaran,
-                'guru' => $request->guru,
-                'jam_mulai' => $request->jam_mulai,
-                'jam_selesai' => $request->jam_selesai,
+                'guru'           => $request->guru,
+                'jam_mulai'      => date('H:i', strtotime($request->jam_mulai)),
+                'jam_selesai'    => date('H:i', strtotime($request->jam_selesai)),
             ]);
 
-            return response()->json(['success' => true, 'message' => 'Jadwal berhasil diperbarui!']);
-        } catch (Throwable $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
-    /** 🗑️ Hapus 1 jadwal (per hari) */
-    public function destroy($id)
-    {
-        try {
-            $jadwal = Jadwal::findOrFail($id);
-            $jadwal->delete();
-
-            return response()->json(['success' => true, 'message' => 'Jadwal berhasil dihapus!']);
-        } catch (Throwable $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal menghapus jadwal.'], 500);
-        }
-    }
-
-    /** 🗓️ Hapus semua jadwal satu mata pelajaran di semester */
-    public function deleteSemester($mataPelajaran)
-    {
-        try {
-            Jadwal::where('mata_pelajaran', $mataPelajaran)->delete();
             return response()->json([
                 'success' => true,
-                'message' => "Semua jadwal '$mataPelajaran' di semester ini telah dihapus."
+                'message' => 'Jadwal berhasil diperbarui.',
             ]);
+
         } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus jadwal semester: ' . $e->getMessage()
+                'message' => 'Kesalahan server.',
             ], 500);
         }
+    }
+
+    /** ===========================
+     * Hapus 1 jadwal
+     * =========================== */
+    public function destroy($id)
+    {
+        Jadwal::findOrFail($id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jadwal dihapus.',
+        ]);
+    }
+
+    /** ===========================
+     * Hapus Semua Jadwal Satu Mapel (Semester)
+     * =========================== */
+    public function deleteSemester($mataPelajaran)
+    {
+        Jadwal::where('mata_pelajaran', $mataPelajaran)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Semua jadwal '$mataPelajaran' dihapus.",
+        ]);
     }
 }

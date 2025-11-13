@@ -1,111 +1,184 @@
-/* ===================================================
-   HALAMAN DATA KELAS (ADMIN)
-   Tema: Soft Elegant Minimal
-   =================================================== */
+/* ======================================================
+   DATA KELAS — DASHBOARD STYLE (FULL VERSION)
+   Desain biru modern, glass-like, profesional
+   ====================================================== */
 
 body {
     background-color: #f7f9fb !important;
     font-family: 'Poppins', sans-serif;
-    color: #333;
 }
 
-/* ======== Header ======== */
+/* ---------------------------------------
+   Global Utility
+-----------------------------------------*/
+.text-main {
+    color: #3b5cff !important;
+}
+
+.bg-main {
+    background-color: #3b5cff !important;
+}
+
 .btn-main {
-    background-color: #5d87ff;
-    color: #fff;
-    border: none;
-    font-weight: 500;
-    transition: 0.3s ease;
+    background-color: #3b5cff !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    transition: .25s ease;
 }
 
 .btn-main:hover {
-    background-color: #496fde;
-    transform: translateY(-1px);
+    background-color: #2446e1 !important;
+    transform: translateY(-2px);
 }
 
-.alert-success {
-    background-color: #e9f9ee;
-    color: #256c3a;
-    border-left: 4px solid #28a745;
-    font-weight: 500;
+.btn-outline-main {
+    border: 1px solid #3b5cff;
+    color: #3b5cff;
+    border-radius: 10px !important;
+    transition: .25s ease;
 }
 
-/* ======== Card ======== */
+.btn-outline-main:hover {
+    background-color: #3b5cff;
+    color: #fff;
+}
+
+/* ---------------------------------------
+   Page Wrapper
+-----------------------------------------*/
+.kelas-index-page {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------------
+   Card Kelas
+-----------------------------------------*/
 .kelas-card {
-    transition: all 0.3s ease;
-    border: 1px solid #eef1f5;
+    border-radius: 18px !important;
+    transition: .3s ease;
+    overflow: hidden;
+    position: relative;
 }
 
 .kelas-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.09);
 }
 
-/* ======== Ikon Kelas ======== */
+.kelas-card-body {
+    padding: 25px !important;
+}
+
 .kelas-icon {
     width: 48px;
     height: 48px;
-    border-radius: 10px;
+    border-radius: 12px;
     background-color: #eef3ff;
-    color: #5d87ff;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.3rem;
 }
 
-/* ======== Tombol ======== */
-.btn-outline-main {
-    border: 1px solid #5d87ff;
-    color: #5d87ff;
-    font-weight: 500;
-    transition: 0.2s ease;
+.kelas-icon i {
+    color: #3b5cff;
+    font-size: 1.5rem;
 }
 
-.btn-outline-main:hover {
-    background-color: #5d87ff;
-    color: #fff;
+/* ---------------------------------------
+   Mini Jadwal Box
+-----------------------------------------*/
+.kelas-jadwal-box {
+    background: #f4f7ff;
+    border: 1px solid #d9e2ff;
+    padding: 12px 15px;
+    border-radius: 14px;
+    margin-bottom: 1.3rem;
 }
 
+.kelas-jadwal-box h6 {
+    font-weight: 600;
+    color: #343a40;
+    font-size: .9rem;
+}
+
+/* Item Jadwal */
+.jadwal-item {
+    background: #ffffff;
+    border: 1px solid #e0e7ff;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: .25s ease;
+}
+
+.jadwal-item:hover {
+    background: #eef3ff;
+    border-color: #cdd8ff;
+}
+
+/* Guru Badge */
+.badge.bg-main-light {
+    background-color: #e6eeff !important;
+    color: #3b5cff !important;
+    padding: 4px 7px;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: .75rem;
+}
+
+/* ---------------------------------------
+   Responsive
+-----------------------------------------*/
+@media (max-width: 991px) {
+    .kelas-card-body {
+        padding: 20px !important;
+    }
+
+    .kelas-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .jadwal-item {
+        padding: 8px 10px;
+        font-size: .82rem;
+    }
+}
+
+@media (max-width: 576px) {
+    h2 {
+        font-size: 1.4rem !important;
+    }
+
+    .kelas-card {
+        margin-bottom: 10px;
+    }
+}
+
+/* ---------------------------------------
+   "Tidak Ada Jadwal" Styling
+-----------------------------------------*/
+.no-jadwal-text {
+    font-style: italic;
+    font-size: .85rem;
+    color: #6c757d;
+}
+
+/* ---------------------------------------
+   Delete / Edit Button Custom
+-----------------------------------------*/
 .btn-outline-warning {
-    border: 1px solid #ffb300;
-    color: #ffb300;
-}
-
-.btn-outline-warning:hover {
-    background-color: #ffb300;
-    color: #fff;
+    border-radius: 8px !important;
 }
 
 .btn-outline-danger {
-    border: 1px solid #dc3545;
-    color: #dc3545;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-/* ======== Font & Spacing ======== */
-.kelas-card h5 {
-    font-size: 1.05rem;
-    margin-bottom: 0.2rem;
-}
-
-.kelas-card p {
-    line-height: 1.5;
-}
-
-/* ======== Responsive ======== */
-@media (max-width: 992px) {
-    .kelas-card-body {
-        padding: 1.25rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .kelas-card {
-        margin-bottom: 1rem;
-    }
+    border-radius: 8px !important;
 }

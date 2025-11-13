@@ -35,9 +35,11 @@
 
             <div class="row g-4">
                 @foreach($daftar as $k)
-                    <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="kelas-card bg-white rounded-4 border shadow-sm">
                             <div class="kelas-card-body p-4">
+
+                                <!-- Header Kelas -->
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="kelas-icon me-3">
                                         <i class="bi bi-mortarboard-fill"></i>
@@ -48,16 +50,46 @@
                                     </div>
                                 </div>
 
+                                <!-- Deskripsi -->
                                 <p class="text-secondary small mb-4">{{ $k->deskripsi ?? 'Tidak ada deskripsi kelas.' }}</p>
 
+                                <!-- ✨ Jadwal Mini List -->
+                                <div class="kelas-jadwal-box mb-4">
+                                    <h6 class="fw-semibold text-dark small mb-2">
+                                        <i class="bi bi-calendar-check me-1"></i> Jadwal Hari Ini
+                                    </h6>
+
+                                    @php
+                                        $today = \Carbon\Carbon::now()->toDateString();
+                                        $jadwalHariIni = $k->jadwals->where('tanggal', $today);
+                                    @endphp
+
+                                    @if($jadwalHariIni->count() == 0)
+                                        <p class="text-muted small fst-italic">Tidak ada jadwal.</p>
+                                    @else
+                                        @foreach($jadwalHariIni as $j)
+                                            <div class="jadwal-item small">
+                                                <div>
+                                                    <strong>{{ $j->mata_pelajaran }}</strong><br>
+                                                    <span class="text-muted">{{ $j->jam_mulai }} - {{ $j->jam_selesai }}</span>
+                                                </div>
+                                                <span class="badge bg-main-light">{{ $j->guru }}</span>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+
+                                <!-- Tombol Aksi -->
                                 <div class="d-flex justify-content-between align-items-center">
                                     <a href="{{ route('admin.kelas.kelolaMurid', $k->id) }}" class="btn btn-sm btn-outline-main px-3">
                                         <i class="bi bi-people-fill me-1"></i> Siswa
                                     </a>
+
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('admin.kelas.edit', $k->id) }}" class="btn btn-sm btn-outline-warning px-2">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
+
                                         <form action="{{ route('admin.kelas.destroy', $k->id) }}" method="POST"
                                               onsubmit="return confirm('Yakin ingin menghapus kelas ini?')">
                                             @csrf @method('DELETE')
@@ -67,6 +99,7 @@
                                         </form>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -79,5 +112,6 @@
             <p class="fs-5 mb-0">Belum ada data kelas yang tersedia.</p>
         </div>
     @endforelse
+
 </div>
 @endsection

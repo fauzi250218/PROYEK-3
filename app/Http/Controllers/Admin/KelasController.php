@@ -12,14 +12,21 @@ use App\Models\Jadwal;
 class KelasController extends Controller
 {
     /**
-     * 🔹 Tampilkan daftar kelas (group per jenjang)
+     * 🔹 Tampilkan daftar kelas (group per jenjang) + JADWAL
      */
     public function index()
     {
-        $kelas = Kelas::with(['guru.user', 'murids'])
+        // Ambil guru + murid + JADWAL kelas
+        $kelas = Kelas::with([
+                'guru.user',
+                'murids',
+                'jadwals' => function ($q) {
+                    $q->orderBy('tanggal')->orderBy('jam_mulai');
+                }
+            ])
             ->get()
             ->groupBy(function ($item) {
-                return substr($item->nama_kelas, 0, 1);
+                return substr($item->nama_kelas, 0, 1); // group berdasarkan angka awal (7,8,9)
             });
 
         return view('admin.kelas.index', compact('kelas'));
@@ -30,7 +37,7 @@ class KelasController extends Controller
      */
     public function create()
     {
-        // Guru yang belum punya kelas binaan
+        // Guru yang belum punya kelas
         $guru = Guru::whereDoesntHave('kelas')->with('user')->get();
         return view('admin.kelas.create', compact('guru'));
     }
@@ -46,14 +53,14 @@ class KelasController extends Controller
             'deskripsi'  => 'nullable|string',
         ]);
 
-        // Buat kelas baru
+        // Simpan kelas
         $kelas = Kelas::create([
             'nama_kelas' => $request->nama_kelas,
             'guru_id'    => $request->guru_id,
             'deskripsi'  => $request->deskripsi,
         ]);
 
-        // 🔹 Sinkronkan dengan guru jika dipilih
+        // Jika guru dipilih → jadikan wali kelas
         if ($request->guru_id) {
             $guru = Guru::find($request->guru_id);
             if ($guru) {
@@ -71,6 +78,8 @@ class KelasController extends Controller
     public function edit($id)
     {
         $kelas = Kelas::findOrFail($id);
+
+        // Guru yg belum punya kelas + wali kelas sekarang
         $guru = Guru::whereDoesntHave('kelas')
             ->orWhere('id', $kelas->guru_id)
             ->with('user')
@@ -80,7 +89,7 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Update Data Kelas
+     * 🔹 Update Kelas
      */
     public function update(Request $request, $id)
     {
@@ -91,13 +100,14 @@ class KelasController extends Controller
         ]);
 
         $kelas = Kelas::findOrFail($id);
+
         $kelas->update([
             'nama_kelas' => $request->nama_kelas,
             'guru_id'    => $request->guru_id,
             'deskripsi'  => $request->deskripsi,
         ]);
 
-        // 🔹 Perbarui wali kelas jika diubah
+        // Update wali kelas bila berubah
         if ($request->guru_id) {
             $guru = Guru::find($request->guru_id);
             if ($guru) {
@@ -110,11 +120,13 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Hapus Data Kelas
+     * 🔹 Hapus Kelas
      */
     public function destroy($id)
     {
         $kelas = Kelas::findOrFail($id);
+
+        // Hapus kelas (murid tetap aman)
         $kelas->delete();
 
         return redirect()->route('admin.kelas.index')
@@ -122,14 +134,14 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Halaman Kelola Siswa & Jadwal Kelas
+     * 🔹 Halaman Kelola Siswa & Jadwal pada kelas
      */
     public function kelolaMurid($id)
     {
-        // Ambil kelas + relasi guru, murid, dan jadwal
+        // Ambil kelas + guru + murid + jadwal
         $kelas = Kelas::with(['murids', 'guru.user', 'jadwals'])->findOrFail($id);
 
-        // Murid yang belum punya kelas
+        // Murid yang belum masuk kelas manapun
         $muridBelumMasukKelas = Murid::whereNull('kelas_id')
             ->orderBy('nama')
             ->get()
@@ -137,12 +149,12 @@ class KelasController extends Controller
                 return substr($murid->nis, 0, 1);
             });
 
-        // Murid dalam kelas saat ini
+        // Murid dalam kelas
         $muridDalamKelas = $kelas->murids;
 
-        // 🔹 Ambil jadwal khusus kelas ini (bukan jadwal guru)
+        // Sort jadwal berdasarkan hari & jam
         $jadwalKelas = $kelas->jadwals
-            ->sortBy(['hari', 'jam_mulai'])
+            ->sortBy(['tanggal', 'jam_mulai'])
             ->values();
 
         return view('admin.kelas.kelola-murid', compact(
@@ -154,7 +166,7 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Tambahkan Murid ke Kelas
+     * 🔹 Tambahkan murid ke kelas
      */
     public function tambahMurid(Request $request, $id)
     {
@@ -168,11 +180,12 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Hapus Murid dari Kelas
+     * 🔹 Hapus murid dari kelas
      */
     public function hapusMurid($kelas_id, $murid_id)
     {
         $murid = Murid::findOrFail($murid_id);
+
         $murid->update(['kelas_id' => null]);
 
         return redirect()->back()->with('success', 'Siswa berhasil dihapus dari kelas.');
