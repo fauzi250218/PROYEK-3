@@ -61,4 +61,12 @@ class Murid extends Model
     {
         return $this->hasMany(Laporan::class, 'murid_id');
     }
+
+    /**
+     * ✅ Relasi ke notifikasi yang diterima murid ini
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'murid_id');
+    }
 }
