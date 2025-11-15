@@ -54,11 +54,19 @@ class Murid extends Model
         return $this->hasMany(CatatanPerilaku::class, 'murid_id');
     }
 
+    // /**
+    //  * ✅ Relasi ke laporan (opsional)
+    //  */
+    // public function laporan()
+    // {
+    //     return $this->hasMany(Laporan::class, 'murid_id');
+    // }
+
     /**
-     * ✅ Relasi ke laporan (opsional)
+     * ✅ Relasi ke Validasi murid (opsional)
      */
-    public function laporan()
+    public function validasiMurid()
     {
-        return $this->hasMany(Laporan::class, 'murid_id');
+        return $this->belongsTo(ValidasiMurid::class, 'nis', 'nis');
     }
 }
