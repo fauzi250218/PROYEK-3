@@ -12,10 +12,14 @@ Route::post('/register-murid', [MuridController::class, 'register']);
 Route::post('/login-murid', [MuridController::class, 'login']);
 
 // =====================
-// Login dan Registrasi With Google
+// Login With Google
 // =====================
-Route::post('/murids/google-register', [MuridController::class, 'googleRegister']);
-Route::get('/murids/email/{email}', [MuridController::class, 'getMuridByEmail']);
+Route::post('/murids/google-login', [MuridController::class, 'googleLogin']);
+
+// =====================
+// Registrasi With Google dengan Validasi NIS
+// =====================
+Route::post('/murids/google-register-validate', [MuridController::class, 'googleRegisterValidate']);
 
 // =====================
 // Profil Murid

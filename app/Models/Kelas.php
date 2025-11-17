@@ -42,5 +42,12 @@ class Kelas extends Model
         return $this->hasMany(Jadwal::class, 'kelas_id');
     }
 
+    /**
+     * Relasi ke Validasi Murid
+     */
+    public function validasiMurids()
+    {
+        return $this->hasMany(ValidasiMurid::class, 'kelas_id');
+    }
 }
 
