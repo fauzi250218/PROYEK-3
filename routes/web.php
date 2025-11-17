@@ -106,6 +106,11 @@ Route::prefix('guru')
         // Dashboard Guru
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
 
+        // AJAX GET JADWAL BERDASARKAN TANGGAL
+        Route::get('/jadwal/{tanggal}', [GuruDashboardController::class, 'getJadwalTanggal'])
+            ->where('tanggal', '[0-9\-]+')
+            ->name('jadwal.tanggal');
+
         // =======================
         // MANAJEMEN KELAS
         // =======================
@@ -127,7 +132,14 @@ Route::prefix('guru')
             });
 
             // ---------- KELAS AJARAN ----------
-            Route::get('/ajaran', [KelasAjaranController::class, 'index'])->name('ajaran.index');
+           Route::prefix('ajaran')->name('ajaran.')->group(function () {
+
+                Route::get('/', [KelasAjaranController::class, 'index'])->name('index');
+
+                Route::get('/detail-kelas/{id}', [KelasAjaranController::class, 'detail'])
+                    ->whereNumber('id')
+                    ->name('detail');
+            });
         });
 
 

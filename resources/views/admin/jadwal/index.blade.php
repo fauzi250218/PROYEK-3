@@ -9,50 +9,42 @@
 @endsection
 
 @section('content')
-<div class="calendar-page-container">
+<div class="calendar-page-container container py-4">
 
-    <!-- Filter Angkatan -->
-    <div class="filter-section d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-semibold text-dark mb-0">Kalender Akademik</h4>
-
-        <div class="d-flex align-items-center">
-            <label class="form-label me-2 mb-0">Filter Angkatan</label>
-            <select id="filterAngkatan" class="form-select form-select-sm d-inline-block w-auto">
-                <option value="">Semua Angkatan</option>
-                <option value="7">Kelas 7</option>
-                <option value="8">Kelas 8</option>
-                <option value="9">Kelas 9</option>
-            </select>
+    <div class="row mb-3 align-items-center">
+        <div class="col">
+            <h4 class="fw-semibold mb-0">Kalender Akademik</h4>
+        </div>
+        <div class="col-auto">
+            <button id="addScheduleBtn" class="btn btn-primary btn-sm">Tambah Jadwal</button>
         </div>
     </div>
 
-    <!-- Kalender -->
-    <div class="calendar-container position-relative">
-        <div class="calendar-header mb-2">
-            <div class="left-section d-flex align-items-center">
-                <button id="prev" class="nav-btn btn btn-light btn-sm"><i class="bi bi-chevron-left"></i></button>
-                <h3 id="monthYear" class="month-year mb-0 mx-3"></h3>
-                <button id="next" class="nav-btn btn btn-light btn-sm"><i class="bi bi-chevron-right"></i></button>
-            </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="calendar-container position-relative">
+                <div class="d-flex align-items-center mb-2">
+                    <button id="prev" class="btn btn-light btn-sm me-2"><i class="bi bi-chevron-left"></i></button>
+                    <h3 id="monthYear" class="month-year mb-0 mx-2"></h3>
+                    <button id="next" class="btn btn-light btn-sm ms-2"><i class="bi bi-chevron-right"></i></button>
+                </div>
 
-            <div class="right-section">
-                <button id="addScheduleBtn" class="btn btn-primary btn-sm">Tambah Jadwal</button>
+                <div id="calendar" class="mini-calendar mt-3" aria-hidden="false"></div>
             </div>
         </div>
 
-        <div id="calendar" class="mini-calendar mt-3"></div>
-    </div>
-
-    <!-- Agenda -->
-    <div class="agenda-section mt-4">
-        <h4 class="agenda-title mb-3"><i class="bi bi-calendar-check"></i> Jadwal</h4>
-        <ul id="agendaList" class="agenda-list">
-            <li class="agenda-empty">Pilih tanggal untuk melihat jadwal.</li>
-        </ul>
+        <div class="col-lg-4">
+            <div class="agenda-section">
+                <h5 class="mb-3"><i class="bi bi-calendar-check"></i> Jadwal</h5>
+                <ul id="agendaList" class="agenda-list">
+                    <li class="agenda-empty">Pilih tanggal untuk melihat jadwal.</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Modal Tambah -->
+{{-- ================= MODAL TAMBAH ================= --}}
 <div class="modal fade" id="addEventModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
@@ -65,7 +57,6 @@
         <form id="eventForm">
           @csrf
 
-          <!-- Urutan BENAR: guru → mapel -->
           <div class="mb-3">
             <label class="form-label">Nama Guru</label>
             <select id="guruSelect" name="guru" class="form-select" required>
@@ -80,7 +71,7 @@
 
           <div class="mb-3">
             <label class="form-label">Mata Pelajaran</label>
-            <input id="mapelInput" type="text" name="mata_pelajaran" class="form-control" readonly required>
+            <input id="mapelInput" type="text" name="mata_pelajaran" class="form-control" readonly>
           </div>
 
           <div class="mb-3">
@@ -108,22 +99,23 @@
             <label class="form-label">Ulang</label>
             <select name="ulang" class="form-select">
                 <option value="sekali">Sekali</option>
-                <option value="semester">Semester (setiap minggu 6 bulan)</option>
+                <option value="semester">Semester</option>
             </select>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100">Simpan Jadwal</button>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal Edit -->
+{{-- ================= MODAL EDIT ================= --}}
 <div class="modal fade" id="editEventModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
-
       <div class="modal-header bg-warning text-dark">
         <h5 class="modal-title">Edit Jadwal</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -134,12 +126,15 @@
           @csrf
           <input type="hidden" name="_method" value="PUT">
           <input type="hidden" id="edit_id">
+          <input type="hidden" id="edit_group_id"> {{-- ★ NEW --}}
 
           <div class="mb-3">
             <label class="form-label">Nama Guru</label>
             <select id="edit_guru" name="guru" class="form-select" required>
                 @foreach($guru as $g)
-                <option value="{{ $g->user->name }}">{{ $g->user->name }}</option>
+                <option value="{{ $g->user->name }}" data-mapel="{{ $g->mata_pelajaran }}">
+                    {{ $g->user->name }}
+                </option>
                 @endforeach
             </select>
           </div>
@@ -163,7 +158,6 @@
               <label class="form-label">Jam Mulai</label>
               <input type="time" id="edit_jam_mulai" name="jam_mulai" class="form-control">
             </div>
-
             <div class="col-md-6 mb-3">
               <label class="form-label">Jam Selesai</label>
               <input type="time" id="edit_jam_selesai" name="jam_selesai" class="form-control">
@@ -178,13 +172,10 @@
 
         </form>
       </div>
-
     </div>
   </div>
 </div>
-
 @endsection
-
 
 @section('extra-js')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -193,283 +184,386 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ==============================
-     AUTO isi mata pelajaran (Tambah)
-  ===============================*/
-  const guruSelect = document.getElementById("guruSelect");
-  const mapelInput = document.getElementById("mapelInput");
+    /* -------------------------
+       ELEMENT SELECTORS SAFE
+    ------------------------- */
+    const calendar = document.getElementById("calendar");
+    const monthYear = document.getElementById("monthYear");
+    const agendaList = document.getElementById("agendaList");
 
-  if (guruSelect) {
-    guruSelect.addEventListener("change", function () {
-      let mapel = this.options[this.selectedIndex].dataset.mapel || "";
-      mapelInput.value = mapel;
-    });
-  }
+    const guruSelect = document.getElementById("guruSelect");
+    const mapelInput = document.getElementById("mapelInput");
 
-  /* ==============================
-     VARIABEL KALENDER
-  ===============================*/
-  const calendar = document.getElementById("calendar");
-  const monthYear = document.getElementById("monthYear");
-  const agendaList = document.getElementById("agendaList");
-  const filterAngkatan = document.getElementById("filterAngkatan");
-  const eventModal = new bootstrap.Modal(document.getElementById("addEventModal"));
-  const editModal  = new bootstrap.Modal(document.getElementById("editEventModal"));
+    const editGuru = document.getElementById("edit_guru");
+    const editMapel = document.getElementById("edit_mata_pelajaran");
+    const editGroupId = document.getElementById("edit_group_id");
 
-  let selectedAngkatan = "";
-  let selectedDate = null;
+    const eventForm = document.getElementById("eventForm");
+    const editForm = document.getElementById("editForm");
 
-  const today = new Date();
-  let currentYear = today.getFullYear();
-  let currentMonth = today.getMonth();
+    const addScheduleBtn = document.getElementById("addScheduleBtn");
+    const deleteOneBtn = document.getElementById("deleteOneBtn");
+    const deleteSemesterBtn = document.getElementById("deleteSemesterBtn");
 
-  const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-  const DAY_OFFSET = 1;
+    const addModalEl = document.getElementById("addEventModal");
+    const editModalEl = document.getElementById("editEventModal");
 
-  let eventsByDate = new Map();
+    const addModal = addModalEl ? new bootstrap.Modal(addModalEl) : null;
+    const editModal = editModalEl ? new bootstrap.Modal(editModalEl) : null;
 
-  function convertDate(y,m,d){
-    const dt = new Date(y,m,d);
-    dt.setHours(0,0,0,0);
-    return dt.toISOString().split("T")[0];
-  }
+    /* ----- prev/next must be defined before used ----- */
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
 
-  /* ==============================
-     FETCH EVENT
-  ===============================*/
-  async function fetchEvents(){
-    const res = await fetch(
-        selectedAngkatan
-          ? `{{ route('admin.jadwal.get') }}?angkatan=${selectedAngkatan}`
-          : `{{ route('admin.jadwal.get') }}`
-    );
+    /* -------------------------
+       STATE
+    ------------------------- */
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    let selectedDate = null;
+    let eventsByDate = new Map();
 
-    const data = await res.json();
-    eventsByDate.clear();
+    const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
-    data.forEach(ev => {
-      const key = ev.start.split("T")[0];
-      if (!eventsByDate.has(key)) eventsByDate.set(key, []);
-      eventsByDate.get(key).push(ev);
-    });
-  }
-
-
-  /* ==============================
-     RENDER KALENDER
-  ===============================*/
-  async function renderCalendar(){
-    calendar.innerHTML = "";
-
-    await fetchEvents();
-
-    monthYear.textContent = `${months[currentMonth]} ${currentYear}`;
-
-    const firstDate = new Date(currentYear,currentMonth,1);
-    const lastDay   = new Date(currentYear,currentMonth+1,0).getDate();
-
-    let startDay = (firstDate.getDay() - DAY_OFFSET + 7) % 7;
-
-    ["Sen","Sel","Rab","Kam","Jum","Sab","Min"].forEach(day => {
-      const div = document.createElement("div");
-      div.classList.add("day-header");
-      div.textContent = day;
-      calendar.appendChild(div);
-    });
-
-    for (let i=0; i<startDay; i++){
-      const empty = document.createElement("div");
-      empty.classList.add("day-cell","empty");
-      calendar.appendChild(empty);
+    /* -------------------------
+       SAFELY ATTACH EVENT (if exists)
+    ------------------------- */
+    if (guruSelect) {
+        guruSelect.addEventListener("change", function () {
+            const opt = this.options[this.selectedIndex];
+            mapelInput.value = opt ? opt.dataset.mapel || "" : "";
+        });
     }
 
-    for (let d=1; d<=lastDay; d++){
-      const key = convertDate(currentYear,currentMonth,d);
-
-      const cell = document.createElement("div");
-      cell.classList.add("day-cell");
-      cell.innerHTML = `<span class="date-number">${d}</span>`;
-
-      if (eventsByDate.has(key)) cell.classList.add("has-event");
-
-      if (key === convertDate(today.getFullYear(),today.getMonth(),today.getDate()))
-        cell.classList.add("today");
-
-      cell.addEventListener("click", () => {
-        document.querySelectorAll(".day-cell.selected").forEach(c => c.classList.remove("selected"));
-        cell.classList.add("selected");
-
-        selectedDate = key;
-        loadAgenda(key);
-      });
-
-      calendar.appendChild(cell);
-    }
-  }
-
-
-  /* ==============================
-     LOAD AGENDA
-  ===============================*/
-  async function loadAgenda(date){
-    const res = await fetch(
-      selectedAngkatan
-        ? `/admin/jadwal/hari/${date}?angkatan=${selectedAngkatan}`
-        : `/admin/jadwal/hari/${date}`
-    );
-
-    const data = await res.json();
-    agendaList.innerHTML = "";
-
-    if (data.length === 0){
-      agendaList.innerHTML = `<li class="agenda-empty">Tidak ada jadwal.</li>`;
-      return;
+    if (editGuru) {
+        editGuru.addEventListener("change", function () {
+            const opt = this.options[this.selectedIndex];
+            editMapel.value = opt ? opt.dataset.mapel || "" : "";
+        });
     }
 
-    data.forEach(j => {
-      const li = document.createElement("li");
-      li.classList.add("agenda-item");
-
-      li.innerHTML = `
-        <strong>${j.mata_pelajaran}</strong><br>
-        <small>Guru: ${j.guru}</small><br>
-        <small>Kelas: ${j.kelas_nama}</small><br>
-        <small>Jam: ${j.jam_mulai.substring(0,5)} - ${j.jam_selesai.substring(0,5)}</small>
-      `;
-
-      li.addEventListener("click", () => openEdit(j));
-      agendaList.appendChild(li);
-    });
-  }
-
-
-  /* ==============================
-     OPEN EDIT
-  ===============================*/
-  function openEdit(j){
-    document.getElementById("edit_id").value = j.id;
-    document.getElementById("edit_guru").value = j.guru;
-    document.getElementById("edit_mata_pelajaran").value = j.mata_pelajaran;
-    document.getElementById("edit_jam_mulai").value = j.jam_mulai;
-    document.getElementById("edit_jam_selesai").value = j.jam_selesai;
-
-    [...document.getElementById("edit_kelas").options].forEach(o => {
-      o.selected = (o.text === j.kelas_nama);
-    });
-
-    editModal.show();
-  }
-
-
-  /* ==============================
-     TAMBAH JADWAL
-  ===============================*/
-  document.getElementById("addScheduleBtn").addEventListener("click", () => {
-    if (!selectedDate) return Swal.fire("Pilih tanggal dulu!", "", "info");
-    eventModal.show();
-  });
-
-  eventForm.addEventListener("submit", async e => {
-    e.preventDefault();
-
-    let fd = new FormData(eventForm);
-    fd.append("tanggal", selectedDate);
-
-    const res = await fetch("{{ route('admin.jadwal.store') }}", {
-      method: "POST",
-      headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-      body: fd
-    });
-
-    const json = await res.json();
-
-    if (json.success){
-      Swal.fire("Berhasil!", json.message, "success");
-      eventModal.hide();
-      eventForm.reset();
-      renderCalendar();
-      loadAgenda(selectedDate);
-    } else {
-      Swal.fire("Gagal!", json.message, "warning");
+    function formatDate(y, m, d) {
+        return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     }
-  });
 
-
-  /* ==============================
-     EDIT JADWAL
-  ===============================*/
-  editForm.addEventListener("submit", async e => {
-    e.preventDefault();
-
-    const id = document.getElementById("edit_id").value;
-    let fd = new FormData(editForm);
-
-    const res = await fetch(`/admin/jadwal/${id}`, {
-      method: "POST",
-      headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-      body: fd
-    });
-
-    const json = await res.json();
-
-    if (json.success){
-      Swal.fire("Berhasil!", "Jadwal diperbarui!", "success");
-      editModal.hide();
-      renderCalendar();
-      loadAgenda(selectedDate);
+    /* ===========================
+       FETCH EVENTS (server)
+    ============================ */
+    async function fetchEvents() {
+        try {
+            const res = await fetch("{{ route('admin.jadwal.get') }}", { cache: "no-store" });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return data;
+        } catch (err) {
+            console.error("fetchEvents error:", err);
+            return [];
+        }
     }
-  });
 
-
-  /* ==============================
-     HAPUS HARI INI
-  ===============================*/
-  deleteOneBtn.addEventListener("click", async () => {
-    const id = document.getElementById("edit_id").value;
-    if (!confirm("Hapus jadwal ini?")) return;
-
-    const res = await fetch(`/admin/jadwal/${id}`, {
-      method: "DELETE",
-      headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
-    });
-
-    const json = await res.json();
-
-    if (json.success){
-      Swal.fire("Dihapus!", "Jadwal berhasil dihapus", "success");
-      editModal.hide();
-      renderCalendar();
-      loadAgenda(selectedDate);
+    async function loadEventsIntoMap() {
+        const data = await fetchEvents();
+        eventsByDate.clear();
+        data.forEach(ev => {
+            const raw = ev.start || ev.tanggal || "";
+            const key = raw.split("T")[0] || raw;
+            if (!eventsByDate.has(key)) eventsByDate.set(key, []);
+            eventsByDate.get(key).push(ev);
+        });
     }
-  });
 
+    /* ===========================
+       RENDER CALENDAR
+    ============================ */
+    async function renderCalendar() {
+        if (!calendar) return;
 
-  /* ==============================
-     HAPUS SEMESTER
-  ===============================*/
-  deleteSemesterBtn.addEventListener("click", async () => {
-    const mapel = document.getElementById("edit_mata_pelajaran").value;
+        calendar.innerHTML = "";
+        await loadEventsIntoMap();
 
-    if (!confirm(`Hapus semua jadwal '${mapel}' selama semester?`)) return;
+        monthYear.textContent = `${months[currentMonth]} ${currentYear}`;
 
-    const res = await fetch(`/admin/jadwal/hapus-semester/${mapel}`, {
-      method: "DELETE",
-      headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
-    });
+        // headers
+        ["Sen","Sel","Rab","Kam","Jum","Sab","Min"].forEach(h => {
+            const el = document.createElement("div");
+            el.className = "day-header";
+            el.textContent = h;
+            calendar.appendChild(el);
+        });
 
-    const json = await res.json();
+        const first = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth+1, 0).getDate();
+        let start = (first.getDay() + 6) % 7; // make Monday index 0
 
-    if (json.success){
-      Swal.fire("Dihapus!", json.message, "success");
-      editModal.hide();
-      renderCalendar();
-      loadAgenda(selectedDate);
+        // empty cells
+        for (let i = 0; i < start; i++) {
+            const c = document.createElement("div");
+            c.className = "day-cell empty";
+            calendar.appendChild(c);
+        }
+
+        for (let d = 1; d <= lastDay; d++) {
+            const key = formatDate(currentYear, currentMonth, d);
+            const c = document.createElement("div");
+            c.className = "day-cell";
+            c.innerHTML = `<span class="date-number">${d}</span>`;
+
+            if (key === formatDate(today.getFullYear(), today.getMonth(), today.getDate())) {
+                c.classList.add("today");
+            }
+
+            if (eventsByDate.has(key)) c.classList.add("has-event");
+
+            c.addEventListener("click", () => {
+                document.querySelectorAll(".day-cell").forEach(el => el.classList.remove("selected"));
+                c.classList.add("selected");
+                selectedDate = key;
+                loadAgenda(key);
+            });
+
+            calendar.appendChild(c);
+        }
     }
-  });
 
-  /* INIT */
-  renderCalendar();
+    /* ===========================
+       LOAD AGENDA (per tanggal)
+    ============================ */
+    async function loadAgenda(date) {
+        try {
+            const res = await fetch(`/admin/jadwal/hari/${date}`);
+            if (!res.ok) {
+                agendaList.innerHTML = `<li class="agenda-empty">Gagal memuat data.</li>`;
+                return;
+            }
+            const data = await res.json();
+            agendaList.innerHTML = "";
 
-});
+            if (!data || data.length === 0) {
+                agendaList.innerHTML = `<li class="agenda-empty">Tidak ada jadwal.</li>`;
+                return;
+            }
+
+            data.forEach(j => {
+                const li = document.createElement("li");
+                li.className = "agenda-item";
+
+                const kelasNama = j.kelas_nama || (j.kelas?.nama_kelas ?? "-");
+
+                li.innerHTML = `
+                    <strong>${j.mata_pelajaran}</strong><br>
+                    <small>Guru: ${j.guru}</small><br>
+                    <small>Kelas: ${kelasNama}</small><br>
+                    <small>${(j.jam_mulai || '').substring(0,5)} - ${(j.jam_selesai || '').substring(0,5)}</small>
+                `;
+
+                li.addEventListener("click", () => openEdit(j));
+                agendaList.appendChild(li);
+            });
+        } catch (err) {
+            console.error("loadAgenda error:", err);
+            agendaList.innerHTML = `<li class="agenda-empty">Error memuat agenda.</li>`;
+        }
+    }
+
+    /* ===========================
+       OPEN EDIT MODAL (isi data)
+    ============================ */
+    function openEdit(j) {
+        if (!editForm) return;
+
+        document.getElementById("edit_id").value = j.id ?? "";
+        if (editGuru) editGuru.value = j.guru ?? "";
+        if (editMapel) editMapel.value = j.mata_pelajaran ?? "";
+        if (document.getElementById("edit_jam_mulai")) document.getElementById("edit_jam_mulai").value = j.jam_mulai ?? "";
+        if (document.getElementById("edit_jam_selesai")) document.getElementById("edit_jam_selesai").value = j.jam_selesai ?? "";
+        editGroupId.value = j.semester_group_id ?? "";
+
+        const editKelas = document.getElementById("edit_kelas");
+        if (editKelas && j.kelas_id) {
+            [...editKelas.options].forEach(o => {
+                o.selected = String(o.value) === String(j.kelas_id);
+            });
+        }
+
+        if (editModal) editModal.show();
+    }
+
+    /* ===========================
+       HANDLERS: tombol add schedule
+    ============================ */
+    if (addScheduleBtn) {
+        addScheduleBtn.addEventListener("click", () => {
+            if (!selectedDate) return Swal.fire("Pilih tanggal dahulu!", "", "info");
+            if (addModal) addModal.show();
+        });
+    }
+
+    /* ===========================
+       SUBMIT TAMBAH
+    ============================ */
+    if (eventForm) {
+        eventForm.addEventListener("submit", async e => {
+            e.preventDefault();
+            if (!selectedDate) return Swal.fire("Pilih tanggal dahulu!", "", "info");
+
+            try {
+                const fd = new FormData(eventForm);
+                fd.append("tanggal", selectedDate);
+
+                const res = await fetch("{{ route('admin.jadwal.store') }}", {
+                    method: "POST",
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                    body: fd
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    Swal.fire("Berhasil!", json.message, "success");
+                    eventForm.reset();
+                    if (addModal) addModal.hide();
+                    await renderCalendar();
+                    loadAgenda(selectedDate);
+                } else {
+                    const msg = json.message || (json.errors ? Object.values(json.errors).flat().join(', ') : 'Gagal');
+                    Swal.fire("Gagal!", msg, "warning");
+                }
+            } catch (err) {
+                console.error("submit add error:", err);
+                Swal.fire("Gagal!", "Kesalahan server.", "error");
+            }
+        });
+    }
+
+    /* ===========================
+       SUBMIT EDIT
+    ============================ */
+    if (editForm) {
+        editForm.addEventListener("submit", async e => {
+            e.preventDefault();
+            const id = document.getElementById("edit_id").value;
+            if (!id) return Swal.fire("Tidak ditemukan id jadwal.", "", "warning");
+
+            try {
+                const fd = new FormData(editForm);
+
+                const res = await fetch(`/admin/jadwal/${id}`, {
+                    method: "POST",
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                    body: fd
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    Swal.fire("Berhasil!", "Jadwal diperbarui!", "success");
+                    if (editModal) editModal.hide();
+                    await renderCalendar();
+                    if (selectedDate) loadAgenda(selectedDate);
+                } else {
+                    const msg = json.message || 'Gagal memperbarui';
+                    Swal.fire("Gagal!", msg, "warning");
+                }
+            } catch (err) {
+                console.error("edit submit error:", err);
+                Swal.fire("Gagal!", "Kesalahan server.", "error");
+            }
+        });
+    }
+
+    /* ===========================
+       DELETE SATU
+    ============================ */
+    if (deleteOneBtn) {
+        deleteOneBtn.addEventListener("click", async () => {
+            const id = document.getElementById("edit_id").value;
+            if (!id) return Swal.fire("ID tidak ditemukan.", "", "warning");
+
+            try {
+                const res = await fetch(`/admin/jadwal/${id}`, {
+                    method: "DELETE",
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    Swal.fire("Dihapus!", json.message, "success");
+                    if (editModal) editModal.hide();
+                    await renderCalendar();
+                    if (selectedDate) loadAgenda(selectedDate);
+                } else {
+                    Swal.fire("Gagal!", json.message || "Gagal menghapus.", "warning");
+                }
+            } catch (err) {
+                console.error("delete one error:", err);
+                Swal.fire("Gagal!", "Kesalahan server.", "error");
+            }
+        });
+    }
+
+    /* ===========================
+       DELETE SEMESTER (group)
+    ============================ */
+    if (deleteSemesterBtn) {
+        deleteSemesterBtn.addEventListener("click", async () => {
+            const groupId = editGroupId.value;
+            if (!groupId) return Swal.fire("Tidak bisa!", "Jadwal ini bukan bagian jadwal semester.", "warning");
+
+            try {
+                const res = await fetch(`/admin/jadwal/hapus-semester/${encodeURIComponent(groupId)}`, {
+                    method: "DELETE",
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+                });
+
+                const json = await res.json();
+
+                if (json.success) {
+                    Swal.fire("Dihapus!", json.message, "success");
+                    if (editModal) editModal.hide();
+                    await renderCalendar();
+                    if (selectedDate) loadAgenda(selectedDate);
+                } else {
+                    Swal.fire("Gagal!", json.message || "Gagal menghapus semester.", "warning");
+                }
+            } catch (err) {
+                console.error("delete semester error:", err);
+                Swal.fire("Gagal!", "Kesalahan server.", "error");
+            }
+        });
+    }
+
+    /* ===========================
+       NAVIGATION
+    ============================ */
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+    }
+
+    /* ===========================
+       INITIAL LOAD
+    ============================ */
+    renderCalendar();
+
+}); // DOMContentLoaded
 </script>
 @endsection

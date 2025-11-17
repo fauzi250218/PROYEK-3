@@ -228,6 +228,20 @@ body.guru {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* ============================
+   Override tombol Keluar guru
+============================ */
+.header-top form .btn-primary {
+    background-color: #218838 !important;
+    border-color: #218838 !important;
+}
+
+.header-top form .btn-primary:hover {
+    background-color: #1a6e2e !important;
+    border-color: #1a6e2e !important;
+}
+
+
 /* =======================================================
    KONTEN AREA
    ======================================================= */

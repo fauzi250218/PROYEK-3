@@ -20,6 +20,7 @@ class Jadwal extends Model
         'jam_selesai',
         'tanggal',
         'keterangan',
+        'semester_group_id',
     ];
 
     public function kelas()
