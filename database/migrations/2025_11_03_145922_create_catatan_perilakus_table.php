@@ -16,7 +16,7 @@ return new class extends Migration
 
             // Relasi ke tabel murid, guru, dan kelas
             $table->foreignId('murid_id')->constrained('murids')->onDelete('cascade');
-            $table->foreignId('guru_id')->constrained('gurus')->onDelete('cascade');
+            $table->foreignId('guru_id')->constrained('guru')->onDelete('cascade');
             $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade'); // ✅ Tambahkan ini
 
             $table->date('tanggal')->default(now());

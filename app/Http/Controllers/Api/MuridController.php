@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Murid;
 use App\Models\Kelas;
+use App\Models\ValidasiMurid;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 class MuridController extends Controller
 {
     // ==========================
-    // REGISTER MURID BARU
+    // REGISTER MURID BARU (MANUAL)
     // ==========================
     public function register(Request $request)
     {
@@ -45,55 +46,99 @@ class MuridController extends Controller
         ], 201);
     }
 
-    public function googleRegister(Request $request)
+    // ==========================
+    // LOGIN MURID DENGAN GOOGLE
+    // ==========================
+    public function googleLogin(Request $request)
     {
+        $validated = $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        // Cek apakah murid sudah terdaftar
+        $murid = Murid::where('email', $validated['email'])->first();
+
+        if ($murid) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Login berhasil!',
+                'data' => $murid,
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email belum terdaftar, silakan registrasi terlebih dahulu.',
+            ], 404);
+        }
+    }
+
+    // ==========================
+    // REGISTER MURID BARU (WITH GOOGLE VALIDASI NIS)
+    // ==========================
+    public function googleRegisterValidate(Request $request)
+    {
+        // ✅ Validasi input dasar
         $validated = $request->validate([
             'nama' => 'required|string',
             'email' => 'required|email',
             'foto' => 'nullable|string',
+            'nis'  => 'required|string',
         ]);
 
-        // Cek apakah murid sudah ada
-        $murid = Murid::where('email', $validated['email'])->first();
-
-        if ($murid) {
-            // User sudah ada, login saja
+        // 🔍 Cek apakah NIS terdaftar di tabel validasi_murids
+        $validNis = DB::table('validasi_murids')->where('nis', $validated['nis'])->first();
+        if (!$validNis) {
             return response()->json([
-                'success' => true,
-                'message' => 'Murid berhasil login dengan Google!',
-                'data' => $murid,
-            ], 200);
+                'success' => false,
+                'message' => 'NIS tidak terdaftar. Hubungi wali kelas untuk verifikasi.',
+            ], 404);
         }
 
-        // Buat NIS sementara jika belum ada
-        $tempNis = 'G' . time() . rand(100, 999);
+        // 🔍 Cek apakah NIS sudah punya akun
+        $nisExists = Murid::where('nis', $validated['nis'])->first();
+        if ($nisExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'NIS ini sudah terdaftar dengan akun lain.',
+            ], 409);
+        }
 
-        // Default jenis_kelamin supaya enum valid
+        // 🔍 Cek apakah email sudah dipakai
+        $emailExists = Murid::where('email', $validated['email'])->first();
+        if ($emailExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email ini sudah terdaftar dengan akun lain.',
+            ], 409);
+        }
+
+        // 🔐 Default jenis kelamin
         $defaultJenisKelamin = 'Laki-laki';
 
-        // Buat murid baru dengan password default 'password'
+        // ✨ Buat akun murid baru
         $murid = Murid::create([
             'nama' => $validated['nama'],
             'email' => $validated['email'],
             'foto_profil' => $validated['foto'] ?? null,
-            'kelas_id' => null,
+            'kelas_id' => $validNis->kelas_id,
             'jenis_kelamin' => $defaultJenisKelamin,
             'nomer_whatsapp' => null,
             'kata_sandi' => bcrypt('password'),
-            'nis' => $tempNis,
+            'nis' => $validated['nis'],
         ]);
 
-        // 🔹 Buat notifikasi untuk user baru
+        // 🔔 Buat notifikasi awal
         $murid->notifications()->create([
-            'title' => 'Login Google Berhasil',
+            'title' => 'Akun Google Berhasil Dibuat',
             'message' => 'Password default Anda adalah "password". Silakan ubah jika perlu.',
             'is_read' => false,
         ]);
 
+        // ✅ Return data murid + relasi kelas
         return response()->json([
             'success' => true,
-            'message' => 'Murid berhasil register/login dengan Google!',
-            'data' => $murid,
+            'message' => 'Akun berhasil dibuat!',
+            'data' => $murid->load('kelas'),
         ], 201);
     }
 
