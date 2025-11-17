@@ -1,170 +1,102 @@
-/* ==============================================
-   Detail Nilai Siswa - Versi Putih Bersih & Rapi
-   ============================================== */
-
-body {
-    background: #f9fafb;
+/* Wrapper */
+.nilai-page {
     font-family: 'Poppins', sans-serif;
 }
 
-/* Header */
+/* Card utama */
+.nilai-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+/* Header Siswa */
 .nilai-header h2 {
-    color: #111827;
-    font-size: 1.9rem;
     font-weight: 700;
 }
 
 .nilai-header p {
-    font-size: 0.95rem;
-    color: #6b7280;
+    font-size: 14px;
 }
 
-/* Tombol Tambah */
-.btn-add {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
+/* Tabel */
+.table-custom th {
+    background: #f4f6f9;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
-    transition: all 0.25s ease-in-out;
-}
-
-.btn-add:hover {
-    background: #15803d;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);
-}
-
-/* Wrapper tabel */
-.nilai-table {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 25px;
-    margin-top: 15px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
-}
-
-/* Header tabel */
-.table thead {
-    background: #16a34a;
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.table th, .table td {
     padding: 16px;
-    border: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.table-custom td {
+    padding: 16px;
     vertical-align: middle;
 }
 
-/* Baris */
-.table tbody tr {
-    background: #fff;
-    transition: all 0.2s ease-in-out;
+/* Input Style */
+.input-mini {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.6px solid #dcdcdc;
+    font-size: 14px;
+    background: #fcfcfc;
 }
 
-.table tbody tr:hover {
-    background: #f0fdf4;
-    transform: scale(1.002);
+.input-mini:focus {
+    border-color: #198754;
+    outline: none;
 }
 
-/* ======== KETERANGAN TANPA KOTAK ======== */
-.keterangan-cell {
-    vertical-align: middle !important;
-    text-align: center;
-}
-
-.keterangan-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 100%;
-}
-
-.keterangan-wrapper span {
-    font-size: 0.92rem;
-    font-weight: 500;
-    color: #111827;
-    background: none;       /* Hilangkan warna latar */
-    border: none;           /* Hilangkan border */
-    padding: 0;             /* Hilangkan padding */
-    text-align: center;
-}
-
-/* Tombol Edit & Delete */
-.btn-edit {
-    background: #fbbf24;
+/* Button Simpan */
+.btn-save {
+    background: #198754;
     color: #fff;
     border: none;
+    padding: 8px 18px;
     border-radius: 8px;
-    padding: 6px 10px;
-    transition: all 0.25s ease;
+    transition: 0.2s;
+    font-size: 14px;
 }
 
-.btn-edit:hover {
-    background: #eab308;
-    transform: translateY(-2px);
+.btn-save:hover {
+    background: #157347;
+}
+
+/* Button Aksi */
+.btn-edit {
+    background: #ffc107;
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 10px;
 }
 
 .btn-delete {
-    background: #ef4444;
-    color: #fff;
-    border: none;
+    background: #dc3545;
     border-radius: 8px;
-    padding: 6px 10px;
-    transition: all 0.25s ease;
-}
-
-.btn-delete:hover {
-    background: #dc2626;
-    transform: translateY(-2px);
-}
-
-/* Tombol Kembali */
-.btn-back {
-    border-radius: 10px;
-    border: 2px solid #16a34a;
-    color: #16a34a;
-    font-weight: 600;
-    padding: 10px 20px;
-    transition: all 0.25s ease-in-out;
-}
-
-.btn-back:hover {
-    background: linear-gradient(90deg, #16a34a, #22c55e);
     color: #fff;
-    transform: translateY(-3px);
+    padding: 8px 10px;
 }
 
-/* Animasi Halus */
-.shadow-card {
-    opacity: 0;
-    animation: fadeIn 0.6s ease forwards;
+/* Floating row untuk tambah nilai */
+.row-add {
+    background: #f9fafb;
+    border-radius: 12px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+.row-add td {
+    padding: 14px 10px !important;
 }
 
-/* Responsif */
-@media (max-width: 768px) {
-    .nilai-header h2 {
-        font-size: 1.4rem;
-    }
+.table-custom tbody tr:hover {
+    background: #fafafa;
+}
 
-    .btn-add, .btn-back {
-        width: 100%;
-        text-align: center;
-    }
-
-    .table td, .table th {
-        font-size: 0.9rem;
-    }
+/* Kembali Button */
+.btn-back {
+    background: #0d6efd;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
 }

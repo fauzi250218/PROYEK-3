@@ -146,20 +146,24 @@ Route::prefix('guru')
         // =======================
         // MANAJEMEN NILAI
         // =======================
-        Route::get('/nilai', fn() => redirect()->route('guru.nilai.semuaKelas'));
-
         Route::prefix('nilai')->name('nilai.')->group(function () {
+
             Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
             Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index');
             Route::get('/kelas/{kelasId}/mapel/{mapel}', [NilaiController::class, 'muridPerMapel'])->name('mapel.murid');
 
             Route::get('/murid/{id}', [NilaiController::class, 'detail'])->name('detail');
-            Route::get('/murid/{id}/create', [NilaiController::class, 'create'])->name('create');
+
+            // === ROUTE YANG SUDAH ADA ===
             Route::post('/murid/{id}', [NilaiController::class, 'store'])->name('store');
-            Route::get('/edit/{id}', [NilaiController::class, 'edit'])->name('edit');
             Route::put('/update/{id}', [NilaiController::class, 'update'])->name('update');
             Route::delete('/hapus/{id}', [NilaiController::class, 'destroy'])->name('destroy');
+
+            // === ROUTE BARU UNTUK INLINE ===
+            Route::post('/murid/{id}/inline', [NilaiController::class, 'storeInline'])->name('storeInline');
+            Route::put('/update-inline/{id}', [NilaiController::class, 'updateInline'])->name('updateInline');
         });
+
 
         // =======================
         // MENU TAMBAHAN GURU

@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 class NilaiController extends Controller
 {
+
     /**
-     * 1️⃣ Tampilkan semua kelas (file: semua-kelas.blade.php)
+     * 1️⃣ Tampilkan semua kelas
      */
     public function semuaKelas()
     {
@@ -22,13 +23,12 @@ class NilaiController extends Controller
     }
 
     /**
-     * 2️⃣ Tampilkan daftar mata pelajaran pada kelas yang dipilih (file: mapel.blade.php)
+     * 2️⃣ Tampilkan daftar mata pelajaran pada kelas tertentu
      */
     public function index($id)
     {
         $kelas = Kelas::with(['guru.user'])->findOrFail($id);
 
-        // Ambil daftar mapel dari jadwal kelas ini
         $mapelList = Jadwal::where('kelas_id', $id)
             ->pluck('mata_pelajaran')
             ->unique();
@@ -37,45 +37,37 @@ class NilaiController extends Controller
     }
 
     /**
-     * 3️⃣ Tampilkan daftar murid berdasarkan kelas dan mapel yang dipilih (file: murid-mapel.blade.php)
+     * 3️⃣ Tampilkan daftar murid dalam mapel
      */
     public function muridPerMapel($kelasId, $mapel)
     {
         $kelas = Kelas::with('murids')->findOrFail($kelasId);
         $murids = $kelas->murids;
-        $mataPelajaran = $mapel;
 
-        return view('guru.nilai.murid-mapel', compact('kelas', 'murids', 'mataPelajaran'));
+        return view('guru.nilai.murid-mapel', [
+            'kelas' => $kelas,
+            'murids' => $murids,
+            'mataPelajaran' => $mapel
+        ]);
     }
 
     /**
-     * 4️⃣ Tampilkan detail nilai untuk satu murid (file: detail.blade.php)
+     * 4️⃣ Halaman detail nilai murid (inline CRUD)
      */
     public function detail($id)
     {
         $murid = Murid::with(['kelas', 'nilai'])->findOrFail($id);
-        $nilaiList = Nilai::where('murid_id', $id)->get();
-        return view('guru.nilai.detail', compact('murid', 'nilaiList'));
-    }
 
-    /**
-     * 5️⃣ Form tambah nilai (file: create.blade.php)
-     */
-    public function create($id)
-    {
-        $murid = Murid::with('kelas')->findOrFail($id);
-        $guru = Auth::user()->guru;
-
-        // Ambil mapel dari jadwal kelas tempat murid berada
+        // Daftar mata pelajaran berdasarkan jadwal kelas murid
         $mapelList = Jadwal::where('kelas_id', $murid->kelas_id)
             ->pluck('mata_pelajaran')
             ->unique();
 
-        return view('guru.nilai.create', compact('murid', 'mapelList'));
+        return view('guru.nilai.detail', compact('murid', 'mapelList'));
     }
 
     /**
-     * Simpan nilai baru (tugas, ulangan harian, uts, uas sekaligus)
+     * 5️⃣ Simpan nilai baru (inline create)
      */
     public function store(Request $request, $id)
     {
@@ -88,9 +80,9 @@ class NilaiController extends Controller
         ]);
 
         $murid = Murid::findOrFail($id);
-        $guruId = Auth::user()->guru->id ?? null;
+        $guruId = Auth::user()->guru->id;
 
-        // Hitung rata-rata dari nilai yang diisi
+        // Hitung rata-rata
         $nilaiArray = array_filter([
             $request->tugas,
             $request->ulangan_harian,
@@ -98,13 +90,12 @@ class NilaiController extends Controller
             $request->uas
         ], fn($v) => $v !== null);
 
-        $rataRata = count($nilaiArray) > 0 ? array_sum($nilaiArray) / count($nilaiArray) : null;
+        $rataRata = count($nilaiArray) ? array_sum($nilaiArray) / count($nilaiArray) : null;
 
-        // Simpan data nilai
         Nilai::create([
             'murid_id'         => $murid->id,
-            'guru_id'          => $guruId,
             'kelas_id'         => $murid->kelas_id,
+            'guru_id'          => $guruId,
             'mata_pelajaran'   => $request->mata_pelajaran,
             'tugas'            => $request->tugas,
             'ulangan_harian'   => $request->ulangan_harian,
@@ -118,23 +109,7 @@ class NilaiController extends Controller
     }
 
     /**
-     * 6️⃣ Form edit nilai (file: edit.blade.php)
-     */
-    public function edit($id)
-    {
-        $nilai = Nilai::findOrFail($id);
-        $guru = Auth::user()->guru;
-
-        // Ambil daftar mapel dari jadwal kelas terkait
-        $mapelList = Jadwal::where('kelas_id', $nilai->kelas_id)
-            ->pluck('mata_pelajaran')
-            ->unique();
-
-        return view('guru.nilai.edit', compact('nilai', 'mapelList'));
-    }
-
-    /**
-     * 7️⃣ Update nilai dan hitung ulang rata-rata
+     * 6️⃣ Update nilai (inline update)
      */
     public function update(Request $request, $id)
     {
@@ -148,6 +123,7 @@ class NilaiController extends Controller
 
         $nilai = Nilai::findOrFail($id);
 
+        // Hitung rata-rata
         $nilaiArray = array_filter([
             $request->tugas,
             $request->ulangan_harian,
@@ -155,7 +131,7 @@ class NilaiController extends Controller
             $request->uas
         ], fn($v) => $v !== null);
 
-        $rataRata = count($nilaiArray) > 0 ? array_sum($nilaiArray) / count($nilaiArray) : null;
+        $rataRata = count($nilaiArray) ? array_sum($nilaiArray) / count($nilaiArray) : null;
 
         $nilai->update([
             'mata_pelajaran'   => $request->mata_pelajaran,
@@ -171,7 +147,7 @@ class NilaiController extends Controller
     }
 
     /**
-     * 8️⃣ Hapus nilai
+     * 7️⃣ Hapus nilai
      */
     public function destroy($id)
     {
