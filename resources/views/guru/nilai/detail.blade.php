@@ -72,8 +72,13 @@
                         <td>
                             <select name="mata_pelajaran" class="form-select form-select-sm" required>
                                 <option value="">Pilih Mapel</option>
+
+                                {{-- AUTO SELECT MAPEL SESUAI YANG DIKLIK PADA HALAMAN SEBELUMNYA --}}
                                 @foreach($mapelList as $m)
-                                    <option value="{{ $m }}">{{ $m }}</option>
+                                    <option value="{{ $m }}"
+                                        {{ isset($selectedMapel) && $selectedMapel == $m ? 'selected' : '' }}>
+                                        {{ $m }}
+                                    </option>
                                 @endforeach
                             </select>
                         </td>

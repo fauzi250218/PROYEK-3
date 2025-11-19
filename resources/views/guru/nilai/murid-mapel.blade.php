@@ -46,7 +46,8 @@
                                 <td class="text-start">{{ $murid->email }}</td>
                                 <td>{{ ucfirst($murid->jenis_kelamin) }}</td>
                                 <td>
-                                    <a href="{{ route('guru.nilai.detail', $murid->id) }}" 
+                                    {{-- ⭐ SUDAH DISESUAIKAN DENGAN ROUTE BARU --}}
+                                    <a href="{{ route('guru.nilai.detail', [$murid->id, $mataPelajaran]) }}" 
                                        class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm px-3 rounded-pill">
                                         <i class="bi bi-eye"></i> Detail
                                     </a>

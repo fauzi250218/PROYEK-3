@@ -46,4 +46,8 @@ class Guru extends Model
     {
         return $this->user->name ?? '-';
     }
+    public function jadwals()
+    {
+        return $this->hasMany(Jadwal::class, 'guru', 'user_id');
+    }
 }

@@ -18,7 +18,15 @@ class NilaiController extends Controller
      */
     public function semuaKelas()
     {
-        $kelasList = Kelas::with(['guru.user'])->get();
+        $guru = Auth::user()->guru;
+        $mapelGuru = $guru->mata_pelajaran;
+
+        $kelasList = Kelas::with(['guru.user'])
+            ->whereHas('jadwals', function ($query) use ($mapelGuru) {
+                $query->where('mata_pelajaran', $mapelGuru);
+            })
+            ->get();
+
         return view('guru.nilai.semua-kelas', compact('kelasList'));
     }
 
@@ -52,22 +60,25 @@ class NilaiController extends Controller
     }
 
     /**
-     * 4️⃣ Halaman detail nilai murid (inline CRUD)
+     * 4️⃣ Halaman detail nilai murid
      */
-    public function detail($id)
+    public function detail($id, $mapel)
     {
         $murid = Murid::with(['kelas', 'nilai'])->findOrFail($id);
 
-        // Daftar mata pelajaran berdasarkan jadwal kelas murid
         $mapelList = Jadwal::where('kelas_id', $murid->kelas_id)
             ->pluck('mata_pelajaran')
             ->unique();
 
-        return view('guru.nilai.detail', compact('murid', 'mapelList'));
+        return view('guru.nilai.detail', [
+            'murid' => $murid,
+            'mapelList' => $mapelList,
+            'selectedMapel' => $mapel
+        ]);
     }
 
     /**
-     * 5️⃣ Simpan nilai baru (inline create)
+     * 5️⃣ Simpan nilai baru
      */
     public function store(Request $request, $id)
     {
@@ -82,7 +93,7 @@ class NilaiController extends Controller
         $murid = Murid::findOrFail($id);
         $guruId = Auth::user()->guru->id;
 
-        // Hitung rata-rata
+        // hitung rata-rata
         $nilaiArray = array_filter([
             $request->tugas,
             $request->ulangan_harian,
@@ -104,12 +115,14 @@ class NilaiController extends Controller
             'rata_rata'        => $rataRata,
         ]);
 
-        return redirect()->route('guru.nilai.detail', $murid->id)
-            ->with('success', 'Nilai berhasil ditambahkan.');
+        return redirect()->route('guru.nilai.detail', [
+            'id' => $murid->id,
+            'mapel' => $request->mata_pelajaran
+        ])->with('success', 'Nilai berhasil ditambahkan.');
     }
 
     /**
-     * 6️⃣ Update nilai (inline update)
+     * 6️⃣ Update nilai
      */
     public function update(Request $request, $id)
     {
@@ -123,7 +136,6 @@ class NilaiController extends Controller
 
         $nilai = Nilai::findOrFail($id);
 
-        // Hitung rata-rata
         $nilaiArray = array_filter([
             $request->tugas,
             $request->ulangan_harian,
@@ -142,8 +154,10 @@ class NilaiController extends Controller
             'rata_rata'        => $rataRata,
         ]);
 
-        return redirect()->route('guru.nilai.detail', $nilai->murid_id)
-            ->with('success', 'Nilai berhasil diperbarui.');
+        return redirect()->route('guru.nilai.detail', [
+            'id' => $nilai->murid_id,
+            'mapel' => $nilai->mata_pelajaran
+        ])->with('success', 'Nilai berhasil diperbarui.');
     }
 
     /**
