@@ -1,69 +1,130 @@
-/* Layout 3 kolom */
-.kelas-3kolom {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
+/* ----------------------------------------------------
+   FONT & BACKGROUND
+---------------------------------------------------- */
+body, .semua-kelas-wrapper {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9fafb;
 }
 
-/* Kolom */
-.kelas-kolom {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+/* Judul Halaman */
+.title-page {
+    color: #1e293b;
+    font-size: 1.9rem;
 }
 
-/* Header kolom */
-.kelas-judul {
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 8px;
-    font-size: 20px;
-}
-
-/* CARD */
-.kelas-card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 22px 24px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-    transition: .25s ease;
-    cursor: pointer;
-}
-
-.kelas-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.14);
-}
-
-/* teks */
-.kelas-card h5 {
-    font-weight: 800;
-    margin-bottom: 5px;
-}
-
-.kelas-card .mapel {
-    font-size: 14px;
+.subtitle {
     color: #6b7280;
-    margin-bottom: 10px;
+    font-size: 0.95rem;
 }
 
-.kelas-card .guru-info {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 14px;
+/* ----------------------------------------------------
+   GRID LAYOUT TILE CARD
+---------------------------------------------------- */
+.kelas-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
 }
 
-/* Responsif */
-@media (max-width: 992px) {
-    .kelas-3kolom {
-        grid-template-columns: repeat(2, 1fr);
+/* ----------------------------------------------------
+   TILE CARD — SIMPLE BORDER EFFECT
+---------------------------------------------------- */
+.kelas-tile {
+    position: relative;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px 18px;
+    text-decoration: none;
+    color: #111;
+
+    /* efek utama yang kamu mau */
+    border-left: 4px solid transparent; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    transition: all 0.2s ease;
+}
+
+/* ----------------------------------------------------
+   HOVER — BORDER KIRI HIJAU & SHADOW
+---------------------------------------------------- */
+.kelas-tile:hover {
+    border-left: 4px solid #22c55e;
+    background: #ffffff; /* tetap putih */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ----------------------------------------------------
+   OVERLAY DIMATIKAN
+---------------------------------------------------- */
+.tile-overlay {
+    display: none;
+}
+
+/* ----------------------------------------------------
+   ICON (TANPA ANIMASI)
+---------------------------------------------------- */
+.tile-icon {
+    position: absolute;
+    right: 10px;
+    bottom: 5px;
+    font-size: 4.5rem;
+    color: rgba(22,163,74,0.12);
+    pointer-events: none;
+}
+
+.kelas-tile:hover .tile-icon {
+    transform: none;
+}
+
+/* ----------------------------------------------------
+   KONTEN TETAP
+---------------------------------------------------- */
+.tile-content {
+    position: relative;
+    z-index: 2;
+}
+
+.kelas-tile:hover .tile-content {
+    transform: none;
+}
+
+/* Nama kelas */
+.nama-kelas {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+/* Wali */
+.wali {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin-bottom: 2px;
+}
+
+/* Deskripsi */
+.desc {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* ----------------------------------------------------
+   EMPTY STATE
+---------------------------------------------------- */
+.empty-state {
+    color: #6b7280;
+}
+
+/* ----------------------------------------------------
+   RESPONSIVE
+---------------------------------------------------- */
+@media (max-width: 768px) {
+    .title-page {
+        font-size: 1.5rem;
     }
-}
 
-@media (max-width: 576px) {
-    .kelas-3kolom {
-        grid-template-columns: 1fr;
+    .kelas-tile {
+        padding: 18px 16px;
     }
 }

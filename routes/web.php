@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\MuridController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\JadwalController;
+
 use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\Guru\KelasBinaanController;
 use App\Http\Controllers\Guru\KelasAjaranController;
@@ -14,20 +16,24 @@ use App\Http\Controllers\Guru\NilaiController;
 use App\Http\Controllers\Guru\PembayaranController;
 use App\Http\Controllers\Guru\PerkembanganController;
 use App\Http\Controllers\Guru\ObrolanController;
+use App\Http\Controllers\Guru\KehadiranController;
+
 
 // ==================================================
-// ================ ROUTE UTAMA =====================
+// =============== ROUTE UTAMA ======================
 // ==================================================
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
+
 // ==================================================
-// ================ AUTH ROUTE ======================
+// =============== AUTH =============================
 // ==================================================
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 // ==================================================
 // ================= ADMIN AREA =====================
@@ -41,7 +47,7 @@ Route::prefix('admin')
         Route::get('/', fn() => redirect()->route('admin.dashboard'));
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // CRUD Data Guru, Murid, dan Kelas
+        // CRUD Guru, Murid, Kelas
         Route::resource('guru', GuruController::class);
         Route::resource('murid', MuridController::class);
         Route::resource('kelas', KelasController::class);
@@ -49,141 +55,191 @@ Route::prefix('admin')
         // Kelola murid dalam kelas
         Route::get('kelas/{id}/kelola-murid', [KelasController::class, 'kelolaMurid'])
             ->whereNumber('id')->name('kelas.kelolaMurid');
+
         Route::post('kelas/{id}/tambah-murid', [KelasController::class, 'tambahMurid'])
             ->whereNumber('id')->name('kelas.tambahMurid');
-        Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}', [KelasController::class, 'hapusMurid'])
-            ->whereNumber('kelas_id')->whereNumber('murid_id')->name('kelas.hapusMurid');
 
+        Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}',
+            [KelasController::class, 'hapusMurid']
+        )->whereNumber('kelas_id')->whereNumber('murid_id')
+         ->name('kelas.hapusMurid');
 
         // ==================================================
-        // ================== JADWAL ========================
+        // ==================== JADWAL ======================
         // ==================================================
         Route::prefix('jadwal')->name('jadwal.')->group(function () {
 
-            // halaman utama kalender
             Route::get('/', [JadwalController::class, 'index'])->name('index');
-
-            // ambil seluruh jadwal (mendukung filter angkatan ?angkatan=7)
             Route::get('/get', [JadwalController::class, 'getJadwal'])->name('get');
+            Route::get('/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])->name('hari');
 
-            // ambil jadwal berdasarkan tanggal
-            Route::get('/hari/{tanggal}', [JadwalController::class, 'getByTanggal'])
-                ->name('hari');
-
-            // tambah jadwal
             Route::post('/', [JadwalController::class, 'store'])->name('store');
-
-            // update jadwal
             Route::put('/{id}', [JadwalController::class, 'update'])
                 ->whereNumber('id')
                 ->name('update');
 
-            // hapus 1 jadwal
             Route::delete('/{id}', [JadwalController::class, 'destroy'])
                 ->whereNumber('id')
                 ->name('destroy');
 
-            // hapus semua jadwal 1 mapel per semester
-            Route::delete('/hapus-semester/{mata_pelajaran}', [JadwalController::class, 'deleteSemester'])
-                ->name('deleteSemester');
+            Route::delete('/hapus-semester/{mata_pelajaran}',
+                [JadwalController::class, 'deleteSemester']
+            )->name('deleteSemester');
 
-            // DETAIL jadwal (dipindah agar tidak nabrak GET/HARI)
             Route::get('/detail/{id}', [JadwalController::class, 'show'])
                 ->whereNumber('id')
                 ->name('show');
         });
+
     });
 
 
+
 // ==================================================
-// ================== GURU AREA ======================
+// ==================== GURU AREA ===================
 // ==================================================
 Route::prefix('guru')
     ->name('guru.')
     ->middleware(['auth', 'role:guru'])
     ->group(function () {
 
-        // Dashboard Guru
+        // Dashboard
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
 
-        // AJAX GET JADWAL BERDASARKAN TANGGAL
         Route::get('/jadwal/{tanggal}', [GuruDashboardController::class, 'getJadwalTanggal'])
             ->where('tanggal', '[0-9\-]+')
             ->name('jadwal.tanggal');
 
-        // =======================
-        // MANAJEMEN KELAS
-        // =======================
+
+        // ==================================================
+        // ================== KELAS GURU ====================
+        // ==================================================
         Route::prefix('kelas')->name('kelas.')->group(function () {
 
-            // ---------- KELAS BINAAN ----------
+            // ------------------- Kelas Binaan -------------------
             Route::prefix('binaan')->name('binaan.')->group(function () {
+
                 Route::get('/', [KelasBinaanController::class, 'index'])->name('index');
                 Route::get('/{id}/data-siswa', [KelasBinaanController::class, 'dataSiswa'])
                     ->whereNumber('id')->name('dataSiswa');
+
                 Route::get('/{id}/perkembangan', [KelasBinaanController::class, 'perkembangan'])
                     ->whereNumber('id')->name('perkembangan');
+
                 Route::get('/{id}/kehadiran', [KelasBinaanController::class, 'kehadiran'])
                     ->whereNumber('id')->name('kehadiran');
+
                 Route::get('/{id}/catatan', [KelasBinaanController::class, 'catatan'])
                     ->whereNumber('id')->name('catatan');
+
                 Route::get('/{id}/laporan', [KelasBinaanController::class, 'laporan'])
                     ->whereNumber('id')->name('laporan');
             });
 
-            // ---------- KELAS AJARAN ----------
-           Route::prefix('ajaran')->name('ajaran.')->group(function () {
+
+            // ------------------- Kelas Ajaran -------------------
+            Route::prefix('ajaran')->name('ajaran.')->group(function () {
 
                 Route::get('/', [KelasAjaranController::class, 'index'])->name('index');
 
                 Route::get('/detail-kelas/{id}', [KelasAjaranController::class, 'detail'])
                     ->whereNumber('id')
                     ->name('detail');
+
+
+                // SESI
+                Route::post('/tambah-sesi', [KelasAjaranController::class, 'storeSesi'])
+                    ->name('sesi.store');
+
+                Route::post('/sesi/{kelas_id}/sync', [KelasAjaranController::class, 'syncSesi'])
+                    ->whereNumber('kelas_id')
+                    ->name('sesi.sync');
+
+                Route::get('/sesi/{id}/edit', [KelasAjaranController::class, 'editSesi'])
+                    ->whereNumber('id')
+                    ->name('sesi.edit');
+
+                Route::put('/sesi/{id}/update', [KelasAjaranController::class, 'updateSesi'])
+                    ->whereNumber('id')
+                    ->name('sesi.update');
+
+                Route::get('/sesi/{id}/hapus', [KelasAjaranController::class, 'deleteSesi'])
+                    ->whereNumber('id')
+                    ->name('sesi.delete');
+
+
+                // ================= MODUL =================
+                Route::post('/upload-modul', [KelasAjaranController::class, 'uploadModul'])
+                    ->name('upload-modul');
+
+                Route::get('/modul/{id}/edit', [KelasAjaranController::class, 'editModul'])
+                    ->whereNumber('id')
+                    ->name('modul.edit');
+
+                Route::put('/modul/{id}/update', [KelasAjaranController::class, 'updateModul'])
+                    ->whereNumber('id')
+                    ->name('modul.update');
+
+                Route::delete('/modul/{id}/delete', [KelasAjaranController::class, 'deleteModul'])
+                    ->whereNumber('id')
+                    ->name('modul.delete');
+
+
+                // ================= PRESENSI (KEHADIRAN) =================
+                Route::get('/sesi/{id}/presensi', [KehadiranController::class, 'index'])
+                    ->whereNumber('id')
+                    ->name('kehadiran.presensi');
+
+                Route::post('/sesi/{id}/presensi/simpan', [KehadiranController::class, 'store'])
+                    ->whereNumber('id')
+                    ->name('kehadiran.simpan');
+
             });
+
         });
 
 
-        // =======================
-        // MANAJEMEN NILAI
-        // =======================
+
+        // ==================================================
+        // ==================== NILAI ========================
+        // ==================================================
         Route::prefix('nilai')->name('nilai.')->group(function () {
 
             Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
 
-            Route::get('/kelas/{id}', [NilaiController::class, 'index'])->name('index');
+            Route::get('/kelas/{id}', [NilaiController::class, 'index'])
+                ->whereNumber('id')
+                ->name('index');
 
-            Route::get('/kelas/{kelasId}/mapel/{mapel}', 
+            Route::get('/kelas/{kelasId}/mapel/{mapel}',
                 [NilaiController::class, 'muridPerMapel']
             )->name('mapel.murid');
 
-            // ================
-            // ROUTE DETAIL MURID (UPDATE)
-            // Sekarang menerima {id} dan {mapel}
-            // ================
-            Route::get('/murid/{id}/{mapel}', 
-                [NilaiController::class, 'detail']
-            )->name('detail');
+            Route::get('/murid/{id}/{mapel}', [NilaiController::class, 'detail'])
+                ->name('detail');
 
-            // ================
-            // STORE NILAI
-            // tetap pakai id murid
-            // ================
-            Route::post('/murid/{id}', [NilaiController::class, 'store'])->name('store');
+            Route::post('/murid/{id}', [NilaiController::class, 'store'])
+                ->name('store');
 
-            Route::put('/update/{id}', [NilaiController::class, 'update'])->name('update');
-            Route::delete('/hapus/{id}', [NilaiController::class, 'destroy'])->name('destroy');
+            Route::put('/update/{id}', [NilaiController::class, 'update'])
+                ->name('update');
 
-            // === ROUTE BARU UNTUK INLINE ===
-            Route::post('/murid/{id}/inline', [NilaiController::class, 'storeInline'])->name('storeInline');
-            Route::put('/update-inline/{id}', [NilaiController::class, 'updateInline'])->name('updateInline');
+            Route::delete('/hapus/{id}', [NilaiController::class, 'destroy'])
+                ->name('destroy');
+
+            Route::post('/murid/{id}/inline', [NilaiController::class, 'storeInline'])
+                ->name('storeInline');
+
+            Route::put('/update-inline/{id}', [NilaiController::class, 'updateInline'])
+                ->name('updateInline');
         });
 
 
-
-        // =======================
-        // MENU TAMBAHAN GURU
-        // =======================
+        // ==================================================
+        // ================= MENU TAMBAHAN ==================
+        // ==================================================
         Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
         Route::get('/perkembangan', [PerkembanganController::class, 'index'])->name('perkembangan.index');
         Route::get('/obrolan', [ObrolanController::class, 'index'])->name('obrolan.index');
+
     });

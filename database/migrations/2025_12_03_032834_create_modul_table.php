@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('modul', function (Blueprint $table) {
+            $table->id();
+
+            $table->unsignedBigInteger('kelas_id');
+            $table->unsignedBigInteger('sesi_id');
+
+            $table->string('judul');
+            $table->string('file');
+            $table->string('topik')->nullable();
+            $table->text('catatan')->nullable();
+
+            $table->timestamps();
+
+            // foreign key benar
+            $table->foreign('kelas_id')
+                  ->references('id')
+                  ->on('kelas')
+                  ->onDelete('cascade');
+
+            $table->foreign('sesi_id')
+                  ->references('id')
+                  ->on('sesi')  // <--- INI WAJIB SESUAI
+                  ->onDelete('cascade');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('modul');
+    }
+};

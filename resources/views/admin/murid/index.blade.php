@@ -13,7 +13,6 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="page-title">Data Siswa</h5>
         <div class="d-flex align-items-center">
-            <a href="#" class="export-link me-3 text-decoration-none">Export CSV</a>
             <a href="{{ route('admin.murid.create') }}" class="btn btn-primary">Tambahkan Siswa</a>
         </div>
     </div>

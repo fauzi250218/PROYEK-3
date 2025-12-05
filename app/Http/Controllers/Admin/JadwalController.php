@@ -26,7 +26,7 @@ class JadwalController extends Controller
     }
 
     /** ===========================
-     * Ambil semua jadwal (fullCalendar / kalender)
+     * Ambil semua jadwal (kalender)
      * =========================== */
     public function getJadwal(Request $request)
     {
@@ -41,7 +41,7 @@ class JadwalController extends Controller
                 'title' => "{$item->kelas->nama_kelas} - {$item->mata_pelajaran} ({$item->guru})",
                 'start' => "{$item->tanggal}T{$item->jam_mulai}",
                 'end'   => "{$item->tanggal}T{$item->jam_selesai}",
-                'semester_group_id' => $item->semester_group_id, // ★ NEW
+                'semester_group_id' => $item->semester_group_id, // group semester
             ];
         });
 
@@ -65,8 +65,9 @@ class JadwalController extends Controller
                     'jam_mulai'    => $item->jam_mulai,
                     'jam_selesai'  => $item->jam_selesai,
                     'kelas_nama'   => $item->kelas->nama_kelas ?? '-',
+                    'kelas_id'     => $item->kelas_id,
                     'tanggal'      => $item->tanggal,
-                    'semester_group_id' => $item->semester_group_id, // ★ NEW
+                    'semester_group_id' => $item->semester_group_id,
                 ];
             });
 
@@ -74,22 +75,22 @@ class JadwalController extends Controller
     }
 
     /** ===========================
-     * Store jadwal (sekali atau 1 semester)
+     * Store jadwal (sekali / 1 semester)
      * =========================== */
     public function store(Request $request)
     {
         try {
             $request->validate([
-                'kelas_id'      => 'required|exists:kelas,id',
-                'mata_pelajaran'=> 'required|string|max:100',
-                'guru'          => 'required|string|max:100',
-                'tanggal'       => 'required|date',
-                'jam_mulai'     => 'required',
-                'jam_selesai'   => 'required|after:jam_mulai',
-                'ulang'         => 'required|in:sekali,semester',
+                'kelas_id'       => 'required|exists:kelas,id',
+                'mata_pelajaran' => 'required|string|max:100',
+                'guru'           => 'required|string|max:100',
+                'tanggal'        => 'required|date',
+                'jam_mulai'      => 'required',
+                'jam_selesai'    => 'required|after:jam_mulai',
+                'ulang'          => 'required|in:sekali,semester',
             ]);
 
-            /** Normalisasi jam untuk format H:i */
+            // Normalisasi jam ke format H:i
             $request->merge([
                 'jam_mulai'   => date('H:i', strtotime($request->jam_mulai)),
                 'jam_selesai' => date('H:i', strtotime($request->jam_selesai)),
@@ -102,30 +103,30 @@ class JadwalController extends Controller
                 return $this->buatJadwal($request, $tanggalMulai, true, null);
             }
 
-            /** ============ SEMESTER (setiap minggu 6 bulan) ============ */
+            /** ============ SEMESTER (16 pertemuan) ============ */
 
-            $groupId = uniqid("grp_"); // ★ NEW group id semester
-
-            $tanggalAkhir = $tanggalMulai->copy()->addMonths(6);
+            $groupId      = uniqid("grp_"); // ID grup semester
+            $maxPertemuan = 16;             // maksimal 16 kali pertemuan
             $createdCount = 0;
 
-            while ($tanggalMulai <= $tanggalAkhir) {
+            for ($i = 0; $i < $maxPertemuan; $i++) {
 
                 $result = $this->buatJadwal($request, $tanggalMulai, false, $groupId);
 
-                // minggu pertama bentrok → batalkan semua
+                // Jika pertemuan pertama bentrok → batalkan seluruh semester
                 if ($result === false && $createdCount === 0) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Jadwal minggu pertama bentrok. Tidak ada yang disimpan.',
+                        'message' => 'Jadwal minggu pertama bentrok. Tidak ada jadwal semester yang disimpan.',
                     ], 422);
                 }
 
-                // minggu selanjutnya bentrok → skip (tetap lanjut)
+                // Minggu berikutnya bentrok → skip saja (lanjut minggu berikutnya)
                 if ($result === true) {
                     $createdCount++;
                 }
 
+                // Naik 1 minggu (pertemuan berikutnya)
                 $tanggalMulai->addWeek();
             }
 
@@ -138,17 +139,20 @@ class JadwalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Jadwal berhasil disimpan ($createdCount kali).",
+                'message' => "Jadwal semester berhasil disimpan ($createdCount pertemuan).",
             ]);
 
         } catch (ValidationException $e) {
+
             return response()->json([
                 'success' => false,
                 'errors'  => $e->errors(),
             ], 422);
 
         } catch (Throwable $e) {
+
             Log::error("Gagal menyimpan jadwal: " . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Kesalahan server.',
@@ -165,7 +169,7 @@ class JadwalController extends Controller
         $mulai      = $request->jam_mulai;
         $selesai    = $request->jam_selesai;
 
-        /** Cek bentrok */
+        // Cek bentrok di hari itu, kelas yang sama
         $bentrok = Jadwal::where('kelas_id', $request->kelas_id)
             ->whereDate('tanggal', $tanggalStr)
             ->where(function ($q) use ($mulai, $selesai) {
@@ -181,18 +185,19 @@ class JadwalController extends Controller
                     'message' => "Jadwal bentrok pada tanggal $tanggalStr.",
                 ], 422);
             }
+            // untuk mode semester: kembalikan false (supaya loop tahu ini bentrok)
             return false;
         }
 
-        /** Simpan */
+        // Simpan jadwal baru
         Jadwal::create([
-            'kelas_id'       => $request->kelas_id,
-            'mata_pelajaran' => $request->mata_pelajaran,
-            'guru'           => $request->guru,
-            'tanggal'        => $tanggalStr,
-            'jam_mulai'      => $mulai,
-            'jam_selesai'    => $selesai,
-            'semester_group_id' => $groupId, // ★ NEW
+            'kelas_id'          => $request->kelas_id,
+            'mata_pelajaran'    => $request->mata_pelajaran,
+            'guru'              => $request->guru,
+            'tanggal'           => $tanggalStr,
+            'jam_mulai'         => $mulai,
+            'jam_selesai'       => $selesai,
+            'semester_group_id' => $groupId,
         ]);
 
         if ($returnResponse) {
@@ -202,6 +207,7 @@ class JadwalController extends Controller
             ]);
         }
 
+        // untuk mode semester: kembalikan true (berhasil)
         return true;
     }
 
@@ -233,6 +239,9 @@ class JadwalController extends Controller
             ]);
 
         } catch (Throwable $e) {
+
+            Log::error("Gagal update jadwal: " . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Kesalahan server.',

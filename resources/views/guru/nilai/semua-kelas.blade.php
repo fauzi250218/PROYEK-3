@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="container-fluid py-5 semua-kelas-wrapper">
-    <div class="text-center mb-5">
+    <div class="text-start mb-4">
         <h2 class="title-page fw-bold mb-2">
             <i class="bi bi-mortarboard-fill text-success me-2"></i>Daftar Semua Kelas
         </h2>

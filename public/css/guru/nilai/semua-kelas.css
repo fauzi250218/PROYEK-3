@@ -1,10 +1,12 @@
-/* Font Modern */
+/* ----------------------------------------------------
+   FONT & BACKGROUND
+---------------------------------------------------- */
 body, .semua-kelas-wrapper {
     font-family: 'Poppins', sans-serif;
     background-color: #f9fafb;
 }
 
-/* Judul Halaman */
+/* Judul */
 .title-page {
     color: #1e293b;
     font-size: 1.9rem;
@@ -15,14 +17,14 @@ body, .semua-kelas-wrapper {
     font-size: 0.95rem;
 }
 
-/* Grid Layout Tiles */
+/* GRID */
 .kelas-tiles {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 25px;
 }
 
-/* Tile utama */
+/* CARD */
 .kelas-tile {
     position: relative;
     background: #ffffff;
@@ -30,77 +32,67 @@ body, .semua-kelas-wrapper {
     padding: 22px 18px;
     text-decoration: none;
     color: #111;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: all 0.35s ease;
-    transform: perspective(800px) rotateX(0deg);
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid transparent; /* penanda hover */
+
+    transition: all 0.2s ease;
 }
 
+/* HOVER — LEFT BORDER saja */
 .kelas-tile:hover {
-    transform: perspective(800px) rotateX(3deg) translateY(-5px);
-    box-shadow: 0 6px 25px rgba(34, 197, 94, 0.25);
+    border-left: 4px solid #22c55e;
+    background: #ffffff; /* tetap putih */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Overlay efek gradasi */
+/* Nonaktifkan overlay dan animasi */
 .tile-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.25));
-    opacity: 0;
-    transition: opacity 0.35s ease;
+    display: none;
 }
 
-.kelas-tile:hover .tile-overlay {
-    opacity: 1;
-}
-
-/* Icon besar di belakang */
 .tile-icon {
     position: absolute;
     right: 10px;
     bottom: 5px;
     font-size: 4.5rem;
-    color: rgba(22, 163, 74, 0.12);
+    color: rgba(22,163,74,0.12);
     pointer-events: none;
 }
 
-/* Konten */
 .tile-content {
     position: relative;
     z-index: 2;
 }
 
+/* Nama */
 .nama-kelas {
     font-weight: 600;
     font-size: 1.1rem;
-    color: #111827;
     margin-bottom: 4px;
+    color: #111827;
 }
 
+/* Wali */
 .wali {
     font-size: 0.9rem;
     color: #4b5563;
     margin-bottom: 2px;
 }
 
+/* Desk */
 .desc {
     font-size: 0.85rem;
     color: #6b7280;
 }
 
-/* Empty State */
+/* EMPTY */
 .empty-state {
     color: #6b7280;
 }
 
-/* Responsif */
+/* RESPONSIVE */
 @media (max-width: 768px) {
-    .title-page {
-        font-size: 1.5rem;
-    }
-
-    .kelas-tile {
-        padding: 18px 16px;
-    }
+    .title-page { font-size: 1.5rem; }
+    .kelas-tile { padding: 18px 16px; }
 }

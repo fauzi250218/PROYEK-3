@@ -9,20 +9,21 @@ class Kehadiran extends Model
 {
     use HasFactory;
 
-    protected $table = 'kehadirans';
+    protected $table = 'kehadiran';
 
     protected $fillable = [
+        'sesi_id',
         'murid_id',
-        'tanggal',
         'status',
-        'keterangan',
     ];
 
-    /**
-     * Relasi ke model Murid
-     */
-    public function murid()
+    public function siswa()
     {
         return $this->belongsTo(Murid::class, 'murid_id');
+    }
+
+    public function sesi()
+    {
+        return $this->belongsTo(Sesi::class, 'sesi_id');
     }
 }
