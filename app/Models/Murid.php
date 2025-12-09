@@ -39,7 +39,7 @@ class Murid extends Model
     }
 
     /**
-     * ✅ Relasi ke data kehadiran
+     * Relasi ke data kehadiran
      */
     public function kehadiran()
     {
@@ -47,23 +47,23 @@ class Murid extends Model
     }
 
     /**
-     * ✅ Relasi ke catatan perkembangan murid
+     * Relasi ke catatan perilaku (lama)
      */
     public function catatan()
     {
         return $this->hasMany(CatatanPerilaku::class, 'murid_id');
     }
 
-    // /**
-    //  * ✅ Relasi ke laporan (opsional)
-    //  */
-    // public function laporan()
-    // {
-    //     return $this->hasMany(Laporan::class, 'murid_id');
-    // }
+    /**
+     * 🔥 Relasi ke catatan perkembangan (baru)
+     */
+    public function catatanPerkembangan()
+    {
+        return $this->hasMany(CatatanPerkembangan::class, 'murid_id');
+    }
 
     /**
-     * ✅ Relasi ke notifikasi yang diterima murid ini
+     * Relasi ke notifikasi yang diterima murid ini
      */
     public function notifications()
     {

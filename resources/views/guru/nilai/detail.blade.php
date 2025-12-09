@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="{{ asset('css/guru/nilai/detail-nilai.css') }}">
 
 <style>
-    /* Lebih modern & clean */
     .nilai-table table {
         border-radius: 12px;
         overflow: hidden;
@@ -20,7 +19,6 @@
         background: #f4f6f9;
     }
 
-    /* Aksi tombol sejajar & lebih rapi */
     .aksi-buttons {
         display: flex;
         gap: 6px;
@@ -63,7 +61,7 @@
 
             <tbody>
 
-                {{-- BARIS TAMBAH NILAI --}}
+                {{-- TAMBAH NILAI --}}
                 <tr class="add-row">
                     <form action="{{ route('guru.nilai.store', $murid->id) }}" method="POST">
                         @csrf
@@ -73,7 +71,6 @@
                             <select name="mata_pelajaran" class="form-select form-select-sm" required>
                                 <option value="">Pilih Mapel</option>
 
-                                {{-- AUTO SELECT MAPEL SESUAI YANG DIKLIK PADA HALAMAN SEBELUMNYA --}}
                                 @foreach($mapelList as $m)
                                     <option value="{{ $m }}"
                                         {{ isset($selectedMapel) && $selectedMapel == $m ? 'selected' : '' }}>
@@ -112,13 +109,13 @@
                     <td>
                         <div class="aksi-buttons">
 
-                            {{-- tombol edit --}}
+                            {{-- EDIT --}}
                             <button onclick="editRow({{ $nilai->id }})" 
                                 class="btn btn-warning btn-sm" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </button>
 
-                            {{-- tombol hapus --}}
+                            {{-- HAPUS --}}
                             <form action="{{ route('guru.nilai.destroy', $nilai->id) }}" method="POST">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-danger btn-sm" onclick="return confirm('Hapus nilai ini?')" title="Hapus">
@@ -130,13 +127,19 @@
                     </td>
                 </tr>
 
-                {{-- EDIT ROW --}}
+                {{-- EDIT FORM --}}
                 <tr id="edit-{{ $nilai->id }}" style="display:none; background:#fcfcfc;">
                     <form action="{{ route('guru.nilai.update', $nilai->id) }}" method="POST">
                         @csrf @method('PUT')
 
+                        {{-- HIDDEN INPUT wajib untuk update --}}
+                        <input type="hidden" name="mata_pelajaran" value="{{ $nilai->mata_pelajaran }}">
+
                         <td>{{ $loop->iteration }}</td>
-                        <td class="fw-semibold">{{ $nilai->mata_pelajaran }}</td>
+
+                        <td class="fw-semibold">
+                            {{ $nilai->mata_pelajaran }}
+                        </td>
 
                         <td><input type="number" name="tugas" value="{{ $nilai->tugas }}" class="form-control form-control-sm"></td>
                         <td><input type="number" name="ulangan_harian" value="{{ $nilai->ulangan_harian }}" class="form-control form-control-sm"></td>

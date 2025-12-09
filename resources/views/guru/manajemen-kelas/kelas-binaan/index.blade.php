@@ -10,7 +10,7 @@
 
     <div class="section-header mb-5">
         <h3 class="fw-bold text-dark mb-1">Kelas Binaan Saya</h3>
-        <p class="text-muted">Kelola data siswa, perkembangan belajar, dan laporan kelas Anda.</p>
+        <p class="text-muted">Kelola data siswa dan perkembangan belajar di kelas Anda.</p>
     </div>
 
     @if($kelasBinaan->isEmpty())
@@ -36,7 +36,7 @@
             </a>
 
             <!-- Perkembangan Belajar -->
-            <a href="{{ route('guru.kelas.binaan.perkembangan', ['id' => $kelas->id]) }}" class="menu-item">
+            <a href="{{ route('guru.kelas.binaan.perkembangan.index', ['id' => $kelas->id]) }}" class="menu-item">
                 <div class="menu-icon bg-success-subtle text-success">
                     <i class="bi bi-bar-chart-line"></i>
                 </div>
@@ -63,33 +63,21 @@
                 </div>
             </a>
 
-            <!-- Catatan -->
-            <a href="{{ route('guru.kelas.binaan.catatan', ['id' => $kelas->id]) }}" class="menu-item">
-                <div class="menu-icon bg-info-subtle text-info">
-                    <i class="bi bi-journal-text"></i>
-                </div>
-                <div class="menu-text">
-                    <h5>Catatan Perilaku</h5>
-                    <p>Lihat atau tambahkan catatan perilaku serta prestasi siswa.</p>
-                </div>
-                <div class="menu-arrow text-info">
-                    <i class="bi bi-arrow-right-circle-fill"></i>
-                </div>
-            </a>
-
-            <!-- Laporan -->
-            <a href="{{ route('guru.kelas.binaan.laporan', ['id' => $kelas->id]) }}" class="menu-item">
+            <!-- E-Raport (tanpa route dulu) -->
+            <a href="#" class="menu-item">
                 <div class="menu-icon bg-danger-subtle text-danger">
-                    <i class="bi bi-file-earmark-text"></i>
+                    {{-- jika punya logo khusus, bisa diganti img --}}
+                    <i class="bi bi-file-earmark-bar-graph"></i>
                 </div>
                 <div class="menu-text">
-                    <h5>Laporan Kelas</h5>
-                    <p>Rekap data perkembangan, absensi, dan catatan siswa Anda.</p>
+                    <h5>E-Raport</h5>
+                    <p>Kelola nilai dan raport siswa kelas {{ $kelas->nama_kelas }}.</p>
                 </div>
                 <div class="menu-arrow text-danger">
                     <i class="bi bi-arrow-right-circle-fill"></i>
                 </div>
             </a>
+
         </div>
         @endforeach
     @endif

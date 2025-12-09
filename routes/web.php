@@ -123,8 +123,31 @@ Route::prefix('guru')
                 Route::get('/{id}/data-siswa', [KelasBinaanController::class, 'dataSiswa'])
                     ->whereNumber('id')->name('dataSiswa');
 
-                Route::get('/{id}/perkembangan', [KelasBinaanController::class, 'perkembangan'])
-                    ->whereNumber('id')->name('perkembangan');
+                // ==================================================
+                // =============== PERKEMBANGAN SISWA ===============
+                // ==================================================
+
+                // LIST PERKEMBANGAN PER KELAS
+                Route::get('/{id}/perkembangan', [PerkembanganController::class, 'index'])
+                    ->whereNumber('id')
+                    ->name('perkembangan.index');
+
+                // DETAIL PERKEMBANGAN PER MURID
+                Route::get('/{id}/perkembangan/{murid}', [PerkembanganController::class, 'show'])
+                    ->whereNumber(['id', 'murid'])
+                    ->name('perkembangan.show');
+
+                // SIMPAN CATATAN PERKEMBANGAN
+                Route::post('/{id}/perkembangan/{murid}/catatan', [PerkembanganController::class, 'storeCatatan'])
+                    ->whereNumber(['id', 'murid'])
+                    ->name('perkembangan.storeCatatan');
+
+                // HAPUS CATATAN
+                Route::delete('/{id}/perkembangan/catatan/{catatan}', [PerkembanganController::class, 'destroyCatatan'])
+                    ->whereNumber(['id', 'catatan'])
+                    ->name('perkembangan.destroyCatatan');
+
+                // ==================================================
 
                 Route::get('/{id}/kehadiran', [KelasBinaanController::class, 'kehadiran'])
                     ->whereNumber('id')->name('kehadiran');
