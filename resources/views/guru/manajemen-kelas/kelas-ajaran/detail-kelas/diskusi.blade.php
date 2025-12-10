@@ -24,6 +24,17 @@
 
         @foreach($sesi as $item)
 
+            @php
+                $modulSesi = $modul->where('sesi_id', $item->id);
+                $punyaTopik     = !empty($item->topik);
+                $punyaDeskripsi = !empty(trim(strip_tags($item->deskripsi)));
+                $punyaModul     = $modulSesi->count() > 0;
+
+                if (!$punyaTopik && !$punyaDeskripsi && !$punyaModul) {
+                    continue;
+                }
+            @endphp
+
             <div class="diskusi-card mb-3 shadow-sm p-3">
 
                 <div class="d-flex align-items-center mb-2">
@@ -61,7 +72,6 @@
                     @endif
 
                     <div class="text-end mt-2">
-                        {{-- PRESENSI DIJADIKAN LINK --}}
                         <a href="{{ route('guru.kelas.ajaran.kehadiran.presensi', $item->id) }}"
                            class="presensi-text text-primary text-decoration-none fw-semibold">
                             Presensi
@@ -75,9 +85,11 @@
 
         @endforeach
 
+        @if($no === 1)
+            <p class="text-muted">Belum ada sesi yang memiliki aktivitas pembelajaran.</p>
+        @endif
+
     </div>
-
-
 
 
     <!-- ===================================================== -->
@@ -94,7 +106,6 @@
             <div class="modul-scroll">
 
                 @foreach($sesi as $s)
-
                     @php
                         $modSesi = $modul->where('sesi_id', $s->id);
                     @endphp
@@ -108,13 +119,12 @@
                                 <span class="text-muted"> menambahkan materi pada </span>
                                 <span class="text-success fw-semibold">Sesi {{ $loop->iteration }}</span>
                                 <div class="text-muted small">
-                                    {{ $modSesi->first()->created_at->diffForHumans() }}
+                                    {{ $s->created_at->diffForHumans() }}
                                 </div>
                             </div>
                         </div>
 
                         @foreach($modSesi as $m)
-
                             <div class="edlink-file-card p-2 mb-3 pointer modul-card"
                                  data-edit="{{ route('guru.kelas.ajaran.modul.edit', $m->id) }}">
 
@@ -129,9 +139,9 @@
 
                                     <div class="d-flex gap-2">
 
-                                        <!-- TOMBOL PRATINJAU -->
+                                        <!-- FIXED: PRATINJAU PDF -->
                                         <button type="button"
-                                                class="btn btn-sm btn-primary preview-btn"
+                                                class="btn btn-sm btn-primary preview-btn edit-ignore"
                                                 data-judul="{{ $m->judul }}"
                                                 data-topik="{{ $m->topik }}"
                                                 data-catatan="{{ $m->catatan }}"
@@ -139,9 +149,8 @@
                                             Pratinjau
                                         </button>
 
-                                        <!-- TOMBOL UNDUH -->
                                         <a href="{{ asset('storage/'.$m->file) }}"
-                                           class="btn btn-sm btn-outline-success"
+                                           class="btn btn-sm btn-outline-success edit-ignore"
                                            target="_blank">
                                            Unduh
                                         </a>
@@ -150,7 +159,6 @@
 
                                 </div>
                             </div>
-
                         @endforeach
 
                     @endif
@@ -165,11 +173,8 @@
 </div>
 
 
-
-
-
 <!-- ===================================================== -->
-<!-- MODAL PREVIEW PDF (LAMA, TETAP DIPAKAI) -->
+<!-- MODAL PREVIEW PDF -->
 <!-- ===================================================== -->
 
 <div id="previewModulOverlay" class="preview-overlay">
@@ -194,17 +199,13 @@
 </div>
 
 
-
-
-
 <!-- ===================================================== -->
-<!-- MODAL UPLOAD MODUL 2 STEP ALA EDLINK (BARU)          -->
+<!-- MODAL UPLOAD MODUL 2 STEP -->
 <!-- ===================================================== -->
 
 <div id="uploadModulOverlay" class="upload-overlay">
     <div class="upload-modal">
 
-        <!-- HEADER MODAL (tanpa ikon back) -->
         <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="d-flex align-items-center">
                 <span class="fw-semibold small text-muted">
@@ -215,7 +216,6 @@
             <button type="button" class="btn-close" aria-label="Close" onclick="closePopupModul()"></button>
         </div>
 
-        <!-- NAV STEP (sekarang hanya 2 step) -->
         <div class="upload-step-nav mb-3">
             <button type="button" class="step-tab active" id="tab-step-1" onclick="goToUploadStep(1)">
                 Pilih Sesi
@@ -225,7 +225,6 @@
             </button>
         </div>
 
-        <!-- FORM UPLOAD -->
         <form id="uploadModulForm"
               method="POST"
               action="{{ route('guru.kelas.ajaran.upload-modul') }}"
@@ -234,7 +233,7 @@
             @csrf
             <input type="hidden" name="kelas_id" value="{{ $kelas_id }}">
 
-            <!-- ================= STEP 1 : PILIH SESI ================= -->
+            <!-- STEP 1 -->
             <div class="upload-step" id="upload-step-1">
 
                 <div class="mb-3">
@@ -269,7 +268,7 @@
                 </div>
             </div>
 
-            <!-- ================= STEP 2 : ATUR MATERI ================= -->
+            <!-- STEP 2 -->
             <div class="upload-step d-none" id="upload-step-2">
 
                 <div class="mb-3">
@@ -319,9 +318,6 @@
         </form>
     </div>
 </div>
-
-
-
 
 
 <!-- ===================================================== -->
@@ -378,9 +374,6 @@
     font-weight:bold;
 }
 
-/* ===================================================== */
-/* MODAL PREVIEW (LAMA)                                  */
-/* ===================================================== */
 .preview-overlay {
     display:none;
     position:fixed;
@@ -411,9 +404,6 @@
     margin-top:15px;
 }
 
-/* ===================================================== */
-/* MODAL UPLOAD MODUL 2 STEP (BARU)                      */
-/* ===================================================== */
 .upload-overlay {
     display:none;
     position:fixed;
@@ -465,12 +455,8 @@
     margin-bottom:4px;
 }
 
-/* helper */
 .d-none { display:none !important; }
 </style>
-
-
-
 
 
 <!-- ===================================================== -->
@@ -478,9 +464,6 @@
 <!-- ===================================================== -->
 
 <script>
-/* ==========================
- * BACA SELENGKAPNYA
- * ========================== */
 function toggleDesc(id){
     let wrapper = document.getElementById("desc-wrapper-"+id);
     let link = document.getElementById("toggle-link-"+id);
@@ -491,9 +474,10 @@ function toggleDesc(id){
                        : "Sembunyikan";
 }
 
-/* ==========================
- * PREVIEW MODAL (LAMA)
- * ========================== */
+
+/* ======================================================
+   FIXED: PREVIEW MODAL PDF
+   ====================================================== */
 document.querySelectorAll('.preview-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -513,9 +497,10 @@ function openPreviewModal(judul, topik, catatan, fileUrl)
     document.getElementById('prevTopik').textContent   = topik || '-';
     document.getElementById('prevCatatan').textContent = catatan || '-';
 
-    const viewerUrl = fileUrl + "#toolbar=1&navpanes=0&scrollbar=1&zoom=page-width";
+    let viewerUrl = fileUrl + "#toolbar=1&navpanes=0&scrollbar=1&zoom=page-width";
+    let separator = viewerUrl.includes('?') ? '&' : '?';
 
-    document.getElementById('pdfView').src = viewerUrl;
+    document.getElementById('pdfView').src = viewerUrl + separator + "v=" + Date.now();
     document.getElementById('btnDownloadFile').href = fileUrl;
 
     document.getElementById('previewModulOverlay').style.display = "flex";
@@ -526,35 +511,40 @@ function closePreviewModal(){
     document.getElementById('pdfView').src = "";
 }
 
-/* ==========================
- * KLIK CARD → EDIT
- * ========================== */
+
+/* ======================================================
+   FIXED: CARD CLICK → GO TO EDIT PAGE
+   ====================================================== */
 document.querySelectorAll('.modul-card').forEach(card => {
     card.addEventListener('click', function(e) {
 
-        if (e.target.closest('button') || e.target.closest('a')) {
+        // Jika klik tombol pratinjau → jangan buka edit
+        if (e.target.closest('.preview-btn')) {
             return;
         }
 
+        // Jika klik tombol unduh → jangan buka edit
+        if (e.target.closest('.btn-outline-success')) {
+            return;
+        }
+
+        // Kalau klik selain tombol → buka halaman edit
         window.location.href = this.dataset.edit;
     });
 });
 
-/* ===================================================== */
-/* MODAL UPLOAD MODUL 2 STEP                             */
-/* ===================================================== */
+
+/* ======================================================
+   UPLOAD MODAL STEP SYSTEM
+   ====================================================== */
 
 let currentUploadStep = 1;
 
 function openPopupModul()
 {
-    // reset form
     const form = document.getElementById('uploadModulForm');
-    if (form) {
-        form.reset();
-    }
+    if (form) form.reset();
 
-    // step awal
     currentUploadStep = 1;
     refreshUploadStepUI();
 
@@ -566,13 +556,11 @@ function closePopupModul()
     document.getElementById('uploadModulOverlay').style.display = 'none';
 }
 
-/* ganti tab manual (kalau user klik header tab) */
 function goToUploadStep(step) {
     currentUploadStep = step;
     refreshUploadStepUI();
 }
 
-/* next / prev dengan tombol */
 function nextUploadStep(fromStep)
 {
     if (fromStep === 1) {
@@ -584,7 +572,6 @@ function nextUploadStep(fromStep)
             return;
         }
 
-        // topik boleh kosong, tapi kasih konfirmasi
         if (!topik) {
             if (!confirm('Topik belum diisi. Lanjutkan tanpa topik?')) {
                 return;
@@ -605,29 +592,18 @@ function prevUploadStep(fromStep)
     refreshUploadStepUI();
 }
 
-/* update tampilan step & tab */
 function refreshUploadStepUI()
 {
-    // step block
     [1,2].forEach(function(step){
         const block = document.getElementById('upload-step-'+step);
         if (!block) return;
-        if (step === currentUploadStep) {
-            block.classList.remove('d-none');
-        } else {
-            block.classList.add('d-none');
-        }
+        block.classList.toggle('d-none', step !== currentUploadStep);
     });
 
-    // tab header
     [1,2].forEach(function(step){
         const tab = document.getElementById('tab-step-'+step);
         if (!tab) return;
-        if (step === currentUploadStep) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
+        tab.classList.toggle('active', step === currentUploadStep);
     });
 }
 </script>

@@ -264,12 +264,12 @@ class KelasAjaranController extends Controller
     public function uploadModul(Request $request)
     {
         $request->validate([
-            'kelas_id'      => 'required|exists:kelas,id',
-            'sesi_id'       => 'required|exists:sesi,id',
-            'judul_materi'  => 'required|string|max:255',
-            'file_materi'   => 'required|file|max:20480',
-            'topik_sesi'    => 'nullable|string|max:255',
-            'catatan_materi'=> 'nullable|string',
+            'kelas_id'       => 'required|exists:kelas,id',
+            'sesi_id'        => 'required|exists:sesi,id',
+            'judul_materi'   => 'required|string|max:255',
+            'file_materi'    => 'required|mimes:pdf|max:20480',
+            'topik_sesi'     => 'nullable|string|max:255',
+            'catatan_materi' => 'nullable|string',
         ]);
 
         $file = $request->file('file_materi');
@@ -326,11 +326,11 @@ class KelasAjaranController extends Controller
             'judul'   => 'required|string|max:255',
             'topik'   => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
-            'file'    => 'nullable|file|max:20480'
+            'file'    => 'nullable|mimes:pdf|max:20480',
         ]);
 
-        $modul->judul  = $request->judul;
-        $modul->topik  = $request->topik;
+        $modul->judul   = $request->judul;
+        $modul->topik   = $request->topik;
         $modul->catatan = $request->catatan;
 
         if ($request->hasFile('file')) {
@@ -340,10 +340,10 @@ class KelasAjaranController extends Controller
                 Storage::disk('public')->delete($modul->file);
             }
 
-            // Upload file baru
             $file = $request->file('file');
             $fileName = time().'_'.$file->getClientOriginalName();
             $path = $file->storeAs('modul', $fileName, 'public');
+
             $modul->file = $path;
         }
 
@@ -357,7 +357,7 @@ class KelasAjaranController extends Controller
 
 
     // ============================================
-    // DELETE MODUL (FINAL VERSION)
+    // DELETE MODUL
     // ============================================
     public function deleteModul($id)
     {
@@ -368,16 +368,34 @@ class KelasAjaranController extends Controller
             abort(403, "Anda tidak memiliki izin menghapus modul ini.");
         }
 
-        // Hapus file dari storage
         if ($modul->file && Storage::disk('public')->exists($modul->file)) {
             Storage::disk('public')->delete($modul->file);
         }
 
-        // Hapus dari database
         $modul->delete();
 
         return redirect()
             ->route('guru.kelas.ajaran.detail', $kelas->id)
             ->with('success', 'Modul berhasil dihapus!');
     }
+
+
+
+    // ==========================================================
+    // VIEW PDF INLINE (ANTI DOWNLOAD, ANTI BLANK PREVIEW)
+    // ==========================================================
+    public function viewPdf($path)
+    {
+        $full = storage_path('app/public/' . $path);
+
+        if (!file_exists($full)) {
+            abort(404);
+        }
+
+        return response()->file($full, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.basename($full).'"'
+        ]);
+    }
 }
+

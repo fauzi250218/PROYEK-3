@@ -43,30 +43,26 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
-        // Dashboard
         Route::get('/', fn() => redirect()->route('admin.dashboard'));
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        // CRUD Guru, Murid, Kelas
         Route::resource('guru', GuruController::class);
         Route::resource('murid', MuridController::class);
         Route::resource('kelas', KelasController::class);
 
-        // Kelola murid dalam kelas
         Route::get('kelas/{id}/kelola-murid', [KelasController::class, 'kelolaMurid'])
             ->whereNumber('id')->name('kelas.kelolaMurid');
 
         Route::post('kelas/{id}/tambah-murid', [KelasController::class, 'tambahMurid'])
             ->whereNumber('id')->name('kelas.tambahMurid');
 
-        Route::delete('kelas/{kelas_id}/hapus-murid/{murid_id}',
+        Route::delete(
+            'kelas/{kelas_id}/hapus-murid/{murid_id}',
             [KelasController::class, 'hapusMurid']
         )->whereNumber('kelas_id')->whereNumber('murid_id')
-         ->name('kelas.hapusMurid');
+            ->name('kelas.hapusMurid');
 
-        // ==================================================
         // ==================== JADWAL ======================
-        // ==================================================
         Route::prefix('jadwal')->name('jadwal.')->group(function () {
 
             Route::get('/', [JadwalController::class, 'index'])->name('index');
@@ -82,7 +78,8 @@ Route::prefix('admin')
                 ->whereNumber('id')
                 ->name('destroy');
 
-            Route::delete('/hapus-semester/{mata_pelajaran}',
+            Route::delete(
+                '/hapus-semester/{mata_pelajaran}',
                 [JadwalController::class, 'deleteSemester']
             )->name('deleteSemester');
 
@@ -90,7 +87,6 @@ Route::prefix('admin')
                 ->whereNumber('id')
                 ->name('show');
         });
-
     });
 
 
@@ -103,7 +99,6 @@ Route::prefix('guru')
     ->middleware(['auth', 'role:guru'])
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/jadwal/{tanggal}', [GuruDashboardController::class, 'getJadwalTanggal'])
@@ -111,9 +106,7 @@ Route::prefix('guru')
             ->name('jadwal.tanggal');
 
 
-        // ==================================================
         // ================== KELAS GURU ====================
-        // ==================================================
         Route::prefix('kelas')->name('kelas.')->group(function () {
 
             // ------------------- Kelas Binaan -------------------
@@ -147,7 +140,7 @@ Route::prefix('guru')
                     ->name('detail');
 
 
-                // SESI
+                // ================= SESI =================
                 Route::post('/tambah-sesi', [KelasAjaranController::class, 'storeSesi'])
                     ->name('sesi.store');
 
@@ -176,7 +169,8 @@ Route::prefix('guru')
                     ->whereNumber('id')
                     ->name('modul.edit');
 
-                Route::put('/modul/{id}/update', [KelasAjaranController::class, 'updateModul'])
+                // 🔥 PERBAIKAN UTAMA DI SINI
+                Route::put('/modul/{id}', [KelasAjaranController::class, 'updateModul'])
                     ->whereNumber('id')
                     ->name('modul.update');
 
@@ -185,7 +179,14 @@ Route::prefix('guru')
                     ->name('modul.delete');
 
 
-                // ================= PRESENSI (KEHADIRAN) =================
+                // ===== VIEW PDF =====
+                Route::get(
+                    '/pdf/view/{path}',
+                    [KelasAjaranController::class, 'viewPdf']
+                )->where('path', '.*')->name('pdf.view');
+
+
+                // ================= PRESENSI =================
                 Route::get('/sesi/{id}/presensi', [KehadiranController::class, 'index'])
                     ->whereNumber('id')
                     ->name('kehadiran.presensi');
@@ -193,16 +194,11 @@ Route::prefix('guru')
                 Route::post('/sesi/{id}/presensi/simpan', [KehadiranController::class, 'store'])
                     ->whereNumber('id')
                     ->name('kehadiran.simpan');
-
             });
-
         });
 
 
-
-        // ==================================================
         // ==================== NILAI ========================
-        // ==================================================
         Route::prefix('nilai')->name('nilai.')->group(function () {
 
             Route::get('/semua-kelas', [NilaiController::class, 'semuaKelas'])->name('semuaKelas');
@@ -211,7 +207,8 @@ Route::prefix('guru')
                 ->whereNumber('id')
                 ->name('index');
 
-            Route::get('/kelas/{kelasId}/mapel/{mapel}',
+            Route::get(
+                '/kelas/{kelasId}/mapel/{mapel}',
                 [NilaiController::class, 'muridPerMapel']
             )->name('mapel.murid');
 
@@ -235,11 +232,8 @@ Route::prefix('guru')
         });
 
 
-        // ==================================================
         // ================= MENU TAMBAHAN ==================
-        // ==================================================
         Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
         Route::get('/perkembangan', [PerkembanganController::class, 'index'])->name('perkembangan.index');
         Route::get('/obrolan', [ObrolanController::class, 'index'])->name('obrolan.index');
-
     });
