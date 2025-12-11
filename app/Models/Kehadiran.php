@@ -14,6 +14,7 @@ class Kehadiran extends Model
     protected $fillable = [
         'sesi_id',
         'murid_id',
+        'jadwal_id',
         'status',
     ];
 
@@ -25,5 +26,10 @@ class Kehadiran extends Model
     public function sesi()
     {
         return $this->belongsTo(Sesi::class, 'sesi_id');
+    }
+
+    public function jadwal()
+    {
+        return $this->belongsTo(Jadwal::class);
     }
 }

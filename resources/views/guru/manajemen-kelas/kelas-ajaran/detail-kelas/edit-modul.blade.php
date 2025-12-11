@@ -10,9 +10,7 @@
 
     <div class="card shadow-sm border-0 p-4 position-relative">
 
-        {{-- ======================== --}}
-        {{-- DELETE ICON (BESAR)     --}}
-        {{-- ======================== --}}
+        {{-- DELETE ICON --}}
         <form action="{{ route('guru.kelas.ajaran.modul.delete', $modul->id) }}"
               method="POST"
               onsubmit="return confirm('Hapus modul ini?')"
@@ -28,10 +26,7 @@
             </button>
         </form>
 
-
-        {{-- ======================== --}}
-        {{-- FORM UPDATE MODUL       --}}
-        {{-- ======================== --}}
+        {{-- FORM UPDATE MODUL --}}
         <form action="{{ route('guru.kelas.ajaran.modul.update', $modul->id) }}"
               method="POST"
               enctype="multipart/form-data">
@@ -39,41 +34,65 @@
             @csrf
             @method('PUT')
 
+            {{-- show validation errors --}}
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            {{-- flash messages --}}
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
             {{-- JUDUL --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Judul Modul</label>
                 <input type="text" name="judul" class="form-control"
-                       value="{{ $modul->judul }}" required>
+                       value="{{ old('judul', $modul->judul) }}" required>
             </div>
 
             {{-- TOPIK --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Topik</label>
                 <input type="text" name="topik" class="form-control"
-                       value="{{ $modul->topik }}">
+                       value="{{ old('topik', $modul->topik) }}">
             </div>
 
             {{-- CATATAN --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Catatan</label>
-                <textarea name="catatan" class="form-control" rows="3">{{ $modul->catatan }}</textarea>
+                <textarea name="catatan" class="form-control" rows="3">{{ old('catatan', $modul->catatan) }}</textarea>
             </div>
 
             {{-- FILE LAMA --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">File Saat Ini</label>
                 <div class="border p-3 rounded bg-light d-flex justify-content-between align-items-center">
-                    <span>{{ basename($modul->file) }}</span>
-                    <a href="{{ asset('storage/'.$modul->file) }}" target="_blank"
-                       class="btn btn-sm btn-primary">Lihat PDF</a>
+                    <div class="text-truncate" style="max-width:70%;">
+                        {{ basename($modul->file) }}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ asset('storage/'.$modul->file) }}" target="_blank"
+                           class="btn btn-sm btn-primary">Lihat PDF</a>
+
+                    </div>
                 </div>
             </div>
 
             {{-- FILE BARU --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Ganti File (Opsional)</label>
-                <input type="file" name="file" class="form-control">
-                <small class="text-muted">Kosongkan jika tidak ingin mengganti file.</small>
+                <input type="file" name="file" class="form-control" accept="application/pdf">
+                <small class="text-muted">Kosongkan jika tidak ingin mengganti file. Maks 0MB (PDF).</small>
             </div>
 
             {{-- BUTTON --}}
@@ -93,30 +112,10 @@
 
 </div>
 
-{{-- ======================== --}}
-{{--  CSS SATU BLOK SAJA      --}}
-{{-- ======================== --}}
 <style>
-    /* Posisi ikon delete */
-    .delete-icon-wrapper {
-        top: 6px;
-        right: 10px;
-    }
-
-    /* Ikon trash elegan */
-    .delete-icon {
-        font-size: 22px;       /* ukuran besar elegan */
-        color: #dc3545;        /* warna merah bootstrap */
-        opacity: 0.85;
-        transition: 0.25s ease-in-out;
-    }
-
-    /* Hover animation */
-    .delete-icon-wrapper:hover .delete-icon {
-        opacity: 1;
-        color: #b30000;
-        transform: scale(1.12);
-    }
+    .delete-icon-wrapper { top: 6px; right: 10px; position: absolute; }
+    .delete-icon { font-size: 22px; color: #dc3545; opacity: 0.85; transition: 0.25s; }
+    .delete-icon-wrapper:hover .delete-icon { opacity:1; color:#b30000; transform: scale(1.08); }
 </style>
 
 @endsection

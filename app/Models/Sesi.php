@@ -10,6 +10,7 @@ class Sesi extends Model
 
     protected $fillable = [
         'kelas_id',
+        'jadwal_id',
         'judul_sesi',
         'topik',
         'deskripsi',
@@ -18,10 +19,23 @@ class Sesi extends Model
         'jam_selesai',
     ];
 
-    // Relasi ke Jadwal berdasarkan kelas & tanggal
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class);
+    }
+
     public function jadwal()
     {
-        return $this->hasOne(Jadwal::class, 'kelas_id', 'kelas_id')
-                    ->whereDate('tanggal', $this->tanggal);
+        return $this->belongsTo(Jadwal::class, 'jadwal_id');
+    }
+
+    public function modul()
+    {
+        return $this->hasMany(Modul::class);
+    }
+
+    public function kehadiran()
+    {
+        return $this->hasMany(Kehadiran::class);
     }
 }

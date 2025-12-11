@@ -4,6 +4,12 @@
 
 @section('content')
 
+@php
+    \Carbon\Carbon::setLocale('id');
+    setlocale(LC_TIME, 'id_ID.UTF-8');
+@endphp
+
+
 <style>
     .info-card {
         background: #fff;
@@ -15,10 +21,10 @@
 
     .presensi-card {
         background: #fff;
-        padding: 18px 20px;
+        padding: 10px 14px; /* DIPERKECIL */
         border-radius: 12px;
         border: 1px solid #e6e6e6;
-        margin-bottom: 14px;
+        margin-bottom: 8px; /* DIPERKECIL */
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -46,7 +52,7 @@
 
     .status-group {
         display: flex;
-        gap: 12px;
+        gap: 10px; /* sedikit diperkecil */
     }
 
     .absen-wrapper {
@@ -126,10 +132,8 @@
 
             <div class="presensi-card">
 
-                {{-- Nama --}}
                 <div class="fw-bold">{{ $murid->nama }}</div>
 
-                {{-- Status --}}
                 <div class="status-group">
                     @foreach(['H','I','A','S'] as $st)
                         <label class="status-btn {{ $status == $st ? 'active' : '' }}">
@@ -156,7 +160,6 @@
 
 
 <script>
-    // Klik tombol status
     document.querySelectorAll(".status-btn").forEach(btn => {
         btn.addEventListener("click", function() {
             let group = this.closest(".status-group");
@@ -168,12 +171,13 @@
         });
     });
 
-    // Tandai H semua
     function tandaiHadirSemua() {
         if (!document.getElementById("checkAllHadir").checked) return;
 
         document.querySelectorAll(".presensi-card").forEach(card => {
+
             let btnH = card.querySelector(".status-btn:nth-child(1)");
+
             card.querySelectorAll(".status-btn").forEach(b => b.classList.remove("active"));
 
             btnH.classList.add("active");

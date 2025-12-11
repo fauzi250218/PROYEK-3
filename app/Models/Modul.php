@@ -11,6 +11,7 @@ class Modul extends Model
     protected $fillable = [
         'kelas_id',
         'sesi_id',
+        'jadwal_id',
         'judul',
         'file',
         'topik',
@@ -25,5 +26,10 @@ class Modul extends Model
     public function sesi()
     {
         return $this->belongsTo(Sesi::class);
+    }
+
+    public function jadwal()
+    {
+        return $this->belongsTo(Jadwal::class);
     }
 }

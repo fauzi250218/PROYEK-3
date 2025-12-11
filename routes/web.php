@@ -203,11 +203,9 @@ Route::prefix('guru')
 
 
                 // ===== VIEW PDF =====
-                Route::get(
-                    '/pdf/view/{path}',
-                    [KelasAjaranController::class, 'viewPdf']
-                )->where('path', '.*')->name('pdf.view');
-
+                Route::get('/modul/{id}/preview', [KelasAjaranController::class, 'previewModul'])
+                    ->whereNumber('id')
+                    ->name('modul.preview');
 
                 // ================= PRESENSI =================
                 Route::get('/sesi/{id}/presensi', [KehadiranController::class, 'index'])

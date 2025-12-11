@@ -15,25 +15,21 @@ class KehadiranController extends Controller
     public function index($id)
     {
         $sesi = Sesi::findOrFail($id);
+        $kelas = Kelas::with('murids')->findOrFail($sesi->kelas_id);
 
-        // ambil kelas & siswa
-        $kelas  = Kelas::with('murids')->findOrFail($sesi->kelas_id);
         $murids = $kelas->murids;
 
-        // ambil presensi lama
         $kehadiran = Kehadiran::where('sesi_id', $id)
             ->get()
             ->keyBy('murid_id');
 
-        // nomor sesi otomatis
         $semuaSesi = Sesi::where('kelas_id', $sesi->kelas_id)
             ->orderBy('id')
             ->get();
 
         $nomorSesi = $semuaSesi->search(fn($ss) => $ss->id == $sesi->id) + 1;
 
-        // ambil jadwal berdasarkan kelas
-        $jadwal = Jadwal::where('kelas_id', $sesi->kelas_id)->first();
+        $jadwal = Jadwal::find($sesi->jadwal_id); // 🔥 FIX
 
         return view(
             'guru.manajemen-kelas.kelas-ajaran.detail-kelas.kehadiran.presensi',
@@ -41,24 +37,25 @@ class KehadiranController extends Controller
         );
     }
 
+
     public function store(Request $request, $id)
     {
+        $sesi = Sesi::findOrFail($id);
+
         $statuses = $request->input('status', []);
 
         foreach ($statuses as $muridId => $stat) {
             Kehadiran::updateOrCreate(
                 [
                     'sesi_id'  => $id,
-                    'murid_id' => $muridId
+                    'murid_id' => $muridId,
                 ],
                 [
-                    'status' => $stat
+                    'status'    => $stat,
+                    'jadwal_id' => $sesi->jadwal_id, // 🔥 FIX
                 ]
             );
         }
-
-        // setelah simpan kembali ke halaman Diskusi
-        $sesi = Sesi::findOrFail($id);
 
         return redirect()
             ->route('guru.kelas.ajaran.detail', $sesi->kelas_id)

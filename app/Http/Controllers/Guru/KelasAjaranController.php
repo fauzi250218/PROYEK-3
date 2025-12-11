@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
 use App\Models\Kelas;
 use App\Models\Jadwal;
 use App\Models\Sesi;
@@ -13,18 +15,16 @@ use App\Models\Modul;
 
 class KelasAjaranController extends Controller
 {
-    // ============================================
-    // INDEX
-    // ============================================
+    /* ============================================================
+       INDEX KELAS AJARAN
+    ============================================================ */
     public function index()
     {
         $guru = Auth::user()->guru;
+        if (!$guru) abort(403, 'Akun ini bukan guru.');
 
-        if (!$guru) {
-            abort(403, 'Akun ini bukan guru.');
-        }
-
-        $kelasAjaran = Kelas::where('guru_id', $guru->id)->get()
+        $kelasAjaran = Kelas::where('guru_id', $guru->id)
+            ->get()
             ->map(function ($k) use ($guru) {
 
                 preg_match('/\d+/', $k->nama_kelas, $match);
@@ -43,17 +43,13 @@ class KelasAjaranController extends Controller
     }
 
 
-
-    // ============================================
-    // DETAIL KELAS AJARAN
-    // ============================================
+    /* ============================================================
+       DETAIL KELAS AJARAN
+    ============================================================ */
     public function detail($id)
     {
         $kelas = Kelas::with(['guru.user', 'murids'])->findOrFail($id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki akses ke kelas ini.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         $jadwal = Jadwal::where('kelas_id', $id)
             ->orderBy('tanggal')
@@ -65,7 +61,7 @@ class KelasAjaranController extends Controller
             ->orderBy('jam_mulai')
             ->get();
 
-        $modul = Modul::where('kelas_id', $id)->get();
+        $modul = Modul::where('kelas_id', $id)->orderBy('created_at')->get();
 
         $detail = [
             'nama_kelas'   => $kelas->nama_kelas,
@@ -80,22 +76,60 @@ class KelasAjaranController extends Controller
             'sesi'      => $sesi,
             'modul'     => $modul,
             'kelas_id'  => $id,
+            'guru'      => $kelas->guru
         ]);
     }
 
 
+    /* ============================================================
+       STORE SESI
+    ============================================================ */
+    public function storeSesi(Request $request)
+    {
+        $request->validate([
+            'kelas_id'   => 'required|exists:kelas,id',
+            'judul_sesi' => 'required|string|max:255',
+            'tanggal'    => 'required|date',
+            'jam_mulai'  => 'required',
+            'jam_selesai' => 'required|after:jam_mulai',
+        ]);
 
-    // ============================================
-    // EDIT SESI
-    // ============================================
+        $kelas = Kelas::findOrFail($request->kelas_id);
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
+
+        $jadwal = Jadwal::where('kelas_id', $kelas->id)
+            ->where('tanggal', $request->tanggal)
+            ->where('jam_mulai', $request->jam_mulai)
+            ->first();
+
+        if (!$jadwal) return back()->with('error', 'Jadwal tidak ditemukan.');
+
+        Sesi::create([
+            'kelas_id'    => $kelas->id,
+            'jadwal_id'   => $jadwal->id,
+            'judul_sesi'  => $request->judul_sesi,
+            'topik'       => $request->topik,
+            'deskripsi'   => $request->deskripsi,
+            'tanggal'     => $request->tanggal,
+            'jam_mulai'   => $request->jam_mulai,
+            'jam_selesai' => $request->jam_selesai,
+        ]);
+
+        return back()->with('success', 'Sesi berhasil ditambahkan!');
+    }
+
+
+    /* ============================================================
+       EDIT SESI
+    ============================================================ */
     public function editSesi($id)
     {
         $sesi  = Sesi::findOrFail($id);
         $kelas = Kelas::findOrFail($sesi->kelas_id);
 
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki izin mengedit sesi ini.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
+
+        $jadwal = Jadwal::find($sesi->jadwal_id);
 
         $detail = [
             'nama_kelas' => $kelas->nama_kelas,
@@ -106,24 +140,21 @@ class KelasAjaranController extends Controller
         return view('guru.manajemen-kelas.kelas-ajaran.detail-kelas.edit-aktivitas-pembelajaran', [
             'sesi'      => $sesi,
             'kelas'     => $kelas,
+            'jadwal'    => $jadwal,
             'detail'    => $detail,
             'kelas_id'  => $kelas->id,
         ]);
     }
 
 
-
-    // ============================================
-    // UPDATE SESI
-    // ============================================
+    /* ============================================================
+       UPDATE SESI
+    ============================================================ */
     public function updateSesi(Request $request, $id)
     {
         $sesi  = Sesi::findOrFail($id);
         $kelas = Kelas::findOrFail($sesi->kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, 'Anda tidak memiliki izin mengubah sesi ini.');
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         $request->validate([
             'judul_sesi'  => 'required|string|max:255',
@@ -134,6 +165,13 @@ class KelasAjaranController extends Controller
             'jam_selesai' => 'required|after:jam_mulai',
         ]);
 
+        $jadwal = Jadwal::where('kelas_id', $kelas->id)
+            ->where('tanggal', $request->tanggal)
+            ->where('jam_mulai', $request->jam_mulai)
+            ->first();
+
+        if (!$jadwal) return back()->with('error', 'Jadwal tidak ditemukan.');
+
         $sesi->update([
             'judul_sesi'  => $request->judul_sesi,
             'topik'       => $request->topik,
@@ -141,80 +179,37 @@ class KelasAjaranController extends Controller
             'tanggal'     => $request->tanggal,
             'jam_mulai'   => $request->jam_mulai,
             'jam_selesai' => $request->jam_selesai,
+            'jadwal_id'   => $jadwal->id,
         ]);
 
-        return redirect()
-            ->route('guru.kelas.ajaran.detail', $kelas->id)
-            ->with('success', 'Sesi pembelajaran berhasil diperbarui!');
+        return redirect()->route('guru.kelas.ajaran.detail', $kelas->id)
+            ->with('success', 'Sesi berhasil diperbarui!');
     }
 
 
-
-    // ============================================
-    // HAPUS SESI
-    // ============================================
+    /* ============================================================
+       DELETE SESI
+    ============================================================ */
     public function deleteSesi($id)
     {
         $sesi  = Sesi::findOrFail($id);
         $kelas = Kelas::findOrFail($sesi->kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki izin menghapus sesi ini.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         $sesi->delete();
 
-        return redirect()
-            ->route('guru.kelas.ajaran.detail', $kelas->id)
-            ->with('success', 'Sesi pembelajaran berhasil dihapus!');
+        return back()->with('success', 'Sesi berhasil dihapus!');
     }
 
 
 
-    // ============================================
-    // STORE SESI BARU
-    // ============================================
-    public function storeSesi(Request $request)
-    {
-        $request->validate([
-            'kelas_id'   => 'required|exists:kelas,id',
-            'judul_sesi' => 'required|string|max:255',
-            'tanggal'    => 'required|date',
-            'jam_mulai'  => 'required',
-            'jam_selesai'=> 'required|after:jam_mulai',
-        ]);
-
-        $kelas = Kelas::findOrFail($request->kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki izin menambah sesi untuk kelas ini.");
-        }
-
-        Sesi::create([
-            'kelas_id'    => $kelas->id,
-            'judul_sesi'  => $request->judul_sesi,
-            'topik'       => $request->input('topik'),
-            'deskripsi'   => $request->input('deskripsi'),
-            'tanggal'     => $request->tanggal,
-            'jam_mulai'   => $request->jam_mulai,
-            'jam_selesai' => $request->jam_selesai,
-        ]);
-
-        return redirect()->back()->with('success', 'Sesi pembelajaran berhasil ditambahkan!');
-    }
-
-
-
-    // ============================================
-    // SYNC SESI DARI JADWAL
-    // ============================================
+    /* ============================================================
+       SYNC SESI OTOMATIS
+    ============================================================ */
     public function syncSesi($kelas_id)
     {
         $kelas = Kelas::findOrFail($kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki akses.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         $jadwalList = Jadwal::where('kelas_id', $kelas_id)
             ->orderBy('tanggal')
@@ -222,14 +217,12 @@ class KelasAjaranController extends Controller
             ->get();
 
         if ($jadwalList->isEmpty()) {
-            return response()->json([
-                'message' => 'Tidak ada jadwal yang bisa disinkronkan.'
-            ], 400);
+            return response()->json(['message' => 'Tidak ada jadwal.'], 400);
         }
 
         $count = 0;
 
-        foreach ($jadwalList as $index => $jadwal) {
+        foreach ($jadwalList as $i => $jadwal) {
 
             $exists = Sesi::where('kelas_id', $kelas_id)
                 ->where('tanggal', $jadwal->tanggal)
@@ -240,9 +233,8 @@ class KelasAjaranController extends Controller
 
             Sesi::create([
                 'kelas_id'    => $kelas_id,
-                'judul_sesi'  => 'Sesi ' . ($index + 1),
-                'topik'       => null,
-                'deskripsi'   => null,
+                'jadwal_id'   => $jadwal->id,
+                'judul_sesi'  => "Sesi " . ($i + 1),
                 'tanggal'     => $jadwal->tanggal,
                 'jam_mulai'   => $jadwal->jam_mulai,
                 'jam_selesai' => $jadwal->jam_selesai,
@@ -251,122 +243,128 @@ class KelasAjaranController extends Controller
             $count++;
         }
 
-        return response()->json([
-            'message' => "$count sesi berhasil disinkronkan."
-        ]);
+        return response()->json(['message' => "$count sesi disinkronkan."]);
     }
 
 
 
-    // ============================================
-    // UPLOAD MODUL
-    // ============================================
+    /* ============================================================
+       UPLOAD MODUL
+    ============================================================ */
     public function uploadModul(Request $request)
     {
         $request->validate([
             'kelas_id'       => 'required|exists:kelas,id',
             'sesi_id'        => 'required|exists:sesi,id',
             'judul_materi'   => 'required|string|max:255',
-            'file_materi'    => 'required|mimes:pdf|max:20480',
+            'file_materi'    => 'required|mimes:pdf|max:102400',
             'topik_sesi'     => 'nullable|string|max:255',
             'catatan_materi' => 'nullable|string',
         ]);
 
+        $sesi = Sesi::findOrFail($request->sesi_id);
+        $kelas = Kelas::findOrFail($request->kelas_id);
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
+
         $file = $request->file('file_materi');
-        $fileName = time().'_'.$file->getClientOriginalName();
+        $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
         $path = $file->storeAs('modul', $fileName, 'public');
 
         Modul::create([
-            'kelas_id'   => $request->kelas_id,
-            'sesi_id'    => $request->sesi_id,
-            'judul'      => $request->judul_materi,
-            'file'       => $path,
-            'topik'      => $request->topik_sesi,
-            'catatan'    => $request->catatan_materi,
+            'kelas_id'  => $kelas->id,
+            'sesi_id'   => $sesi->id,
+            'jadwal_id' => $sesi->jadwal_id,
+            'judul'     => $request->judul_materi,
+            'file'      => $path,
+            'topik'     => $request->topik_sesi,
+            'catatan'   => $request->catatan_materi,
         ]);
 
-        return redirect()->back()->with('success', 'Modul berhasil diupload!');
+        return back()->with('success', 'Modul berhasil diunggah!');
     }
 
 
 
-    // ============================================
-    // EDIT MODUL
-    // ============================================
+    /* ============================================================
+       EDIT MODUL
+    ============================================================ */
     public function editModul($id)
     {
         $modul = Modul::findOrFail($id);
         $kelas = Kelas::findOrFail($modul->kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki akses untuk mengedit modul ini.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         return view('guru.manajemen-kelas.kelas-ajaran.detail-kelas.edit-modul', [
             'modul' => $modul,
-            'kelas' => $kelas
+            'kelas' => $kelas,
         ]);
     }
 
 
 
-    // ============================================
-    // UPDATE MODUL
-    // ============================================
+    /* ============================================================
+       UPDATE MODUL (FIX: FILE BENAR-BENAR TERGANTI)
+    ============================================================ */
     public function updateModul(Request $request, $id)
     {
         $modul = Modul::findOrFail($id);
         $kelas = Kelas::findOrFail($modul->kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki akses memperbarui modul ini.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         $request->validate([
             'judul'   => 'required|string|max:255',
             'topik'   => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
-            'file'    => 'nullable|mimes:pdf|max:20480',
+            'file'    => 'nullable|mimes:pdf|max:102400',
         ]);
 
-        $modul->judul   = $request->judul;
-        $modul->topik   = $request->topik;
-        $modul->catatan = $request->catatan;
+        DB::beginTransaction();
 
-        if ($request->hasFile('file')) {
+        try {
+            $oldPath = $modul->file;
 
-            // Hapus file lama
-            if ($modul->file && Storage::disk('public')->exists($modul->file)) {
-                Storage::disk('public')->delete($modul->file);
+            $modul->judul   = $request->judul;
+            $modul->topik   = $request->topik;
+            $modul->catatan = $request->catatan;
+
+            // Jika ada file baru
+            if ($request->hasFile('file')) {
+
+                $file = $request->file('file');
+                $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+                $newPath = $file->storeAs('modul', $fileName, 'public');
+
+                $modul->file = $newPath;
             }
 
-            $file = $request->file('file');
-            $fileName = time().'_'.$file->getClientOriginalName();
-            $path = $file->storeAs('modul', $fileName, 'public');
+            $modul->save();
 
-            $modul->file = $path;
+            DB::commit();
+
+            // Hapus file lama setelah commit
+            if ($request->hasFile('file') && $oldPath && Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            return redirect()->route('guru.kelas.ajaran.detail', $kelas->id)
+                ->with('success', 'Modul berhasil diperbarui!');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Gagal memperbarui modul: ' . $e->getMessage());
         }
-
-        $modul->save();
-
-        return redirect()
-            ->route('guru.kelas.ajaran.detail', $kelas->id)
-            ->with('success', 'Modul berhasil diperbarui!');
     }
 
 
 
-    // ============================================
-    // DELETE MODUL
-    // ============================================
+    /* ============================================================
+       DELETE MODUL
+    ============================================================ */
     public function deleteModul($id)
     {
         $modul = Modul::findOrFail($id);
         $kelas = Kelas::findOrFail($modul->kelas_id);
-
-        if ($kelas->guru_id !== Auth::user()->guru->id) {
-            abort(403, "Anda tidak memiliki izin menghapus modul ini.");
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
         if ($modul->file && Storage::disk('public')->exists($modul->file)) {
             Storage::disk('public')->delete($modul->file);
@@ -374,28 +372,28 @@ class KelasAjaranController extends Controller
 
         $modul->delete();
 
-        return redirect()
-            ->route('guru.kelas.ajaran.detail', $kelas->id)
+        return redirect()->route('guru.kelas.ajaran.detail', $kelas->id)
             ->with('success', 'Modul berhasil dihapus!');
     }
 
 
 
-    // ==========================================================
-    // VIEW PDF INLINE (ANTI DOWNLOAD, ANTI BLANK PREVIEW)
-    // ==========================================================
-    public function viewPdf($path)
+    /* ============================================================
+       PREVIEW PDF (FIX: TIDAK REDIRECT KE LOGIN)
+    ============================================================ */
+    public function previewModul($id)
     {
-        $full = storage_path('app/public/' . $path);
+        $modul = Modul::findOrFail($id);
+        $kelas = Kelas::findOrFail($modul->kelas_id);
 
-        if (!file_exists($full)) {
-            abort(404);
-        }
+        if ($kelas->guru_id !== Auth::user()->guru->id) abort(403);
 
-        return response()->file($full, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="'.basename($full).'"'
-        ]);
+        return response()->file(
+            storage_path('app/public/' . $modul->file),
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . basename($modul->file) . '"'
+            ]
+        );
     }
 }
-
