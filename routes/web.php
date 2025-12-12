@@ -2,13 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\MuridController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\JadwalController;
-
 use App\Http\Controllers\Guru\GuruDashboardController;
 use App\Http\Controllers\Guru\KelasBinaanController;
 use App\Http\Controllers\Guru\KelasAjaranController;
