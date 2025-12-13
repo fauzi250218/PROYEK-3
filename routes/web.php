@@ -251,8 +251,19 @@ Route::prefix('guru')
         });
 
 
-        // ================= MENU TAMBAHAN ==================
-        Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
-        Route::get('/perkembangan', [PerkembanganController::class, 'index'])->name('perkembangan.index');
-        Route::get('/obrolan', [ObrolanController::class, 'index'])->name('obrolan.index');
+               // ================= MENU TAMBAHAN ==================
+        Route::get('/pembayaran', [PembayaranController::class, 'index'])
+            ->name('pembayaran.index');
+
+        Route::get('/perkembangan', [PerkembanganController::class, 'index'])
+            ->name('perkembangan.index');
+
+        // ===== ROUTE OBROLAN (LAMA - TETAP DIPERTAHANKAN) =====
+        Route::get('/obrolan', [ObrolanController::class, 'index'])
+            ->name('obrolan.index');
+
+        // ===== ROUTE OBROLAN BARU (DITAMBAHKAN) =====
+        Route::get('/obrolan/{murid}', [ObrolanController::class, 'chat'])
+            ->whereNumber('murid')
+            ->name('obrolan.chat');
     });

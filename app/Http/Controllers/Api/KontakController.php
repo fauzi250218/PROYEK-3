@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Murid;
 use App\Models\Guru;
-use Illuminate\Http\Request;
 
 class KontakController extends Controller
 {
     public function getKontak($email)
     {
-        $murid = Murid::with('kelas.guru.user')
+        $murid = Murid::with('kelas')
             ->where('email', $email)
             ->first();
 
@@ -31,28 +30,43 @@ class KontakController extends Controller
             ], 404);
         }
 
+        // ===============================
+        // TEMAN SE-KELAS
+        // ===============================
         $teman = $kelas->murids()
             ->where('id', '!=', $murid->id)
             ->get()
             ->map(function ($t) {
                 return [
-                    'id'    => $t->id,
-                    'nama'  => $t->nama,
-                    'email' => $t->email,
-                    'foto_profil' => $this->formatFoto($t->foto_profil)
+                    'id'          => $t->id, // murids.id
+                    'nama'        => $t->nama,
+                    'email'       => $t->email,
+                    'role'        => 'murid',
+                    'foto_profil' => $this->formatFoto($t->foto_profil),
                 ];
             });
 
+        // ===============================
+        // 🔥 WALI KELAS (AMBIL LANGSUNG DARI TABEL GURU)
+        // ===============================
         $wali = null;
-        if ($kelas->guru && $kelas->guru->user) {
-            $guru = $kelas->guru->user;
-            $wali = [
-                'id'    => $guru->id,
-                'nama'  => $guru->name,
-                'email' => $guru->email,
-                'role'  => 'guru',
-                'foto_profil' => $this->formatFoto($guru->foto_profil)
-            ];
+
+        if ($kelas->guru_id) {
+            $guru = Guru::with('user')
+                ->where('id', $kelas->guru_id) // 🔒 PASTI guru.id
+                ->first();
+
+            if ($guru) {
+                $wali = [
+                    'id'          => $guru->id, // ✅ guru.id (FINAL)
+                    'nama'        => $guru->user->name ?? '-',
+                    'email'       => $guru->user->email ?? '-',
+                    'role'        => 'guru',
+                    'foto_profil' => $this->formatFoto(
+                        $guru->foto_profil ?? $guru->user->foto_profil
+                    ),
+                ];
+            }
         }
 
         return response()->json([
@@ -61,8 +75,9 @@ class KontakController extends Controller
         ], 200);
     }
 
-
-    // Tambahkan fungsi ini di dalam controller
+    // ===============================
+    // HELPER FORMAT FOTO
+    // ===============================
     private function formatFoto($foto)
     {
         if (!$foto) return null;
@@ -73,5 +88,4 @@ class KontakController extends Controller
 
         return asset("storage/" . $foto);
     }
-
 }
