@@ -35,12 +35,14 @@
                 @csrf
 
                 <div class="mb-2">
-                    <label class="form-label">Kategori</label>
+                    <label class="form-label">Kategori (Mata Pelajaran)</label>
+
                     <select name="kategori" class="form-select" required>
-                        <option value="Kognitif">Kognitif</option>
-                        <option value="Motorik">Motorik</option>
-                        <option value="Sosial-Emosional">Sosial-Emosional</option>
-                        <option value="Bahasa">Bahasa</option>
+                        @forelse($mapels as $m)
+                            <option value="{{ $m }}">{{ $m }}</option>
+                        @empty
+                            <option disabled>Tidak ada mata pelajaran pada kelas ini</option>
+                        @endforelse
                     </select>
                 </div>
 

@@ -15,6 +15,7 @@ use App\Http\Controllers\Guru\PembayaranController;
 use App\Http\Controllers\Guru\PerkembanganController;
 use App\Http\Controllers\Guru\ObrolanController;
 use App\Http\Controllers\Guru\KehadiranController;
+use App\Http\Controllers\Guru\ERaportController;
 
 
 // ==================================================
@@ -148,6 +149,25 @@ Route::prefix('guru')
 
                 Route::get('/{id}/laporan', [KelasBinaanController::class, 'laporan'])
                     ->whereNumber('id')->name('laporan');
+
+                // ==================================================
+                // ===============  E-RAPORT BARU DITAMBAHKAN  ======
+                // ==================================================
+
+                // 1. List murid untuk E-Raport
+                Route::get('/{id}/eraport', [ERaportController::class, 'index'])
+                    ->whereNumber('id')
+                    ->name('eraport.index');
+
+                // 2. Preview raport murid
+                Route::get('/eraport/{murid_id}/show', [ERaportController::class, 'show'])
+                    ->whereNumber('murid_id')
+                    ->name('eraport.show');
+
+                // 3. Download raport PDF
+                Route::get('/eraport/{murid_id}/download', [ERaportController::class, 'download'])
+                    ->whereNumber('murid_id')
+                    ->name('eraport.download');
             });
 
 

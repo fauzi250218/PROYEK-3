@@ -71,11 +71,20 @@ class PerkembanganController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        // =====================================
+        // 🔥 Tambahan: Ambil mata pelajaran dari jadwal kelas
+        // =====================================
+        $mapels = $kelas->jadwals()
+            ->pluck('mata_pelajaran')
+            ->unique()
+            ->values();
+
         return view('guru.manajemen-kelas.kelas-binaan.perkembangan.show', [
             'guru' => $guru,
             'murid' => $murid,
             'kelas' => $kelas,
-            'catatan' => $catatan
+            'catatan' => $catatan,
+            'mapels' => $mapels,  // ← dikirim ke view
         ]);
     }
 
@@ -85,7 +94,7 @@ class PerkembanganController extends Controller
     public function storeCatatan(Request $request, $kelas_id, $murid_id)
     {
         $request->validate([
-            'kategori' => 'required|string|max:100',
+            'kategori' => 'required|string',  // ← perbaikan validasi
             'catatan' => 'required|string',
             'tanggal' => 'nullable|date',
         ]);
@@ -103,7 +112,7 @@ class PerkembanganController extends Controller
         CatatanPerkembangan::create([
             'murid_id' => $murid->id,
             'guru_id' => $guru->id,
-            'kategori' => $request->kategori,
+            'kategori' => $request->kategori, // ← kategori = nama mapel
             'catatan' => $request->catatan,
             'tanggal' => $request->tanggal ?? now()->format('Y-m-d'),
         ]);
