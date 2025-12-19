@@ -64,9 +64,8 @@
             </a>
 
             <!-- E-Raport (tanpa route dulu) -->
-            <a href="#" class="menu-item">
+            <a href="{{ route('guru.kelas.binaan.eraport.index', ['id' => $kelas->id]) }}" class="menu-item">
                 <div class="menu-icon bg-danger-subtle text-danger">
-                    {{-- jika punya logo khusus, bisa diganti img --}}
                     <i class="bi bi-file-earmark-bar-graph"></i>
                 </div>
                 <div class="menu-text">
@@ -77,6 +76,7 @@
                     <i class="bi bi-arrow-right-circle-fill"></i>
                 </div>
             </a>
+
 
         </div>
         @endforeach
