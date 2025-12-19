@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\JadwalController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\NilaiController;
 use App\Http\Controllers\Api\KontakController;
+use App\Http\Controllers\Api\ModulController;
 
 // =====================
 // Login dan Registrasi
@@ -75,3 +76,10 @@ Route::get('/kontak/{email}', [KontakController::class, 'getKontak']);
 // Nilai
 // =====================
 Route::get('/nilai/murid/{murid_id}', [NilaiController::class, 'getNilaiByMurid']);
+
+// =====================
+// Modul
+// =====================
+Route::get('/modul/mata-pelajaran/{murid_id}', [ModulController::class, 'getMataPelajaran']);
+Route::get('/modul/by-mapel-jadwal/{jadwal_id}', [ModulController::class, 'getModulByMapelJadwal']);
+Route::post('/modul/by-many-jadwal', [ModulController::class, 'getModulByManyJadwal']);
