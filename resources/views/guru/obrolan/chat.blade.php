@@ -18,12 +18,11 @@
     </div>
 
     {{-- CHAT BOX --}}
-    <div id="chat-box"
-         class="chat-box mb-3 bg-white rounded shadow-sm">
+    <div id="chat-box" class="chat-box mb-3 bg-white rounded shadow-sm">
         <!-- pesan dimuat via JS -->
     </div>
 
-    {{-- FORM INPUT --}}
+    {{-- INPUT --}}
     <form id="chat-form">
         @csrf
         <div class="input-group">
@@ -33,9 +32,7 @@
                    placeholder="Ketik pesan..."
                    autocomplete="off"
                    required>
-            <button class="btn btn-success px-4">
-                Kirim
-            </button>
+            <button class="btn btn-success px-4">Kirim</button>
         </div>
     </form>
 
@@ -47,9 +44,7 @@ const guruId  = {{ $guru->id }};
 const muridId = {{ $murid->id }};
 let roomId    = null;
 
-// ===============================
-// OPEN / CREATE ROOM
-// ===============================
+// ================= OPEN ROOM =================
 fetch("{{ url('/api/chat/open-room') }}", {
     method: 'POST',
     headers: {
@@ -67,12 +62,10 @@ fetch("{{ url('/api/chat/open-room') }}", {
 .then(data => {
     roomId = data.room.id;
     loadMessages();
-    markAsRead(); // 🔥 FIX BADGE UNREAD
+    markAsRead();
 });
 
-// ===============================
-// LOAD MESSAGES
-// ===============================
+// ================= LOAD MESSAGES =================
 function loadMessages() {
     fetch(`/api/chat/messages/${roomId}?user_id=${guruId}&user_role=guru`)
         .then(res => res.json())
@@ -82,15 +75,28 @@ function loadMessages() {
 
             data.messages.forEach(m => {
                 const wrap = document.createElement('div');
-                wrap.className = m.sender_role === 'guru'
+                const isGuru = m.sender_role === 'guru';
+                const isRead = isGuru && m.read_at !== null;
+
+                wrap.className = isGuru
                     ? 'chat-row chat-right'
                     : 'chat-row chat-left';
 
                 wrap.innerHTML = `
-                    <div class="chat-bubble ${m.sender_role === 'guru' ? 'bubble-guru' : 'bubble-murid'}">
+                    <div class="chat-bubble ${isGuru ? 'bubble-guru' : 'bubble-murid'}">
                         ${m.message}
-                        <div class="chat-time">
-                            ${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        <div class="chat-meta">
+                            <span class="chat-time">
+                                ${new Date(m.created_at).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute:'2-digit'
+                                })}
+                            </span>
+                            ${isGuru ? `
+                                <span class="chat-read ${isRead ? 'readed' : ''}">
+                                    ✓✓
+                                </span>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -98,17 +104,17 @@ function loadMessages() {
             });
 
             box.scrollTop = box.scrollHeight;
+            markAsRead(); // 🔥 realtime read
         });
 }
 
-// ===============================
-// SEND MESSAGE
-// ===============================
+// ================= SEND MESSAGE =================
 document.getElementById('chat-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const input = document.getElementById('message');
-    const msg   = input.value;
+    const msg   = input.value.trim();
+    if (!msg) return;
 
     fetch("{{ url('/api/chat/send') }}", {
         method: 'POST',
@@ -128,9 +134,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     });
 });
 
-// ===============================
-// MARK AS READ (🔥 PENTING)
-// ===============================
+// ================= MARK AS READ =================
 function markAsRead() {
     fetch("{{ url('/api/chat/mark-read') }}", {
         method: 'POST',
@@ -188,14 +192,31 @@ function markAsRead() {
     border-bottom-left-radius: 4px;
 }
 
+/* ===== META ===== */
+.chat-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 4px;
+}
+
 .chat-time {
     font-size: 10px;
     opacity: .7;
-    margin-top: 4px;
-    text-align: right;
 }
 
-/* BUTTON BACK */
+/* ===== READ INDICATOR ===== */
+.chat-read {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6); /* belum dibaca */
+}
+
+.chat-read.readed {
+    color: #faf7f7; /* ✓✓ biru */
+}
+
+/* ===== BUTTON BACK ===== */
 .btn-back {
     border-radius: 50%;
     width: 36px;

@@ -7,7 +7,6 @@ use App\Models\ChatRoom;
 use App\Models\ChatMessage;
 use App\Models\Murid;
 use App\Models\Guru;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -30,33 +29,27 @@ class ChatController extends Controller
         $peerId   = (int) $request->peer_id;
         $peerRole = $request->peer_role;
 
-        // ======================================
-        // 🔒 VALIDASI: MURID ↔ WALI KELAS SAJA
-        // ======================================
+        // 🔒 VALIDASI: murid ↔ wali kelas
         if ($userRole === 'murid' && $peerRole === 'guru') {
-
             $murid = Murid::with('kelas')->find($userId);
             $guru  = Guru::find($peerId);
 
             if (!$murid || !$murid->kelas || !$guru) {
                 return response()->json([
-                    'status'  => false,
+                    'status' => false,
                     'message' => 'Data murid / guru tidak valid'
                 ], 403);
             }
 
-            // 🔥 GURU HARUS WALI KELAS
             if ($murid->kelas->guru_id !== $guru->id) {
                 return response()->json([
-                    'status'  => false,
+                    'status' => false,
                     'message' => 'Guru bukan wali kelas murid ini'
                 ], 403);
             }
         }
 
-        // ======================================
-        // CARI ROOM (2 ARAH)
-        // ======================================
+        // 🔍 Cari room dua arah
         $room = ChatRoom::where(function ($q) use ($userId, $userRole, $peerId, $peerRole) {
             $q->where([
                 ['user_one_id', $userId],
@@ -73,9 +66,7 @@ class ChatController extends Controller
             ]);
         })->first();
 
-        // ======================================
-        // BUAT ROOM JIKA BELUM ADA
-        // ======================================
+        // ➕ Buat room jika belum ada
         if (!$room) {
             $room = ChatRoom::create([
                 'user_one_id'   => $userId,
@@ -87,12 +78,12 @@ class ChatController extends Controller
 
         return response()->json([
             'status' => true,
-            'room'   => $room,
+            'room'   => $room
         ]);
     }
 
     // ==================================================
-    // AMBIL SEMUA ROOM USER
+    // GET CHAT ROOMS + UNREAD COUNT
     // ==================================================
     public function getRooms(Request $request)
     {
@@ -110,12 +101,11 @@ class ChatController extends Controller
         })->orWhere(function ($q) use ($userId, $userRole) {
             $q->where('user_two_id', $userId)
               ->where('user_two_role', $userRole);
-        })->with(['messages' => function ($q) {
-            $q->latest();
-        }])->get();
+        })->get();
 
         $result = $rooms->map(function ($room) use ($userId, $userRole) {
 
+            // Tentukan lawan chat
             if ($room->user_one_id == $userId && $room->user_one_role == $userRole) {
                 $peerId   = $room->user_two_id;
                 $peerRole = $room->user_two_role;
@@ -124,26 +114,36 @@ class ChatController extends Controller
                 $peerRole = $room->user_one_role;
             }
 
-            $peerName  = '-';
+            // Nama & foto
+            $peerName = '-';
             $peerPhoto = null;
 
             if ($peerRole === 'murid') {
                 $m = Murid::find($peerId);
                 if ($m) {
-                    $peerName  = $m->nama;
+                    $peerName = $m->nama;
                     $peerPhoto = $this->formatFoto($m->foto_profil);
                 }
             } else {
                 $g = Guru::find($peerId);
                 if ($g && $g->user) {
-                    $peerName  = $g->user->name;
+                    $peerName = $g->user->name;
                     $peerPhoto = $this->formatFoto(
                         $g->foto_profil ?? $g->user->foto_profil
                     );
                 }
             }
 
-            $lastMessage = $room->messages->first();
+            // Pesan terakhir
+            $lastMessage = ChatMessage::where('chat_room_id', $room->id)
+                ->latest()
+                ->first();
+
+            // 🔥 HITUNG UNREAD (INI KUNCI BADGE)
+            $unreadCount = ChatMessage::where('chat_room_id', $room->id)
+                ->where('sender_role', '!=', $userRole)
+                ->whereNull('read_at')
+                ->count();
 
             return [
                 'id'           => $room->id,
@@ -152,7 +152,7 @@ class ChatController extends Controller
                 'peerName'     => $peerName,
                 'peerPhoto'    => $peerPhoto,
                 'lastMessage'  => $lastMessage?->message ?? '',
-                'unreadCount'  => 0,
+                'unreadCount'  => $unreadCount,
             ];
         });
 
@@ -163,7 +163,7 @@ class ChatController extends Controller
     }
 
     // ==================================================
-    // AMBIL PESAN DALAM ROOM
+    // GET MESSAGES + AUTO MARK READ
     // ==================================================
     public function getMessages($roomId, Request $request)
     {
@@ -171,6 +171,12 @@ class ChatController extends Controller
             'user_id'   => 'required|integer',
             'user_role' => 'required|in:murid,guru'
         ]);
+
+        // 🔥 AUTO MARK AS READ
+        ChatMessage::where('chat_room_id', $roomId)
+            ->where('sender_role', '!=', $request->user_role)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         $messages = ChatMessage::where('chat_room_id', $roomId)
             ->orderBy('created_at', 'asc')
@@ -183,7 +189,7 @@ class ChatController extends Controller
     }
 
     // ==================================================
-    // KIRIM PESAN
+    // SEND MESSAGE
     // ==================================================
     public function sendMessage(Request $request)
     {
@@ -195,7 +201,6 @@ class ChatController extends Controller
         ]);
 
         $room = ChatRoom::find($request->room_id);
-
         if (!$room) {
             return response()->json([
                 'status' => false,
@@ -218,7 +223,7 @@ class ChatController extends Controller
     }
 
     // ==================================================
-    // HELPER FORMAT FOTO
+    // FORMAT FOTO
     // ==================================================
     private function formatFoto($foto)
     {
@@ -226,40 +231,4 @@ class ChatController extends Controller
         if (str_starts_with($foto, 'http')) return $foto;
         return asset("storage/" . $foto);
     }
-
-    // ==================================================
-    // MARK PESAN SEBAGAI SUDAH DIBACA
-    // ==================================================
-    public function markAsRead(Request $request)
-    {
-        $request->validate([
-            'room_id'   => 'required|integer',
-            'user_role' => 'required|in:murid,guru',
-        ]);
-
-        // Jika guru membuka chat → tandai pesan murid sebagai read
-        if ($request->user_role === 'guru') {
-            ChatMessage::where('chat_room_id', $request->room_id)
-                ->where('sender_role', 'murid')
-                ->whereNull('read_at')
-                ->update([
-                    'read_at' => now()
-                ]);
-        }
-
-        // Jika murid membuka chat → tandai pesan guru sebagai read
-        if ($request->user_role === 'murid') {
-            ChatMessage::where('chat_room_id', $request->room_id)
-                ->where('sender_role', 'guru')
-                ->whereNull('read_at')
-                ->update([
-                    'read_at' => now()
-                ]);
-        }
-
-        return response()->json([
-            'status' => true
-        ]);
-    }
-
 }
