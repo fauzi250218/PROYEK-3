@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\MuridController;
 use App\Http\Controllers\Api\KelasController;
 use App\Http\Controllers\Api\JadwalController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ERaportController;
+use App\Http\Controllers\Api\KehadiranController;
 use App\Http\Controllers\Api\NilaiController;
 use App\Http\Controllers\Api\KontakController;
 use App\Http\Controllers\Api\ModulController;
@@ -83,3 +85,16 @@ Route::get('/nilai/murid/{murid_id}', [NilaiController::class, 'getNilaiByMurid'
 Route::get('/modul/mata-pelajaran/{murid_id}', [ModulController::class, 'getMataPelajaran']);
 Route::get('/modul/by-mapel-jadwal/{jadwal_id}', [ModulController::class, 'getModulByMapelJadwal']);
 Route::post('/modul/by-many-jadwal', [ModulController::class, 'getModulByManyJadwal']);
+
+// =====================
+// Kehadiran
+// =====================
+Route::get('/kehadiran/mata-pelajaran/{murid_id}', [KehadiranController::class, 'getMataPelajaran']);
+Route::post('/kehadiran/by-many-jadwal', [KehadiranController::class, 'getKehadiranByManyJadwal']);
+Route::post('/kehadiran/store', [KehadiranController::class, 'store']);
+
+// =====================
+// E-Raport
+// =====================
+Route::get('/eraport/{murid_id}', [ERaportController::class, 'show']);
+Route::get('/eraport/{murid}/download', [ERaportController::class, 'download']);
