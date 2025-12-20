@@ -69,4 +69,13 @@ class Murid extends Model
     {
         return $this->hasMany(Notification::class, 'murid_id');
     }
+
+    /**
+     * Relasi ke TagihanSPP
+     */
+
+    public function tagihanSPP()
+    {
+        return $this->hasMany(TagihanSPP::class, 'murid_id');
+    }
 }
