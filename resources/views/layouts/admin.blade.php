@@ -64,10 +64,12 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link main-link" href="#">
-          <i class="bi bi-bank me-2"></i> Pembayaran
+        <a class="nav-link main-link {{ request()->routeIs('admin.pembayaran-spp.*') ? 'active' : '' }}"
+          href="{{ route('admin.pembayaran-spp.index') }}">
+          <i class="bi bi-bank me-2"></i> Pembayaran SPP
         </a>
       </li>
+
 
       <li class="nav-item">
         <a class="nav-link main-link" href="#">
