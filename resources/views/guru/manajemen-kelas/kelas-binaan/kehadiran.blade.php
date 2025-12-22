@@ -1,98 +1,232 @@
 @extends('layouts.guru')
-@section('title','Rekap Kehadiran - Kelas Binaan')
-
-@section('extra-css')
-<link rel="stylesheet" href="{{ asset('css/guru/manajemen-siswa/kehadiran.css') }}">
-@endsection
 
 @section('content')
-<div class="kehadiran-wrapper container-fluid py-4">
 
-    <!-- Header -->
-    <div class="section-header align-with-header mb-4">
-        <h3 class="fw-bold text-dark mb-1">Rekap Kehadiran Siswa</h3>
-        <p class="text-muted">Lihat data kehadiran siswa di kelas binaan dengan tampilan ringkas dan interaktif.</p>
-    </div>
+<style>
+:root{
+    --bg:#f4f7f2;
+    --card:#ffffff;
+    --text:#020617;
+    --muted:#64748b;
+    --primary:#16a34a;
+    --warning:#f59e0b;
+    --danger:#dc2626;
+    --border:#e5e7eb;
+}
 
-    <!-- Statistik Atas -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="stat-card">
-                <h6>Total Siswa</h6>
-                <h3>32</h3>
-                <p><i class="bi bi-people-fill"></i> siswa terdaftar</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stat-card">
-                <h6>Rata-rata Kehadiran</h6>
-                <h3 class="text-success">95%</h3>
-                <p><i class="bi bi-graph-up"></i> bulan Oktober</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stat-card">
-                <h6>Periode Aktif</h6>
-                <h3>Oktober 2025</h3>
-                <p><i class="bi bi-calendar-event"></i> semester ganjil</p>
-            </div>
-        </div>
-    </div>
+/* HEADER */
+.page-header{ margin-bottom:30px; }
+.page-header h1{ font-size:2rem; font-weight:800; }
+.page-header p{ color:var(--muted); margin-top:6px; }
 
-    <!-- Filter Bulan -->
-    <div class="filter-bar d-flex flex-wrap align-items-center mb-4">
-        <select class="form-select bulan-select me-2">
-            <option>Bulan Ini</option>
-            <option>Januari</option>
-            <option>Februari</option>
-            <option>Maret</option>
-        </select>
-        <button class="btn-filter">Tampilkan</button>
-    </div>
+/* SUMMARY */
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+    margin-bottom:26px;
+}
+.summary-card{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 25px 60px rgba(2,6,23,.08);
+}
+.summary-card span{ font-size:.8rem; color:var(--muted); }
+.summary-card h2{ font-size:2rem; font-weight:800; color:var(--primary); }
 
-    <!-- Grid Card Kehadiran -->
-    <div class="row g-4">
-        @php
-            $data = [
-                ['nama'=>'Rizky Ahmad','hadir'=>20,'sakit'=>1,'izin'=>1,'alpa'=>0],
-                ['nama'=>'Siti Rahma','hadir'=>19,'sakit'=>2,'izin'=>0,'alpa'=>1],
-                ['nama'=>'Budi Santoso','hadir'=>18,'sakit'=>1,'izin'=>2,'alpa'=>1],
-                ['nama'=>'Dewi Lestari','hadir'=>22,'sakit'=>0,'izin'=>1,'alpa'=>0],
-            ];
-        @endphp
+/* FILTER */
+.filter-box{
+    background:#fff;
+    padding:16px;
+    border-radius:14px;
+    box-shadow:0 15px 40px rgba(2,6,23,.06);
+    margin-bottom:30px;
+    display:flex;
+    gap:12px;
+}
+.filter-box select{
+    flex:1;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+}
+.filter-box button{
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+}
 
-        @foreach($data as $row)
-        @php
-            $total = $row['hadir'] + $row['sakit'] + $row['izin'] + $row['alpa'];
-            $persen = round(($row['hadir'] / $total) * 100);
-        @endphp
-        <div class="col-md-3 col-sm-6">
-            <div class="attendance-card shadow-sm">
-                <div class="header d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold text-dark mb-0">{{ $row['nama'] }}</h6>
-                    <span class="badge bg-success">{{ $persen }}%</span>
-                </div>
+/* GRID */
+.student-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:26px;
+}
+.student-card{
+    background:#fff;
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 20px 50px rgba(2,6,23,.08);
+    display:flex;
+    flex-direction:column;
+}
+.student-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+.student-name{ font-weight:800; }
+.student-percent{
+    background:var(--primary);
+    color:#fff;
+    font-size:.75rem;
+    padding:4px 10px;
+    border-radius:999px;
+}
 
-                <div class="progress mt-3" style="height: 8px;">
-                    <div class="progress-bar bg-success" style="width: {{ $persen }}%;"></div>
-                </div>
+/* PROGRESS */
+.progress{
+    height:10px;
+    background:#e5e7eb;
+    border-radius:999px;
+    margin-bottom:16px;
+}
+.progress-bar{ height:100%; border-radius:999px; }
 
-                <div class="mt-3 d-flex justify-content-between small text-muted">
-                    <span>Hadir: <b>{{ $row['hadir'] }}</b></span>
-                    <span>Sakit: <b>{{ $row['sakit'] }}</b></span>
-                </div>
-                <div class="d-flex justify-content-between small text-muted">
-                    <span>Izin: <b>{{ $row['izin'] }}</b></span>
-                    <span>Alpa: <b>{{ $row['alpa'] }}</b></span>
-                </div>
+/* STATS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:6px 16px;
+    font-size:.85rem;
+    margin-bottom:16px;
+}
+.stats div{ display:flex; justify-content:space-between; color:var(--muted); }
+.stats strong{ color:var(--text); }
 
-                <div class="footer mt-3 text-end">
-                    <button class="btn-detail">Detail</button>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
+/* ACTION */
+.card-action{
+    margin-top:auto;
+    text-align:right;
+}
+.btn-detail{
+    background:transparent;
+    border:1px solid var(--primary);
+    color:var(--primary);
+    padding:7px 16px;
+    border-radius:999px;
+    font-size:.75rem;
+    font-weight:700;
+    text-decoration:none;
+    transition:.2s;
+}
+.btn-detail:hover{
+    background:var(--primary);
+    color:#fff;
+}
+</style>
 
+{{-- HEADER --}}
+<div class="page-header">
+    <h1>Rekap Kehadiran Siswa</h1>
+    <p>Kelas {{ $kelas->nama_kelas }} · {{ $periodeAktif }}</p>
 </div>
+
+{{-- SUMMARY --}}
+<div class="summary-grid">
+    <div class="summary-card">
+        <span>Total Siswa</span>
+        <h2>{{ $totalSiswa }}</h2>
+    </div>
+    <div class="summary-card">
+        <span>Rata-rata Kehadiran</span>
+        <h2>{{ $rataRataKehadiran }}%</h2>
+    </div>
+    <div class="summary-card">
+        <span>Periode</span>
+        <h2>{{ $periodeAktif }}</h2>
+    </div>
+</div>
+
+{{-- FILTER --}}
+<form method="GET">
+    <div class="filter-box">
+        <select name="bulan">
+            <option value="all" {{ request('bulan','all')=='all'?'selected':'' }}>
+                Pilih Bulan
+            </option>
+            @foreach([
+                1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',
+                5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',
+                9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+            ] as $k=>$bulan)
+                <option value="{{ $k }}" {{ request('bulan')==$k?'selected':'' }}>
+                    {{ $bulan }}
+                </option>
+            @endforeach
+        </select>
+
+        <select name="tahun">
+            @foreach($daftarTahun as $tahun)
+                <option value="{{ $tahun }}"
+                    {{ request('tahun',now()->year)==$tahun?'selected':'' }}>
+                    {{ $tahun }}
+                </option>
+            @endforeach
+        </select>
+
+        <button type="submit">Tampilkan</button>
+    </div>
+</form>
+
+{{-- GRID SISWA --}}
+<div class="student-grid">
+@forelse($rekap as $r)
+@php
+    $color = $r['persen'] >= 90 ? 'var(--primary)' :
+             ($r['persen'] >= 75 ? 'var(--warning)' : 'var(--danger)');
+@endphp
+<div class="student-card">
+    <div class="student-header">
+        <div class="student-name">{{ $r['nama'] }}</div>
+        <div class="student-percent">{{ $r['persen'] }}%</div>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" style="width:{{ $r['persen'] }}%;background:{{ $color }}"></div>
+    </div>
+
+    <div class="stats">
+        <div>Hadir <strong>{{ $r['hadir'] }}</strong></div>
+        <div>Sakit <strong>{{ $r['sakit'] }}</strong></div>
+        <div>Izin <strong>{{ $r['izin'] }}</strong></div>
+        <div>Alpha <strong>{{ $r['alpha'] }}</strong></div>
+    </div>
+
+    {{-- BUTTON DETAIL --}}
+    <div class="card-action">
+        <a
+            href="{{ route('guru.kelas.binaan.kehadiran.detail', [
+                'kelas' => $kelas->id,
+                'murid' => $r['murid_id'],
+                'bulan' => request('bulan','all'),
+                'tahun' => request('tahun', now()->year),
+            ]) }}"
+            class="btn-detail"
+        >
+            Detail
+        </a>
+    </div>
+</div>
+@empty
+    <p style="color:var(--muted)">Tidak ada data kehadiran.</p>
+@endforelse
+</div>
+
 @endsection

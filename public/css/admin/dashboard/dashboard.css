@@ -1,89 +1,220 @@
+/* =====================================================
+   ADMIN DASHBOARD – PREMIUM CLEAN UI (COMPACT SPACING)
+===================================================== */
 
-.dashboard-container {
-    background-color: #f8f9fc;
-    min-height: 100vh;
-    font-family: 'Poppins', sans-serif;
+:root{
+    --bg1:#f8fafc;
+    --bg2:#eef2ff;
+    --card:#ffffff;
+    --text:#020617;
+    --muted:#64748b;
+
+    --primary:#2563eb;
+    --success:#16a34a;
+    --warning:#f59e0b;
+    --info:#0ea5e9;
+    --danger:#dc2626;
+    --pink:#ec4899;
+
+    --border:#e5e7eb;
+    --shadow-soft:0 10px 30px rgba(2,6,23,.08);
+    --shadow-hover:0 24px 55px rgba(2,6,23,.14);
 }
 
-/* STAT CARDS */
-.stat-card {
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    gap: 15px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    transition: all 0.3s ease;
-    border: 1px solid #f1f1f1;
+/* ================= GLOBAL ================= */
+body{
+    background:
+        radial-gradient(circle at top,var(--bg2),transparent 60%),
+        var(--bg1);
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont;
+    color:var(--text);
 }
 
-.stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+/* ================= WRAP ================= */
+.dashboard-wrap{
+    max-width:1450px;
+    margin:0 auto;
+    padding:36px; /* diperkecil dari 42px */
+    animation:fadeSlide .6s ease;
 }
 
-.icon-wrapper {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.5rem;
-    flex-shrink: 0;
+@keyframes fadeSlide{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:none; }
 }
 
-.stat-title {
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin-bottom: 4px;
+/* ================= HEADER ================= */
+.dashboard-header{
+    margin-bottom:28px; /* JARAK NAIK KE ATAS */
 }
 
-.stat-number {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #343a40;
+.dashboard-header h1{
+    font-size:2.3rem;
+    font-weight:900;
+    letter-spacing:-.4px;
 }
 
-/* CHART CARDS */
-.chart-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 25px;
-    border: 1px solid #f1f1f1;
-    transition: all 0.3s ease;
+.dashboard-header p{
+    margin-top:6px;
+    font-size:.9rem;
+    color:var(--muted);
 }
 
-.chart-card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+/* ================= STAT GRID ================= */
+.stat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:22px;            /* lebih rapat */
+    margin-bottom:48px; /* lebih dekat ke chart */
 }
 
-.chart-header {
-    margin-bottom: 15px;
+/* ================= CARD ================= */
+.stat-card{
+    background:linear-gradient(180deg,#fff,#f8fafc);
+    border-radius:22px;
+    padding:26px; /* diperkecil */
+    display:flex;
+    align-items:center;
+    gap:18px;
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--border);
+    position:relative;
+    overflow:hidden;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
 }
 
-.chart-title {
-    font-weight: 600;
-    color: #343a40;
-    margin-bottom: 5px;
+/* NETRAL HOVER */
+.stat-card:hover{
+    transform:translateY(-5px);
+    box-shadow:var(--shadow-hover);
 }
 
-/* LEGEND */
-.chart-legend {
-    font-size: 0.9rem;
+/* ================= ICON ================= */
+.stat-icon{
+    width:60px; /* diperkecil */
+    height:60px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.6rem;
+    color:#fff;
+    flex-shrink:0;
 }
 
-.legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
+.stat-icon.primary{
+    background:linear-gradient(135deg,#2563eb,#1e3a8a);
+}
+.stat-icon.success{
+    background:linear-gradient(135deg,#16a34a,#14532d);
+}
+.stat-icon.warning{
+    background:linear-gradient(135deg,#f59e0b,#92400e);
+}
+.stat-icon.info{
+    background:linear-gradient(135deg,#0ea5e9,#075985);
+}
+.stat-icon.danger{
+    background:linear-gradient(135deg,#dc2626,#7f1d1d);
 }
 
-/* COLORS */
-.bg-pink {
-    background-color: #e83e8c !important;
+/* ================= TEXT ================= */
+.stat-info span{
+    font-size:.72rem;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:var(--muted);
+}
+
+.stat-info h2{
+    margin-top:6px;
+    font-size:1.85rem; /* sedikit diperkecil */
+    font-weight:900;
+    letter-spacing:-.3px;
+}
+
+/* ================= CHART GRID ================= */
+.chart-grid{
+    display:grid;
+    grid-template-columns:2.4fr 1.2fr;
+    gap:26px; /* lebih rapat */
+}
+
+/* ================= CHART CARD ================= */
+.chart-card{
+    background:linear-gradient(180deg,#fff,#f9fafb);
+    border-radius:24px;
+    padding:28px; /* diperkecil */
+    box-shadow:var(--shadow-soft);
+    border:1px solid var(--border);
+    transition:box-shadow .25s ease;
+}
+
+.chart-card:hover{
+    box-shadow:var(--shadow-hover);
+}
+
+/* BATASI TINGGI CANVAS (ANTI MEMANJANG) */
+.chart-card canvas{
+    width:100% !important;
+    height:260px !important; /* lebih proporsional */
+}
+
+/* ================= CHART HEADER ================= */
+.chart-header{
+    margin-bottom:18px; /* lebih dekat */
+}
+
+.chart-header h3{
+    font-size:1.1rem;
+    font-weight:800;
+}
+
+.chart-header span{
+    font-size:.78rem;
+    color:var(--muted);
+}
+
+/* ================= LEGEND ================= */
+.chart-legend{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin-top:18px;
+    font-size:.78rem;
+    color:var(--muted);
+}
+
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    display:inline-block;
+    margin-right:6px;
+}
+
+.dot.primary{ background:var(--primary); }
+.dot.pink{ background:var(--pink); }
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:1200px){
+    .chart-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:768px){
+    .dashboard-wrap{
+        padding:22px;
+    }
+
+    .dashboard-header h1{
+        font-size:1.9rem;
+    }
+
+    .stat-info h2{
+        font-size:1.6rem;
+    }
 }

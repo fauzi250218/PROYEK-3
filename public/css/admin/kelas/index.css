@@ -1,6 +1,5 @@
 /* ======================================================
-   DATA KELAS — DASHBOARD STYLE (FULL VERSION)
-   Desain biru modern, glass-like, profesional
+   DATA KELAS — DASHBOARD STYLE (FINAL CLEAN VERSION)
    ====================================================== */
 
 body {
@@ -8,177 +7,105 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-/* ---------------------------------------
-   Global Utility
------------------------------------------*/
-.text-main {
-    color: #3b5cff !important;
+/* ================= UTIL ================= */
+.text-main { color:#3b5cff !important; }
+.bg-main   { background:#3b5cff !important; }
+
+/* ================= BUTTON ================= */
+.btn-main{
+    background:#3b5cff !important;
+    color:#fff !important;
+    border-radius:10px !important;
+    transition:.25s ease;
+}
+.btn-main:hover{
+    background:#2446e1 !important;
+    transform:translateY(-2px);
 }
 
-.bg-main {
-    background-color: #3b5cff !important;
+.btn-outline-main{
+    border:1px solid #3b5cff;
+    color:#3b5cff;
+    border-radius:10px;
+    transition:.25s ease;
+}
+.btn-outline-main:hover{
+    background:#3b5cff;
+    color:#fff;
 }
 
-.btn-main {
-    background-color: #3b5cff !important;
-    color: #fff !important;
-    border-radius: 10px !important;
-    transition: .25s ease;
+/* ================= PAGE ================= */
+.kelas-index-page{
+    padding-top:-2rem;      /* ⬅️ DINAIKKAN */
+    padding-bottom:3rem;
+    animation:fadeIn .4s ease;
 }
 
-.btn-main:hover {
-    background-color: #2446e1 !important;
-    transform: translateY(-2px);
+/* ================= HEADER ================= */
+.kelas-header{
+    margin-bottom:2rem;    /* ⬅️ LEBIH DEKAT KE KONTEN */
 }
 
-.btn-outline-main {
-    border: 1px solid #3b5cff;
-    color: #3b5cff;
-    border-radius: 10px !important;
-    transition: .25s ease;
+/* ================= SECTION ================= */
+.kelas-section{
+    margin-bottom:3rem;
 }
 
-.btn-outline-main:hover {
-    background-color: #3b5cff;
-    color: #fff;
+/* ================= CARD ================= */
+.kelas-card{
+    border-radius:18px;
+    transition:.3s ease;
+    overflow:hidden;
+}
+.kelas-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 25px rgba(0,0,0,.09);
 }
 
-/* ---------------------------------------
-   Page Wrapper
------------------------------------------*/
-.kelas-index-page {
-    animation: fadeIn 0.5s ease-out;
+.kelas-card-body{
+    padding:24px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* ================= ICON ================= */
+.kelas-icon{
+    width:48px;
+    height:48px;
+    border-radius:12px;
+    background:#eef3ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.kelas-icon i{
+    color:#3b5cff;
+    font-size:1.4rem;
 }
 
-/* ---------------------------------------
-   Card Kelas
------------------------------------------*/
-.kelas-card {
-    border-radius: 18px !important;
-    transition: .3s ease;
-    overflow: hidden;
-    position: relative;
+/* ================= BADGE ================= */
+.badge.bg-main-light{
+    background:#e6eeff !important;
+    color:#3b5cff !important;
+    border-radius:8px;
+    font-size:.75rem;
 }
 
-.kelas-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.09);
+/* ================= BUTTON SMALL ================= */
+.btn-outline-warning,
+.btn-outline-danger{
+    border-radius:8px !important;
 }
 
-.kelas-card-body {
-    padding: 25px !important;
+/* ================= ANIM ================= */
+@keyframes fadeIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:none; }
 }
 
-.kelas-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background-color: #eef3ff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* ================= RESPONSIVE ================= */
+@media(max-width:991px){
+    .kelas-card-body{ padding:20px; }
+    .kelas-icon{ width:42px;height:42px; }
 }
-
-.kelas-icon i {
-    color: #3b5cff;
-    font-size: 1.5rem;
-}
-
-/* ---------------------------------------
-   Mini Jadwal Box
------------------------------------------*/
-.kelas-jadwal-box {
-    background: #f4f7ff;
-    border: 1px solid #d9e2ff;
-    padding: 12px 15px;
-    border-radius: 14px;
-    margin-bottom: 1.3rem;
-}
-
-.kelas-jadwal-box h6 {
-    font-weight: 600;
-    color: #343a40;
-    font-size: .9rem;
-}
-
-/* Item Jadwal */
-.jadwal-item {
-    background: #ffffff;
-    border: 1px solid #e0e7ff;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: .25s ease;
-}
-
-.jadwal-item:hover {
-    background: #eef3ff;
-    border-color: #cdd8ff;
-}
-
-/* Guru Badge */
-.badge.bg-main-light {
-    background-color: #e6eeff !important;
-    color: #3b5cff !important;
-    padding: 4px 7px;
-    font-weight: 600;
-    border-radius: 8px;
-    font-size: .75rem;
-}
-
-/* ---------------------------------------
-   Responsive
------------------------------------------*/
-@media (max-width: 991px) {
-    .kelas-card-body {
-        padding: 20px !important;
-    }
-
-    .kelas-icon {
-        width: 42px;
-        height: 42px;
-    }
-
-    .jadwal-item {
-        padding: 8px 10px;
-        font-size: .82rem;
-    }
-}
-
-@media (max-width: 576px) {
-    h2 {
-        font-size: 1.4rem !important;
-    }
-
-    .kelas-card {
-        margin-bottom: 10px;
-    }
-}
-
-/* ---------------------------------------
-   "Tidak Ada Jadwal" Styling
------------------------------------------*/
-.no-jadwal-text {
-    font-style: italic;
-    font-size: .85rem;
-    color: #6c757d;
-}
-
-/* ---------------------------------------
-   Delete / Edit Button Custom
------------------------------------------*/
-.btn-outline-warning {
-    border-radius: 8px !important;
-}
-
-.btn-outline-danger {
-    border-radius: 8px !important;
+@media(max-width:576px){
+    h2{ font-size:1.4rem !important; }
 }

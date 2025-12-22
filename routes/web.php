@@ -24,6 +24,8 @@ use App\Http\Controllers\Guru\PerkembanganController;
 use App\Http\Controllers\Guru\ObrolanController;
 use App\Http\Controllers\Guru\KehadiranController;
 use App\Http\Controllers\Guru\ERaportController;
+use App\Http\Controllers\Guru\RekapKehadiranController;
+
 
 
 /* ==================================================
@@ -136,7 +138,7 @@ Route::prefix('admin')
             ->whereNumber('id')
             ->name('pembayaran-spp.bayar');
 
-        /* 🔥 OPSI LOCALHOST (FORCE LUNAS) */
+        /*OPSI LOCALHOST (FORCE LUNAS) */
         Route::post(
             '/pembayaran-spp/{id}/force-lunas',
             [PembayaranSPPController::class, 'forceLunas']
@@ -193,10 +195,6 @@ Route::prefix('guru')
                     ->whereNumber(['id', 'catatan'])
                     ->name('perkembangan.destroyCatatan');
 
-                Route::get('/{id}/kehadiran', [KelasBinaanController::class, 'kehadiran'])
-                    ->whereNumber('id')
-                    ->name('kehadiran');
-
                 Route::get('/{id}/laporan', [KelasBinaanController::class, 'laporan'])
                     ->whereNumber('id')
                     ->name('laporan');
@@ -212,6 +210,21 @@ Route::prefix('guru')
                 Route::get('/eraport/{murid_id}/download', [ERaportController::class, 'download'])
                     ->whereNumber('murid_id')
                     ->name('eraport.download');
+
+                /*REKAP KEHADIRAN (BARU)*/
+                Route::get(
+                    '/{id}/kehadiran',
+                    [RekapKehadiranController::class, 'index']
+                )
+                    ->whereNumber('id')
+                    ->name('kehadiran');
+
+                Route::get(
+                    '/{kelas}/kehadiran/{murid}',
+                    [RekapKehadiranController::class, 'detail']
+                )
+                    ->whereNumber(['kelas', 'murid'])
+                    ->name('kehadiran.detail');
             });
 
             Route::prefix('ajaran')->name('ajaran.')->group(function () {

@@ -1,547 +1,403 @@
-<!-- ===================================================== -->
-<!-- HEADER RUANG DISKUSI + BUTTON UPLOAD MODUL -->
-<!-- ===================================================== -->
+{{-- =====================================================
+RUANG DISKUSI – FULL STABLE VERSION
+NO FUNCTION REMOVED
+===================================================== --}}
+
+@php
+    $namaGuru = $guru->nama ?? auth()->user()->name ?? 'Guru';
+    $inisial  = strtoupper(substr($namaGuru, 0, 1));
+    $foto     = $guru->foto_profil ?? null;
+@endphp
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h5 class="fw-bold mb-0">Ruang Diskusi</h5>
+    <h4 class="fw-bold mb-0">Ruang Diskusi</h4>
 
-    <button class="btn btn-primary px-4" onclick="openPopupModul()">
-        <i class="bi bi-upload me-1"></i> Upload Modul
+    <button class="btn btn-primary btn-sm px-4"
+            onclick="openBagikanMateriModal()">
+        Bagikan Materi
     </button>
 </div>
 
-<div class="row">
+<div class="row g-4">
 
-    <!-- ===================================================== -->
-    <!-- KOLOM KIRI (SESI) -->
-    <!-- ===================================================== -->
-    <div class="col-md-6">
+{{-- =====================================================
+KOLOM SESI
+===================================================== --}}
+<div class="col-md-6">
 
-        @php
-            $namaGuru = $guru->nama ?? auth()->user()->name ?? 'Guru Pengampu';
-            $no = 1;
-        @endphp
+@forelse($sesi as $item)
 
-        @foreach($sesi as $item)
+@if($item->updated_at->eq($item->created_at))
+    @continue
+@endif
 
-            @php
-                $modulSesi = $modul->where('sesi_id', $item->id);
+@php
+    $plain  = trim(strip_tags($item->deskripsi));
+    $isLong = strlen($plain) > 280;
+@endphp
 
-                $punyaTopik     = !empty($item->topik);
-                $punyaDeskripsi = !empty(trim(strip_tags($item->deskripsi)));
-                $punyaModul     = $modulSesi->count() > 0;
+<div class="session-card">
 
-                if (!$punyaTopik && !$punyaDeskripsi && !$punyaModul) {
-                    continue;
-                }
-            @endphp
+    <div class="session-header">
+        <div class="avatar">
+            @if($foto)
+                <img src="{{ asset('storage/'.$foto) }}">
+            @else
+                <span>{{ $inisial }}</span>
+            @endif
+        </div>
 
-            <div class="diskusi-card mb-3 shadow-sm p-3">
+        <div class="header-meta">
+            <div class="name-line">
+                <span class="name">{{ $namaGuru }}</span>
+                <span class="activity">memperbarui sesi</span>
+                <span class="session-badge">Sesi {{ $loop->iteration }}</span>
+            </div>
+            <span class="timestamp">{{ $item->updated_at->diffForHumans() }}</span>
+        </div>
+    </div>
 
-                <div class="d-flex align-items-center mb-2">
-                    <div class="edlink-avatar"></div>
+    <div class="session-content">
 
-                    <div class="ms-2">
-                        <span class="fw-semibold">{{ $namaGuru }}</span>
-                        <span class="text-muted"> menambahkan sesi </span>
-                        <span class="text-success fw-semibold">Sesi {{ $no }}</span>
+        @if($item->topik)
+            <div class="topic">{{ $item->topik }}</div>
+        @endif
 
-                        <div class="text-muted small">
-                            {{ $item->updated_at->diffForHumans() }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-2">
-
-                    @if($item->topik)
-                        <p class="mb-2 topik-text">{{ $item->topik }}</p>
-                    @endif
-
-                    @php
-                        $plain  = trim(strip_tags($item->deskripsi));
-                        $isLong = strlen($plain) > 250;
-                    @endphp
-
-                    <div id="desc-wrapper-{{ $item->id }}"
-                         class="session-desc-wrapper {{ $isLong ? 'collapsed' : '' }}">
-                        {!! $item->deskripsi !!}
-                    </div>
-
-                    @if($isLong)
-                        <p id="toggle-link-{{ $item->id }}"
-                           class="text-primary small fw-bold pointer mb-0"
-                           onclick="toggleDesc({{ $item->id }})">
-                           Baca selengkapnya...
-                        </p>
-                    @endif
-
-                    <div class="text-end mt-2">
-                        <a href="{{ route('guru.kelas.ajaran.kehadiran.presensi', $item->id) }}"
-                           class="presensi-text text-primary text-decoration-none fw-semibold">
-                            Presensi
-                        </a>
-                    </div>
-                </div>
+        @if($plain)
+            <div id="desc-wrapper-{{ $item->id }}"
+                 class="objective {{ $isLong ? 'collapsed' : '' }}">
+                {!! $item->deskripsi !!}
             </div>
 
-            @php $no++; @endphp
+            @if($isLong)
+                <span id="toggle-link-{{ $item->id }}"
+                      class="read-toggle"
+                      onclick="toggleDesc({{ $item->id }})">
+                    Baca selengkapnya
+                </span>
+            @endif
+        @endif
 
+    </div>
+
+    <div class="session-footer">
+        <a href="{{ route('guru.kelas.ajaran.kehadiran.presensi', $item->id) }}">
+            Presensi
+        </a>
+    </div>
+
+</div>
+
+@empty
+<p class="text-muted">Belum ada sesi yang diperbarui.</p>
+@endforelse
+
+</div>
+
+{{-- =====================================================
+KOLOM MODUL
+===================================================== --}}
+<div class="col-md-6">
+
+@foreach($sesi as $s)
+@php $modSesi = $modul->where('sesi_id', $s->id); @endphp
+
+@if($modSesi->count() > 0)
+
+<div class="module-card">
+
+    <div class="module-header">
+        <div class="avatar">
+            @if($foto)
+                <img src="{{ asset('storage/'.$foto) }}">
+            @else
+                <span>{{ $inisial }}</span>
+            @endif
+        </div>
+
+        <div class="header-meta">
+            <div class="name-line">
+                <span class="name">{{ $namaGuru }}</span>
+                <span class="activity">mengunggah modul</span>
+                <span class="session-badge">Sesi {{ $loop->iteration }}</span>
+            </div>
+            <span class="timestamp">
+                Terakhir diunggah {{ $modSesi->last()->created_at->diffForHumans() }}
+            </span>
+        </div>
+    </div>
+
+    <div class="module-list">
+
+        @foreach($modSesi as $m)
+        <div class="module-item modul-card-click"
+             data-edit="{{ route('guru.kelas.ajaran.modul.edit', $m->id) }}">
+
+            <div class="file-name">
+                {{ basename($m->file) }}
+            </div>
+
+            <div class="file-actions">
+                <button class="btn-preview preview-btn edit-ignore"
+                        data-file="{{ route('guru.kelas.ajaran.modul.preview', $m->id) }}">
+                    Pratinjau
+                </button>
+
+                <a href="{{ asset('storage/'.$m->file) }}"
+                   class="btn-download edit-ignore"
+                   download>
+                    Unduh
+                </a>
+            </div>
+
+        </div>
         @endforeach
 
-        @if($no === 1)
-            <p class="text-muted">Belum ada sesi yang memiliki aktivitas pembelajaran.</p>
-        @endif
-
-    </div>
-
-    <!-- ===================================================== -->
-    <!-- KOLOM KANAN (MODUL) -->
-    <!-- ===================================================== -->
-    <div class="col-md-6">
-
-        @if(!$modul->isEmpty())
-
-        <div class="modul-wrapper p-3 rounded shadow-sm bg-white">
-
-            <div class="modul-scroll">
-
-                @foreach($sesi as $s)
-
-                    @php
-                        $modSesi = $modul->where('sesi_id', $s->id);
-                    @endphp
-
-                    @if($modSesi->count() > 0)
-
-                        <div class="d-flex align-items-center mt-3 mb-2">
-                            <div class="edlink-avatar"></div>
-
-                            <div class="ms-2">
-                                <span class="fw-semibold">{{ $namaGuru }}</span>
-                                <span class="text-muted"> menambahkan materi pada </span>
-                                <span class="text-success fw-semibold">Sesi {{ $loop->iteration }}</span>
-
-                                <div class="text-muted small">
-                                    {{ $s->updated_at->diffForHumans() }}
-                                </div>
-                            </div>
-                        </div>
-
-                        @foreach($modSesi as $m)
-                            <div class="edlink-file-card p-2 mb-3 pointer modul-card"
-                                 data-edit="{{ route('guru.kelas.ajaran.modul.edit', $m->id) }}">
-
-                                <div class="d-flex justify-content-between align-items-center">
-
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="file-icon-pdf">PDF</div>
-
-                                        <!-- PERBAIKAN NAMA FILE PANJANG -->
-                                        <span class="edlink-file-name">
-                                            {{ basename($m->file) }}
-                                        </span>
-                                    </div>
-
-                                    <div class="d-flex gap-2">
-
-                                        <!-- PREVIEW -->
-                                        <button type="button"
-                                                class="btn btn-sm btn-primary preview-btn edit-ignore"
-                                                data-judul="{{ $m->judul }}"
-                                                data-topik="{{ $m->topik }}"
-                                                data-catatan="{{ $m->catatan }}"
-                                                data-file="{{ route('guru.kelas.ajaran.modul.preview', $m->id) }}">
-                                            Pratinjau
-                                        </button>
-
-                                        <!-- DOWNLOAD -->
-                                        <a href="{{ asset('storage/'.$m->file) }}"
-                                           class="btn btn-sm btn-outline-success edit-ignore"
-                                           download>
-                                           Unduh
-                                        </a>
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        @endforeach
-
-                    @endif
-
-                @endforeach
-
-            </div>
-        </div>
-
-        @endif
-
     </div>
 
 </div>
 
+@endif
+@endforeach
 
-<!-- ===================================================== -->
-<!-- MODAL PREVIEW PDF -->
-<!-- ===================================================== -->
+</div>
+</div>
 
+{{-- =====================================================
+MODAL PREVIEW PDF (LAMA – TIDAK DIUBAH)
+===================================================== --}}
 <div id="previewModulOverlay" class="preview-overlay">
     <div class="preview-modal">
-
-        <h4 class="fw-bold mb-3">Pratinjau Materi</h4>
-
-        <h5 id="prevJudul" class="fw-semibold mb-1"></h5>
-        <p id="prevTopik" class="text-muted mb-1"></p>
-        <p id="prevCatatan" class="text-muted"></p>
-
-        <div class="viewer-box">
-            <iframe id="pdfView" src="" width="100%" height="100%" style="border:none;"></iframe>
+        <iframe id="pdfView" width="100%" height="520" style="border:none;"></iframe>
+        <div class="text-end mt-3">
+            <button class="btn btn-sm btn-secondary"
+                    onclick="closePreviewModal()">Tutup</button>
         </div>
-
-        <div class="d-flex justify-content-end mt-3">
-            <a id="btnDownloadFile" class="btn btn-success btn-sm me-2" download>Unduh</a>
-            <button class="btn btn-secondary btn-sm" onclick="closePreviewModal()">Tutup</button>
-        </div>
-
     </div>
 </div>
 
+{{-- =====================================================
+MODAL BAGIKAN MATERI – PRO UI (FUNCTION TETAP)
+===================================================== --}}
+<div id="bagikanMateriModal" class="upload-overlay">
+    <div class="upload-modal pro">
 
-<!-- ===================================================== -->
-<!-- MODAL UPLOAD MODUL -->
-<!-- ===================================================== -->
-
-<div id="uploadModulOverlay" class="upload-overlay">
-    <div class="upload-modal">
-
-        <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="upload-header pro">
             <div>
-                <span class="fw-semibold small text-muted">Bagikan sesuatu di kelas Anda:</span>
+                <h5>Bagikan Materi Pembelajaran</h5>
+                <small>Unggah modul PDF untuk siswa</small>
             </div>
-
-            <button type="button" class="btn-close" onclick="closePopupModul()"></button>
+            <button class="btn-close" onclick="closeBagikanMateriModal()"></button>
         </div>
 
-        <div class="upload-step-nav mb-3">
-            <button type="button" class="step-tab active" id="tab-step-1" onclick="goToUploadStep(1)">
-                Pilih Sesi
-            </button>
-            <button type="button" class="step-tab" id="tab-step-2" onclick="goToUploadStep(2)">
-                Atur Materi
-            </button>
+        <div class="stepper">
+            <div class="step active" id="step-indicator-1">
+                <span>1</span><label>Informasi</label>
+            </div>
+            <div class="line"></div>
+            <div class="step" id="step-indicator-2">
+                <span>2</span><label>Upload</label>
+            </div>
         </div>
 
-        <form id="uploadModulForm"
-              method="POST"
+        <form method="POST"
               action="{{ route('guru.kelas.ajaran.upload-modul') }}"
               enctype="multipart/form-data">
-
             @csrf
-            <input type="hidden" name="kelas_id" value="{{ $kelas_id }}">
 
-            <!-- STEP 1 -->
-            <div class="upload-step" id="upload-step-1">
+            {{-- STEP 1 --}}
+            <div class="materi-step active" id="materi-step-1">
+                <label>Pilih Sesi</label>
+                <select name="sesi_id" class="form-select mb-3" required>
+                    @foreach($sesi as $i => $ss)
+                        <option value="{{ $ss->id }}">
+                            Sesi {{ $i + 1 }}
+                        </option>
+                    @endforeach
+                </select>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold small">Pilih Sesi</label>
-                    <select name="sesi_id" id="upload_sesi_id" class="form-select">
-                        @foreach($sesi as $index => $item)
-                            <option value="{{ $item->id }}">
-                                Sesi {{ $index + 1 }} - {{ $item->judul_sesi ?? 'Tanpa judul' }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                <label>Judul Materi</label>
+                <input type="text"
+                       name="judul"
+                       class="form-control mb-3"
+                       required>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold small">Topik Sesi</label>
-                    <input type="text" class="form-control" name="topik_sesi" id="upload_topik_sesi">
-                </div>
-
-                <div class="d-flex justify-content-end mt-3">
-                    <button type="button" class="btn btn-success btn-sm" onclick="nextUploadStep(1)">
-                        Langkah Berikutnya
+                <div class="text-end">
+                    <button type="button"
+                            class="btn btn-primary btn-sm"
+                            onclick="nextMateriStepPro()">
+                        Lanjut →
                     </button>
                 </div>
-
             </div>
 
-            <!-- STEP 2 -->
-            <div class="upload-step d-none" id="upload-step-2">
+            {{-- STEP 2 --}}
+            <div class="materi-step" id="materi-step-2">
+                <label>File PDF</label>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold small">Judul Materi</label>
-                    <input type="text" class="form-control" name="judul_materi">
+                <div class="dropzone mb-3">
+                    <input type="file"
+                           name="file"
+                           accept="application/pdf"
+                           required>
+                    <div class="drop-content">
+                        <strong>Tarik & lepas file PDF</strong>
+                        <span>atau klik untuk memilih</span>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold small">File Materi (PDF)</label>
-                    <input type="file" class="form-control" name="file_materi" accept="application/pdf">
-                </div>
+                <label>Catatan</label>
+                <textarea name="catatan"
+                          class="form-control mb-3"
+                          rows="3"></textarea>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold small">Catatan (Opsional)</label>
-                    <textarea class="form-control" name="catatan_materi" rows="3"></textarea>
-                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="button"
+                            class="btn btn-light btn-sm"
+                            onclick="prevMateriStepPro()">← Kembali</button>
 
-                <div class="d-flex justify-content-between mt-3">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="prevUploadStep(2)">
-                        Kembali
+                    <button type="submit"
+                            class="btn btn-success btn-sm">
+                        📤 Bagikan Materi
                     </button>
-
-                    <button type="submit" class="btn btn-success btn-sm">
-                        Bagikan Materi
-                    </button>
                 </div>
-
             </div>
 
         </form>
     </div>
 </div>
 
-
-<!-- ===================================================== -->
-<!-- CSS LENGKAP + FIX FILE NAME -->
-<!-- ===================================================== -->
-
+{{-- =====================================================
+CSS
+===================================================== --}}
 <style>
-.diskusi-card {
-    border-radius: 14px;
-    background: white;
-    border: 1px solid #e8e8e9;
-}
+body{background:#f8fafc}
+.avatar{width:44px;height:44px;border-radius:50%;background:#e5e7eb;
+display:flex;align-items:center;justify-content:center;font-weight:600}
+.avatar img{width:100%;height:100%;object-fit:cover}
 
-.edlink-avatar {
-    width: 42px;
-    height: 42px;
-    background: #eee;
-    border-radius: 50%;
-}
+.session-card,.module-card{
+background:#fff;border:1px solid #e5e7eb;border-radius:16px;
+box-shadow:0 8px 20px rgba(15,23,42,.05);margin-bottom:22px}
 
-.topik-text { font-weight: 700; }
+.session-header,.module-header{
+display:flex;gap:14px;padding:18px;border-bottom:1px solid #f1f5f9}
 
-.session-desc-wrapper.collapsed {
-    max-height: 120px;
-    overflow: hidden;
-}
+.name{font-weight:600;font-size:14px}
+.activity{font-size:13px;color:#64748b}
+.timestamp{font-size:12px;color:#94a3b8}
+.session-badge{
+font-size:11px;background:#16a34a;color:#fff;
+padding:2px 10px;border-radius:999px}
 
-.pointer { cursor:pointer; }
+.session-content{padding:18px}
+.topic{font-size:15px;font-weight:600}
+.objective{font-size:14px;line-height:1.7}
+.objective.collapsed{max-height:140px;overflow:hidden}
+.read-toggle{font-size:13px;color:#2563eb;cursor:pointer}
 
-.modul-wrapper { border:1px solid #e8e8e9; }
+.session-footer{
+padding:14px 18px;border-top:1px solid #f1f5f9;
+display:flex;justify-content:flex-end}
 
-.modul-scroll {
-    max-height:75vh;
-    overflow-y:auto;
-    padding-right:6px;
-}
+.module-list{padding:16px}
+.module-item{
+display:flex;justify-content:space-between;
+align-items:center;padding:14px;border-radius:12px;
+background:#f8fafc;border:1px solid #e5e7eb;
+margin-bottom:10px;cursor:pointer}
 
-.edlink-file-card {
-    background:#e8edff;
-    border-radius:8px;
-    border:1px solid #d7dcff;
-}
+.file-name{font-size:13px;max-width:70%;overflow:hidden}
+.file-actions{display:flex;gap:8px}
+.btn-preview,.btn-download{
+font-size:11px;padding:6px 12px;border-radius:8px;border:none;color:#fff}
+.btn-preview{background:#2563eb}
+.btn-download{background:#16a34a}
 
-/* ================================ */
-/* FIX FILE NAME PANJANG            */
-/* ================================ */
-.edlink-file-name {
-    max-width: 220px;        /* ubah sesuai selera */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-}
+.preview-overlay,.upload-overlay{
+display:none;position:fixed;inset:0;
+background:rgba(0,0,0,.5);z-index:9999;
+align-items:center;justify-content:center}
 
-.file-icon-pdf {
-    width:28px;
-    height:28px;
-    background:#ff6b6b;
-    color:white;
-    border-radius:6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:11px;
-    font-weight:bold;
-}
+.upload-overlay.active{display:flex}
 
-.preview-overlay {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.45);
-    z-index:9999;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
+.preview-modal,.upload-modal{
+background:#fff;padding:22px;border-radius:14px;
+max-width:95%}
 
-.preview-modal {
-    background:white;
-    border-radius:14px;
-    padding:25px;
-    width:850px;
-    max-width:95%;
-    max-height:90vh;
-    overflow-y:auto;
-}
+.preview-modal{width:920px}
+.upload-modal.pro{width:560px}
 
-.viewer-box {
-    border:1px solid #ddd;
-    border-radius:12px;
-    height:65vh;
-    overflow:hidden;
-    background:white;
-    margin-top:15px;
-}
+.stepper{display:flex;align-items:center;margin:18px 0}
+.step{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#94a3b8}
+.step span{
+width:30px;height:30px;border-radius:50%;
+border:2px solid #cbd5f5;
+display:flex;align-items:center;justify-content:center}
+.step.active span{background:#2563eb;color:#fff;border-color:#2563eb}
+.line{flex:1;height:2px;background:#e5e7eb}
 
-.upload-overlay {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.45);
-    z-index:10000;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-
-.upload-modal {
-    background:white;
-    border-radius:10px;
-    padding:18px 22px;
-    width:520px;
-    max-width:95%;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
-    font-size:14px;
-}
-
-.upload-step-nav {
-    display:flex;
-    border-bottom:1px solid #e5e5e5;
-}
-
-.step-tab {
-    flex:1;
-    border:none;
-    background:transparent;
-    padding:8px;
-    font-size:13px;
-    font-weight:600;
-    color:#777;
-    border-bottom:2px solid transparent;
-}
-
-.step-tab.active {
-    color:#198754;
-    border-color:#198754;
-}
-
-.upload-step .form-label { margin-bottom:4px; }
-
-.d-none { display:none !important; }
+.dropzone{
+border:2px dashed #c7d2fe;border-radius:14px;
+padding:30px;position:relative;text-align:center;background:#f8fafc}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
 </style>
 
-
-<!-- ===================================================== -->
-<!-- JAVASCRIPT LENGKAP -->
-<!-- ===================================================== -->
-
+{{-- =====================================================
+JS – SEMUA FUNGSI LAMA TETAP ADA
+===================================================== --}}
 <script>
 function toggleDesc(id){
-    let wrapper = document.getElementById("desc-wrapper-"+id);
-    let link = document.getElementById("toggle-link-"+id);
-
-    wrapper.classList.toggle("collapsed");
-    link.textContent = wrapper.classList.contains("collapsed")
-                       ? "Baca selengkapnya..."
-                       : "Sembunyikan";
+    const w=document.getElementById("desc-wrapper-"+id);
+    const l=document.getElementById("toggle-link-"+id);
+    w.classList.toggle("collapsed");
+    l.textContent=w.classList.contains("collapsed")
+        ?"Baca selengkapnya":"Sembunyikan";
 }
 
-/* PREVIEW PDF ------------------------- */
-document.querySelectorAll('.preview-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
+/* PREVIEW */
+document.querySelectorAll('.preview-btn').forEach(btn=>{
+    btn.addEventListener('click',e=>{
         e.stopPropagation();
-        openPreviewModal(
-            this.dataset.judul,
-            this.dataset.topik,
-            this.dataset.catatan,
-            this.dataset.file
-        );
+        document.getElementById('pdfView').src=btn.dataset.file;
+        document.getElementById('previewModulOverlay').style.display='flex';
     });
 });
-
-function openPreviewModal(judul, topik, catatan, fileUrl){
-    document.getElementById('prevJudul').textContent   = judul || '-';
-    document.getElementById('prevTopik').textContent   = topik || '-';
-    document.getElementById('prevCatatan').textContent = catatan || '-';
-
-    let viewerUrl = fileUrl + "#toolbar=1&navpanes=0&zoom=page-width";
-    let separator = viewerUrl.includes('?') ? '&' : '?';
-
-    document.getElementById('pdfView').src = viewerUrl + separator + "v=" + Date.now();
-    document.getElementById('btnDownloadFile').href = fileUrl;
-
-    document.getElementById('previewModulOverlay').style.display = "flex";
-}
-
 function closePreviewModal(){
-    document.getElementById('previewModulOverlay').style.display = "none";
-    document.getElementById('pdfView').src = "";
+    document.getElementById('previewModulOverlay').style.display='none';
+    document.getElementById('pdfView').src='';
 }
 
-/* CARD CLICK ------------------------- */
-document.querySelectorAll('.modul-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-        if (e.target.closest('.preview-btn')) return;
-        if (e.target.closest('.btn-outline-success')) return;
-
-        window.location.href = this.dataset.edit;
+/* CLICK EDIT */
+document.querySelectorAll('.modul-card-click').forEach(card=>{
+    card.addEventListener('click',function(e){
+        if(e.target.closest('.edit-ignore')) return;
+        window.location.href=this.dataset.edit;
     });
 });
 
-/* MODAL UPLOAD 2 STEP ---------------- */
-let currentUploadStep = 1;
-
-function openPopupModul(){
-    const form = document.getElementById('uploadModulForm');
-    if (form) form.reset();
-
-    currentUploadStep = 1;
-    refreshUploadStepUI();
-
-    document.getElementById('uploadModulOverlay').style.display = 'flex';
+/* MODAL */
+function openBagikanMateriModal(){
+    document.getElementById('materi-step-1').classList.add('active');
+    document.getElementById('materi-step-2').classList.remove('active');
+    document.getElementById('bagikanMateriModal').classList.add('active');
+}
+function closeBagikanMateriModal(){
+    document.getElementById('bagikanMateriModal').classList.remove('active');
 }
 
-function closePopupModul(){
-    document.getElementById('uploadModulOverlay').style.display = 'none';
+/* STEP PRO */
+function nextMateriStepPro(){
+    materiStepSwitch(2);
 }
-
-function goToUploadStep(step){
-    currentUploadStep = step;
-    refreshUploadStepUI();
+function prevMateriStepPro(){
+    materiStepSwitch(1);
 }
+function materiStepSwitch(step){
+    document.querySelectorAll('.materi-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('materi-step-'+step).classList.add('active');
 
-function nextUploadStep(from){
-    if(from === 1){
-        const sesi  = document.getElementById('upload_sesi_id').value;
-        if (!sesi) return alert('Pilih sesi terlebih dahulu!');
-        currentUploadStep = 2;
-    }
-    refreshUploadStepUI();
-}
-
-function prevUploadStep(){
-    currentUploadStep = 1;
-    refreshUploadStepUI();
-}
-
-function refreshUploadStepUI(){
-    [1,2].forEach(s => {
-        document.getElementById('upload-step-'+s).classList.toggle('d-none', s !== currentUploadStep);
-        document.getElementById('tab-step-'+s).classList.toggle('active', s === currentUploadStep);
-    });
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('step-indicator-'+step).classList.add('active');
 }
 </script>

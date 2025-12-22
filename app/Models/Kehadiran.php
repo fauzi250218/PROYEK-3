@@ -18,18 +18,27 @@ class Kehadiran extends Model
         'status',
     ];
 
-    public function siswa()
+    /**
+     * Relasi ke murid
+     */
+    public function murid()
     {
         return $this->belongsTo(Murid::class, 'murid_id');
     }
 
+    /**
+     * Relasi ke sesi
+     */
     public function sesi()
     {
         return $this->belongsTo(Sesi::class, 'sesi_id');
     }
 
+    /**
+     * Relasi ke jadwal
+     */
     public function jadwal()
     {
-        return $this->belongsTo(Jadwal::class);
+        return $this->belongsTo(Jadwal::class, 'jadwal_id');
     }
 }

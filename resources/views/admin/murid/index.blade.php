@@ -9,42 +9,53 @@
 @section('content')
 <div class="container-fluid murid-index-page">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="page-title">Data Siswa</h5>
-        <div class="d-flex align-items-center">
-            <a href="{{ route('admin.murid.create') }}" class="btn btn-primary">Tambahkan Siswa</a>
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            {{-- 🔥 HEADER DIPERBESAR --}}
+            <h2 class="page-title fw-bold mb-1">Data Siswa</h2>
+
+            {{-- PARAGRAF PENJELASAN --}}
+            <p class="text-muted mb-0" style="max-width: 520px;">
+               Manajemen Data Siswa.
+            </p>
         </div>
+
+        <a href="{{ route('admin.murid.create') }}" class="btn btn-primary">
+            Tambahkan Siswa
+        </a>
     </div>
 
-    <!-- Tab Navigasi -->
+    <!-- ================= TAB NAVIGASI ================= -->
     <ul class="nav nav-tabs mb-3" id="kelasTabs" role="tablist">
         @forelse($muridPerJenjang as $jenjang => $murids)
             <li class="nav-item" role="presentation">
-                <button class="nav-link {{ $loop->first ? 'active' : '' }}" 
-                        id="tab-{{ $jenjang }}" 
-                        data-bs-toggle="tab" 
-                        data-bs-target="#kelas-{{ $jenjang }}" 
-                        type="button" 
-                        role="tab" 
-                        aria-controls="kelas-{{ $jenjang }}" 
+                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                        id="tab-{{ $jenjang }}"
+                        data-bs-toggle="tab"
+                        data-bs-target="#kelas-{{ $jenjang }}"
+                        type="button"
+                        role="tab"
+                        aria-controls="kelas-{{ $jenjang }}"
                         aria-selected="{{ $loop->first ? 'true' : 'false' }}">
                     Kelas {{ $jenjang }}
                 </button>
             </li>
         @empty
             <li class="nav-item">
-                <button class="nav-link active" disabled>Tidak ada data siswa</button>
+                <button class="nav-link active" disabled>
+                    Tidak ada data siswa
+                </button>
             </li>
         @endforelse
     </ul>
 
-    <!-- Isi Tab -->
+    <!-- ================= ISI TAB ================= -->
     <div class="tab-content" id="kelasTabsContent">
         @forelse($muridPerJenjang as $jenjang => $murids)
-            <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" 
-                 id="kelas-{{ $jenjang }}" 
-                 role="tabpanel" 
+            <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                 id="kelas-{{ $jenjang }}"
+                 role="tabpanel"
                  aria-labelledby="tab-{{ $jenjang }}">
 
                 @if($murids->count())
@@ -69,20 +80,17 @@
                                         <td>{{ $m->nis }}</td>
                                         <td>{{ $m->nama }}</td>
                                         <td>{{ $m->email }}</td>
-                                        
-                                        <!-- 🔧 Perbaikan utama: ambil nama_kelas, bukan objek kelas -->
                                         <td>{{ $m->kelas->nama_kelas ?? '-' }}</td>
-
                                         <td>{{ $m->jenis_kelamin }}</td>
                                         <td>{{ $m->nomer_whatsapp ?? '-' }}</td>
                                         <td>
-                                            <a href="{{ route('admin.murid.edit', $m->id) }}" 
+                                            <a href="{{ route('admin.murid.edit', $m->id) }}"
                                                class="btn btn-sm btn-warning">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
 
-                                            <form action="{{ route('admin.murid.destroy', $m->id) }}" 
-                                                  method="POST" 
+                                            <form action="{{ route('admin.murid.destroy', $m->id) }}"
+                                                  method="POST"
                                                   class="d-inline"
                                                   onsubmit="return confirm('Yakin hapus siswa ini?')">
                                                 @csrf

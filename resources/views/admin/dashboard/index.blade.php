@@ -4,83 +4,129 @@
 
 @section('extra-css')
 <link rel="stylesheet" href="{{ asset('css/admin/dashboard/dashboard.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<style>
+/* FIX KHUSUS CHART */
+.chart-box{
+    height:320px;
+    position:relative;
+}
+.chart-box.small{
+    height:260px;
+}
+.chart-box canvas{
+    width:100% !important;
+    height:100% !important;
+}
+</style>
 @endsection
 
 @section('content')
-<div class="dashboard-container container-fluid py-4">
+<div class="dashboard-wrap">
 
-    <!-- Header -->
-    <div class="mb-4">
-        <h3 class="fw-bold text-dark">Dashboard Admin</h3>
-        <p class="text-muted">data guru, siswa, dan aktivitas sekolah.</p>
+    <!-- ================= HEADER ================= -->
+    <div class="dashboard-header">
+        <h1>Dashboard Admin</h1>
+        <p>Ringkasan data akademik dan pembayaran sekolah</p>
     </div>
 
-    <!-- Statistik Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="stat-card shadow-sm">
-                <div class="icon-wrapper bg-primary">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <div>
-                    <p class="stat-title">Total Guru</p>
-                    <h4 class="stat-number">{{ $totalGuru }}</h4>
-                </div>
+    <!-- ================= STAT ================= -->
+    <div class="stat-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-info">
+                <span>Total Guru</span>
+                <h2>{{ $totalGuru }}</h2>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="stat-card shadow-sm">
-                <div class="icon-wrapper bg-success">
-                    <i class="bi bi-person-lines-fill"></i>
-                </div>
-                <div>
-                    <p class="stat-title">Total Siswa</p>
-                    <h4 class="stat-number">{{ $totalMurid }}</h4>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="bi bi-person-lines-fill"></i>
+            </div>
+            <div class="stat-info">
+                <span>Total Siswa</span>
+                <h2>{{ $totalMurid }}</h2>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="stat-card shadow-sm">
-                <div class="icon-wrapper bg-warning">
-                    <i class="bi bi-house-door-fill"></i>
-                </div>
-                <div>
-                    <p class="stat-title">Total Kelas</p>
-                    <h4 class="stat-number">{{ $totalKelas }}</h4>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="bi bi-house-door-fill"></i>
+            </div>
+            <div class="stat-info">
+                <span>Total Kelas</span>
+                <h2>{{ $totalKelas }}</h2>
             </div>
         </div>
+
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-info">
+                <span>Total Pembayaran</span>
+                <h2>Rp {{ number_format($totalPembayaran,0,',','.') }}</h2>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div class="stat-info">
+                <span>SPP Lunas</span>
+                <h2>{{ $sppLunas }}</h2>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="bi bi-x-circle-fill"></i>
+            </div>
+            <div class="stat-info">
+                <span>SPP Belum Lunas</span>
+                <h2>{{ $sppBelumLunas }}</h2>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Charts -->
-    <div class="row g-4">
-        <!-- Grafik Murid -->
-        <div class="col-lg-8">
-            <div class="chart-card shadow-sm">
-                <div class="chart-header">
-                    <h5 class="chart-title">Jumlah Murid per Bulan</h5>
-                    <p class="text-muted small">Data pembaruan per kelas 7, 8, dan 9</p>
-                </div>
+    <!-- ================= CHART ================= -->
+    <div class="chart-grid">
+
+        <!-- BAR CHART -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Jumlah Murid per Bulan</h3>
+                <span>Akumulasi murid setiap kelas</span>
+            </div>
+            <div class="chart-box">
                 <canvas id="muridPerBulanChart"></canvas>
             </div>
         </div>
 
-        <!-- Grafik Guru -->
-        <div class="col-lg-4">
-            <div class="chart-card shadow-sm">
-                <div class="chart-header">
-                    <h5 class="chart-title">Jumlah Tenaga Pengajar</h5>
-                </div>
+        <!-- DOUGHNUT -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Komposisi Guru</h3>
+                <span>Berdasarkan jenis kelamin</span>
+            </div>
+            <div class="chart-box small">
                 <canvas id="guruGenderChart"></canvas>
-                <div class="chart-legend mt-3 text-center">
-                    <span><span class="legend-dot bg-primary"></span> Laki-laki</span>
-                    <span class="ms-3"><span class="legend-dot bg-pink"></span> Perempuan</span>
-                </div>
+            </div>
+
+            <div class="chart-legend">
+                <span><i class="dot primary"></i> Laki-laki</span>
+                <span><i class="dot pink"></i> Perempuan</span>
             </div>
         </div>
+
     </div>
+
 </div>
 @endsection
 
@@ -88,83 +134,69 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    // ================
-    // 📊 GRAFIK MURID
-    // ================
-    const ctxMurid = document.getElementById('muridPerBulanChart').getContext('2d');
 
-    const gradient7 = ctxMurid.createLinearGradient(0, 0, 0, 400);
-    gradient7.addColorStop(0, '#4e73df');
-    gradient7.addColorStop(1, 'rgba(78, 115, 223, 0.2)');
-
-    const gradient8 = ctxMurid.createLinearGradient(0, 0, 0, 400);
-    gradient8.addColorStop(0, '#1cc88a');
-    gradient8.addColorStop(1, 'rgba(28, 200, 138, 0.2)');
-
-    const gradient9 = ctxMurid.createLinearGradient(0, 0, 0, 400);
-    gradient9.addColorStop(0, '#f6c23e');
-    gradient9.addColorStop(1, 'rgba(246, 194, 62, 0.2)');
-
-    new Chart(ctxMurid, {
+    /* ================= BAR CHART ================= */
+    new Chart(document.getElementById('muridPerBulanChart'), {
         type: 'bar',
         data: {
             labels: @json($bulan),
             datasets: [
-                { label: 'Kelas 7', data: @json($muridKelas7PerBulan), backgroundColor: gradient7, borderColor: '#4e73df', borderWidth: 1 },
-                { label: 'Kelas 8', data: @json($muridKelas8PerBulan), backgroundColor: gradient8, borderColor: '#1cc88a', borderWidth: 1 },
-                { label: 'Kelas 9', data: @json($muridKelas9PerBulan), backgroundColor: gradient9, borderColor: '#f6c23e', borderWidth: 1 }
+                {
+                    label: 'Kelas 7',
+                    data: @json($muridKelas7PerBulan),
+                    backgroundColor: '#2563eb',
+                    borderRadius: 8
+                },
+                {
+                    label: 'Kelas 8',
+                    data: @json($muridKelas8PerBulan),
+                    backgroundColor: '#16a34a',
+                    borderRadius: 8
+                },
+                {
+                    label: 'Kelas 9',
+                    data: @json($muridKelas9PerBulan),
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 8
+                }
             ]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { position: 'bottom' },
-                tooltip: {
-                    backgroundColor: '#2e2e2e',
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
-                    cornerRadius: 6
+                legend: {
+                    position: 'bottom'
                 }
             },
             scales: {
+                x: { grid: { display:false } },
                 y: {
                     beginAtZero: true,
-                    grid: { color: '#f0f0f0' },
-                    ticks: { stepSize: 1 }
-                },
-                x: {
-                    grid: { display: false }
+                    grid: { color:'rgba(0,0,0,.08)' }
                 }
             }
         }
     });
 
-    // ======================
-    // 👩‍🏫 GRAFIK GURU GENDER
-    // ======================
-    const ctxGuru = document.getElementById('guruGenderChart').getContext('2d');
-    new Chart(ctxGuru, {
+    /* ================= DOUGHNUT ================= */
+    new Chart(document.getElementById('guruGenderChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Laki-laki', 'Perempuan'],
+            labels: ['Laki-laki','Perempuan'],
             datasets: [{
                 data: [{{ $guruLaki }}, {{ $guruPerempuan }}],
-                backgroundColor: ['#4e73df', '#e83e8c'],
-                hoverOffset: 6
+                backgroundColor: ['#2563eb','#ec4899']
             }]
         },
         options: {
-            cutout: '70%',
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => `${ctx.label}: ${ctx.parsed} Guru`
-                    }
-                }
+            responsive:true,
+            cutout:'60%',
+            plugins:{
+                legend:{ display:false }
             }
         }
     });
+
 });
 </script>
 @endsection

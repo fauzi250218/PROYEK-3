@@ -49,5 +49,9 @@ class Kelas extends Model
     {
         return $this->hasMany(ValidasiMurid::class, 'kelas_id');
     }
-}
 
+    public function sesi()
+    {
+        return $this->hasMany(Sesi::class, 'kelas_id');
+    }
+}

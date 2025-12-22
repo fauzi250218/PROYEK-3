@@ -16,6 +16,7 @@
 
             <input type="hidden" name="kelas_id" value="{{ $kelas_id }}">
 
+            {{-- Judul --}}
             <label class="fw-semibold small">Judul Sesi</label>
             <input 
                 type="text"
@@ -25,24 +26,27 @@
                 required
             >
 
+            {{-- Topik --}}
             <label class="fw-semibold small">Topik</label>
             <input 
                 type="text"
                 name="topik"
                 class="form-control mb-3"
+                placeholder="Tuliskan topik..."
                 value="{{ $sesi->topik }}"
             >
 
+            {{-- Tujuan Pembelajaran (TEXTAREA BIASA) --}}
             <label class="fw-semibold small">Tujuan Pembelajaran</label>
-
-            <!-- TEXTAREA disembunyikan supaya tidak muncul dulu -->
             <textarea 
-                id="editorDeskripsi"
                 name="deskripsi"
-                class="hidden-editor"
-            >{!! $sesi->deskripsi !!}</textarea>
+                class="form-control mb-3"
+                rows="5"
+                placeholder="Tuliskan tujuan pembelajaran..."
+            >{{ $sesi->deskripsi }}</textarea>
 
-            <label class="fw-semibold small mt-3">Tanggal Sesi</label>
+            {{-- Tanggal --}}
+            <label class="fw-semibold small">Tanggal Sesi</label>
             <input 
                 type="date" 
                 name="tanggal"
@@ -51,6 +55,7 @@
                 required
             >
 
+            {{-- Jam --}}
             <div class="row">
                 <div class="col-6 mb-3">
                     <label class="fw-semibold small">Jam Mulai</label>
@@ -75,6 +80,7 @@
                 </div>
             </div>
 
+            {{-- Aksi --}}
             <div class="d-flex justify-content-end gap-2 mt-3">
                 <a href="{{ route('guru.kelas.ajaran.detail', $kelas_id) }}" class="btn btn-light">
                     Batal
@@ -89,69 +95,5 @@
     </div>
 
 </div>
-
-@endsection
-
-
-@section('extra-css')
-<style>
-    /* textarea wajib disembunyikan agar tidak muncul <p> sebelum TinyMCE muncul */
-    .hidden-editor {
-        display: none !important;
-    }
-
-    .tox-tinymce {
-        border-radius: 8px !important;
-        width: 100% !important;
-    }
-
-    @media (max-width: 576px) {
-        .tox-tinymce {
-            min-height: 250px !important;
-        }
-    }
-</style>
-@endsection
-
-
-@section('extra-js')
-
-<!-- LOAD TinyMCE -->
-<script src="https://cdn.tiny.cloud/1/f07j73qf5orh08pbdf2z8lltgc4x3q0y4cg5gxnw50hca6i9/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
-
-<script>
-tinymce.init({
-    selector: '#editorDeskripsi',
-    height: 320,
-    menubar: false,
-
-    plugins: 'lists link image table autoresize code',
-
-    toolbar: `
-        undo redo |
-        bold italic underline |
-        bullist numlist |
-        link image table |
-        code removeformat
-    `,
-
-    elementpath: false,
-    statusbar: false,
-
-    content_style: `
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-        }
-    `,
-
-    /* HILANGKAN BUG KEDIP */
-    setup: function(editor) {
-        editor.on('init', function() {
-            document.querySelector('#editorDeskripsi').style.display = 'block';
-        });
-    }
-});
-</script>
 
 @endsection
