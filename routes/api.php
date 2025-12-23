@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\KehadiranController;
 use App\Http\Controllers\Api\NilaiController;
 use App\Http\Controllers\Api\KontakController;
 use App\Http\Controllers\Api\ModulController;
+use App\Http\Controllers\Api\TagihanSPPController;
+use App\Http\Controllers\Api\PembayaranSPPController;
+use App\Http\Controllers\Api\MidtransCallbackController;
 
 // =====================
 // Login dan Registrasi
@@ -98,3 +101,35 @@ Route::post('/kehadiran/store', [KehadiranController::class, 'store']);
 // =====================
 Route::get('/eraport/{murid_id}', [ERaportController::class, 'show']);
 Route::get('/eraport/{murid}/download', [ERaportController::class, 'download']);
+
+// ==================================================
+// TAGIHAN & PEMBAYARAN SPP (MIDTRANS)
+// ==================================================
+
+
+// =====================
+// TAGIHAN SPP (MURID LOGIN)
+// =====================
+Route::middleware('auth:sanctum')->get(
+    '/tagihan',
+    [TagihanSPPController::class, 'index']
+);
+
+// =====================
+// PEMBAYARAN SPP
+// =====================
+Route::middleware('auth:sanctum')->post(
+    '/payments/create',
+    [PembayaranSPPController::class, 'create']
+);
+
+Route::middleware('auth:sanctum')->get(
+    '/payments/history',
+    [PembayaranSPPController::class, 'history']
+);
+
+// =====================
+// CALLBACK MIDTRANS (TANPA AUTH)
+// =====================
+Route::post('/midtrans/callback', [MidtransCallbackController::class, 'handle']);
+

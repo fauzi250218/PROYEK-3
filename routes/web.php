@@ -326,5 +326,5 @@ Route::prefix('guru')
 /* ==================================================
  | MIDTRANS CALLBACK
  ================================================== */
-Route::post('/midtrans/callback', [PembayaranSPPController::class, 'callback'])
-    ->name('midtrans.callback');
+// Route::post('/midtrans/callback', [PembayaranSPPController::class, 'callback'])
+//     ->name('midtrans.callback');

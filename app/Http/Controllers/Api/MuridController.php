@@ -15,38 +15,6 @@ use Illuminate\Support\Facades\DB;
 class MuridController extends Controller
 {
     // ==========================
-    // REGISTER MURID BARU (MANUAL)
-    // ==========================
-    public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'nis' => 'required|string|unique:murids,nis',
-            'nama' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:murids,email',
-            'kelas_id' => 'required|exists:kelas,id',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'kata_sandi' => 'required|string|min:6',
-            'nomer_whatsapp' => 'nullable|string',
-        ]);
-
-        $murid = Murid::create([
-            'nis' => $validated['nis'],
-            'nama' => $validated['nama'],
-            'email' => $validated['email'],
-            'kelas_id' => $validated['kelas_id'],
-            'jenis_kelamin' => $validated['jenis_kelamin'],
-            'kata_sandi' => Hash::make($validated['kata_sandi']),
-            'nomer_whatsapp' => $validated['nomer_whatsapp'] ?? null,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Registrasi murid berhasil!',
-            'data' => $murid,
-        ], 201);
-    }
-
-    // ==========================
     // LOGIN MURID DENGAN GOOGLE
     // ==========================
     public function googleLogin(Request $request)
@@ -55,21 +23,33 @@ class MuridController extends Controller
             'email' => 'required|email',
         ]);
 
-        // Cek apakah murid sudah terdaftar
+        // Cari murid berdasarkan email Google
         $murid = Murid::where('email', $validated['email'])->first();
 
-        if ($murid) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Login berhasil!',
-                'data' => $murid,
-            ], 200);
-        } else {
+        if (!$murid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Email belum terdaftar, silakan registrasi terlebih dahulu.',
             ], 404);
         }
+
+        // 🔐 BUAT TOKEN SAMA SEPERTI LOGIN MANUAL
+        $token = $murid->createToken('murid-google-token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login Google berhasil!',
+            'token' => $token, // 🔥 WAJIB
+            'data' => [
+                'id' => $murid->id,
+                'nama' => $murid->nama,
+                'email' => $murid->email,
+                'kelas' => $murid->kelas ? $murid->kelas->nama_kelas : null,
+                'nomer_whatsapp' => $murid->nomer_whatsapp,
+                'jenis_kelamin' => $murid->jenis_kelamin,
+                'foto_profil' => $murid->foto_profil,
+            ],
+        ], 200);
     }
 
     // ==========================
@@ -134,11 +114,20 @@ class MuridController extends Controller
             'is_read' => false,
         ]);
 
-        // ✅ Return data murid + relasi kelas
+        // 🔐 BUAT TOKEN LANGSUNG SETELAH REGISTER
+        $token = $murid->createToken('murid-google-register')->plainTextToken;
+
         return response()->json([
             'success' => true,
-            'message' => 'Akun berhasil dibuat!',
-            'data' => $murid->load('kelas'),
+            'message' => 'Akun berhasil dibuat dan login otomatis!',
+            'token' => $token, // 🔥 PENTING
+            'data' => [
+                'id' => $murid->id,
+                'nama' => $murid->nama,
+                'email' => $murid->email,
+                'kelas' => $murid->kelas ? $murid->kelas->nama_kelas : null,
+                'foto_profil' => $murid->foto_profil,
+            ],
         ], 201);
     }
 
@@ -161,9 +150,13 @@ class MuridController extends Controller
             ], 401);
         }
 
+        // 🔐 BUAT TOKEN DI SINI (INI YANG KURANG)
+        $token = $murid->createToken('murid-token')->plainTextToken;
+
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil!',
+            'token' => $token, // ✅ SEKARANG ADA
             'data' => [
                 'id' => $murid->id,
                 'nama' => $murid->nama,
@@ -196,7 +189,7 @@ class MuridController extends Controller
             'data' => $murid
         ], 200);
     }
-    
+
     // ==========================
     // TAMPILKAN PROFIL MURID BERDASARKAN ID
     // ==========================
