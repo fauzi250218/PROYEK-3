@@ -14,7 +14,7 @@ class RekapKehadiranController extends Controller
 {
     /**
      * =====================================================
-     * REKAP KEHADIRAN SISWA (PER KELAS)
+     * REKAP KEHADIRAN SISWA (SEMUA GURU / PER KELAS)
      * =====================================================
      */
     public function index(Request $request, $kelasId)
@@ -31,22 +31,20 @@ class RekapKehadiranController extends Controller
         $tahun = (int) $request->get('tahun', now()->year);
 
         /* ===============================
-         | 3. AMBIL KELAS + RELASI (LENGKAP)
+         | 3. AMBIL KELAS (TANPA FILTER GURU)
+         |    → PRESENSI DIGABUNG SEMUA GURU
          =============================== */
         $kelas = Kelas::with([
             'murids',
-            'sesi.jadwal',      // 🔥 WAJIB
+            'sesi.jadwal',
             'sesi.kehadiran'
-        ])
-            ->where('id', $kelasId)
-            ->where('guru_id', $guru->id)
-            ->firstOrFail();
+        ])->findOrFail($kelasId);
 
         /* ===============================
-         | 4. DAFTAR TAHUN (DINAMIS)
+         | 4. DAFTAR TAHUN (DINAMIS DARI SESI)
          =============================== */
         $daftarTahun = $kelas->sesi
-            ->map(fn($sesi) => Carbon::parse($sesi->tanggal)->year)
+            ->map(fn($s) => Carbon::parse($s->tanggal)->year)
             ->unique()
             ->sortDesc()
             ->values();
@@ -56,20 +54,25 @@ class RekapKehadiranController extends Controller
         }
 
         /* ===============================
-         | 5. REKAP PER SISWA
+         | 5. REKAP KEHADIRAN PER SISWA
          =============================== */
         $rekap = [];
 
         foreach ($kelas->murids as $murid) {
 
-            $hadir = $izin = $sakit = $alpha = 0;
+            $hadir = 0;
+            $izin  = 0;
+            $sakit = 0;
+            $alpha = 0;
 
             foreach ($kelas->sesi as $sesi) {
+
+                if (!$sesi->tanggal) continue;
 
                 $tanggal = Carbon::parse($sesi->tanggal);
 
                 if ($tanggal->year !== $tahun) continue;
-                if ($bulan !== 'all' && $tanggal->month !== (int) $bulan) continue;
+                if ($bulan !== 'all' && $tanggal->month !== (int)$bulan) continue;
 
                 $absen = $sesi->kehadiran
                     ->where('murid_id', $murid->id)
@@ -82,6 +85,7 @@ class RekapKehadiranController extends Controller
                     'I' => $izin++,
                     'S' => $sakit++,
                     'A' => $alpha++,
+                    default => null
                 };
             }
 
@@ -104,14 +108,17 @@ class RekapKehadiranController extends Controller
          | 6. STATISTIK GLOBAL
          =============================== */
         $totalSiswa = count($rekap);
-        $rataRataKehadiran = round(collect($rekap)->avg('persen') ?? 0);
+        $rataRataKehadiran = $totalSiswa > 0
+            ? round(collect($rekap)->avg('persen'))
+            : 0;
 
         /* ===============================
          | 7. LABEL PERIODE
          =============================== */
         $periodeAktif = $bulan === 'all'
             ? "Tahun $tahun"
-            : Carbon::createFromDate($tahun, (int) $bulan, 1)->translatedFormat('F Y');
+            : Carbon::createFromDate($tahun, (int)$bulan, 1)
+            ->translatedFormat('F Y');
 
         /* ===============================
          | 8. RETURN VIEW
@@ -131,34 +138,29 @@ class RekapKehadiranController extends Controller
 
     /**
      * =====================================================
-     * DETAIL KEHADIRAN PER SISWA (REKAP MAPEL)
+     * DETAIL KEHADIRAN PER SISWA
+     * (SEMUA SESI / SEMUA GURU)
      * =====================================================
      */
     public function detail(Request $request, $kelasId, $muridId)
     {
         /* ===============================
-         | VALIDASI GURU
+         | VALIDASI GURU LOGIN
          =============================== */
-        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+        Guru::where('user_id', Auth::id())->firstOrFail();
 
         /* ===============================
-         | AMBIL DATA (AMAN)
+         | AMBIL DATA KELAS + SESI
          =============================== */
         $kelas = Kelas::with([
-            'sesi.jadwal',      // 🔥 WAJIB
+            'sesi.jadwal',
             'sesi.kehadiran'
-        ])
-            ->where('id', $kelasId)
-            ->where('guru_id', $guru->id)
-            ->firstOrFail();
+        ])->findOrFail($kelasId);
 
         $murid = Murid::where('id', $muridId)
             ->where('kelas_id', $kelas->id)
             ->firstOrFail();
 
-        /* ===============================
-         | RETURN VIEW DETAIL
-         =============================== */
         return view(
             'guru.manajemen-kelas.kelas-binaan.detail-kehadiran',
             compact('kelas', 'murid')

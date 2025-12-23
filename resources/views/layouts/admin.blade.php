@@ -29,35 +29,35 @@
 
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
            href="{{ route('admin.dashboard') }}">
           <i class="bi bi-house-fill me-2"></i> Beranda
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->is('admin/guru*') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->is('admin/guru*') ? 'active' : '' }}"
            href="{{ route('admin.guru.index') }}">
           <i class="bi bi-person-badge me-2"></i> Guru
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->is('admin/murid*') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->is('admin/murid*') ? 'active' : '' }}"
            href="{{ route('admin.murid.index') }}">
           <i class="bi bi-people-fill me-2"></i> Siswa
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('admin.kelas.*') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->routeIs('admin.kelas.*') ? 'active' : '' }}"
            href="{{ route('admin.kelas.index') }}">
           <i class="bi bi-building-fill me-2"></i> Data Kelas
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('admin.jadwal.*') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->routeIs('admin.jadwal.*') ? 'active' : '' }}"
            href="{{ route('admin.jadwal.index') }}">
           <i class="bi bi-calendar-week me-2"></i> Jadwal Pelajaran
         </a>
@@ -70,13 +70,6 @@
         </a>
       </li>
 
-
-      <li class="nav-item">
-        <a class="nav-link main-link" href="#">
-          <i class="bi bi-gear-fill me-2"></i> Pengaturan
-        </a>
-      </li>
-    </ul>
   </nav>
 
   <!-- Main Content -->

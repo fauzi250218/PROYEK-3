@@ -299,3 +299,49 @@ body.guru {
     z-index: 1100;
   }
 }
+
+/* =======================================================
+   SIDEBAR PROFILE GURU (FOTO / INISIAL)
+   ======================================================= */
+.profile-circle{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  font-size:26px;
+  font-weight:700;
+  color:var(--guru-sidebar-bg);
+  border:3px solid #ffffff;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Jika pakai foto */
+.profile-circle img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* Jika pakai inisial */
+.profile-circle span{
+  line-height:1;
+  text-transform:uppercase;
+}
+
+/* Nama guru */
+.logo-title{
+  font-size:.95rem;
+  font-weight:600;
+  color:#ffffff;
+}
+
+/* Role (Guru) */
+.logo-wrapper small{
+  font-size:.75rem;
+  opacity:.85;
+}

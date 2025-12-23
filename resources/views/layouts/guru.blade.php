@@ -16,21 +16,37 @@
 
 <body class="guru">
 <div class="d-flex" id="app">
-  <!-- Sidebar -->
+
+  <!-- ================= SIDEBAR ================= -->
   <nav class="sidebar" id="sidebar">
+
+    {{-- ================= FOTO PROFIL (DIPERBAIKI) ================= --}}
+    @php
+        $guru     = Auth::user()->guru ?? null;
+        $foto     = $guru->foto_profil ?? null;
+        $nama     = $guru->nama_lengkap ?? Auth::user()->name ?? 'Guru';
+        $inisial  = strtoupper(substr($nama, 0, 1));
+    @endphp
+
     <div class="logo-wrapper text-center">
-      <div class="logo-circle bg-white mx-auto mb-2">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="img-fluid">
+      <div class="profile-circle mx-auto mb-2">
+        @if($foto)
+          <img src="{{ asset('storage/'.$foto) }}" alt="Foto Guru">
+        @else
+          <span>{{ $inisial }}</span>
+        @endif
       </div>
-      <h6 class="logo-title">Guru</h6>
+
+      <h6 class="logo-title">{{ $nama }}</h6>
       <hr class="sidebar-divider">
     </div>
+    {{-- ================= END FOTO PROFIL ================= --}}
 
     <ul class="nav flex-column">
 
       <!-- Dashboard -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"
            href="{{ route('guru.dashboard') }}">
           <i class="bi bi-house-fill me-2"></i> Beranda
         </a>
@@ -65,7 +81,7 @@
         </div>
       </li>
 
-      <!-- ✅ Manajemen Nilai (DIPERBAIKI DI SINI) -->
+      <!-- Manajemen Nilai -->
       <li class="nav-item">
         <a class="nav-link main-link {{ request()->routeIs('guru.nilai.*') ? 'active' : '' }}"
            href="{{ route('guru.nilai.semuaKelas') }}">
@@ -75,54 +91,43 @@
 
       <!-- Obrolan -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}"
            href="{{ route('guru.obrolan.index') }}">
           <i class="bi bi-chat-dots-fill me-2"></i> Obrolan
         </a>
       </li>
 
-      <!-- Laporan -->
-      <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}" 
-           href="{{ route('guru.obrolan.index') }}">
-          <i class="bi bi-file-earmark-text"></i> Laporan
-        </a>
-      </li>
     </ul>
   </nav>
 
-  <!-- Main Content -->
+  <!-- ================= MAIN CONTENT ================= -->
   <div class="flex-grow-1 p-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4 header-top">
       <div class="d-flex align-items-center">
-        <button class="sidebar-toggle-btn me-3" id="sidebarToggle" aria-label="Toggle sidebar">
+        <button class="sidebar-toggle-btn me-3" id="sidebarToggle">
           <i class="bi bi-list"></i>
         </button>
         <div>
-          <h4 class="mb-0">Selamat datang, {{ Auth::user()->name ?? 'Guru' }}</h4>
+          <h4 class="mb-0">Selamat datang, {{ $nama }}</h4>
           <small class="text-muted">SMP Negeri 1 Mars</small>
         </div>
       </div>
-      <div class="d-flex align-items-center">
-        <form action="{{ route('logout') }}" method="POST" class="ms-2">
-          @csrf
-          <button type="submit" class="btn btn-primary">Keluar</button>
-        </form>
-      </div>
+
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="btn btn-primary">Keluar</button>
+      </form>
     </div>
 
-    <!-- Page Content -->
     @yield('content')
   </div>
+
 </div>
 
-<!-- Bootstrap JS -->
+<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Sidebar JS -->
 <script src="{{ asset('js/guru/sidebar.js') }}"></script>
-
-<!-- Extra JS per halaman -->
 @yield('extra-js')
 
 </body>

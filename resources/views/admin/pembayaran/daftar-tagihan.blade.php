@@ -215,7 +215,6 @@ tbody tr:hover {
                     <th>Periode</th>
                     <th>Nominal</th>
                     <th>Status</th>
-                    <th>Aksi</th>
                 </tr>
             </thead>
 
@@ -237,14 +236,7 @@ tbody tr:hover {
                         </div>
                     </td>
                     <td>
-                        @if($t->status === 'belum_bayar')
-                            <a href="{{ route('admin.pembayaran-spp.bayar', $t->id) }}"
-                               class="action-btn">
-                                Bayar
-                            </a>
-                        @else
-                            <span class="action-btn disabled">Selesai</span>
-                        @endif
+                        {{-- Tombol pembayaran dihapus --}}
                     </td>
                 </tr>
                 @empty
