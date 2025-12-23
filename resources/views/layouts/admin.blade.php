@@ -70,13 +70,6 @@
         </a>
       </li>
 
-
-      <li class="nav-item">
-        <a class="nav-link main-link" href="#">
-          <i class="bi bi-gear-fill me-2"></i> Pengaturan
-        </a>
-      </li>
-    </ul>
   </nav>
 
   <!-- Main Content -->

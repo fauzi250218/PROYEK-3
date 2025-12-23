@@ -102,7 +102,7 @@
         <div class="chart-card">
             <div class="chart-header">
                 <h3>Jumlah Murid per Bulan</h3>
-                <span>Akumulasi murid setiap kelas</span>
+                <span>Akumulasi murid setiap angkatan</span>
             </div>
             <div class="chart-box">
                 <canvas id="muridPerBulanChart"></canvas>

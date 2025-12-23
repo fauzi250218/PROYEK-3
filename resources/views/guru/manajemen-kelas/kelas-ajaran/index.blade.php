@@ -11,11 +11,13 @@
 <div class="container-fluid py-5 semua-kelas-wrapper">
 
     <!-- JUDUL HALAMAN -->
-    <div class="text-start mb-4">
+    <div class="text-start mb-4 header-kelas-ajaran">
         <h2 class="title-page fw-bold mb-2">
             <i class="bi bi-people-fill text-success me-2"></i>Kelas Ajaran
         </h2>
-        <p class="subtitle">Daftar kelas yang Anda ajarkan pada tahun akademik ini.</p>
+        <p class="subtitle mb-0">
+            Daftar kelas yang Anda ajarkan pada tahun akademik ini.
+        </p>
     </div>
 
     @php
@@ -41,7 +43,9 @@
     @if(empty($kelasAjaran) || empty($kelompok))
         <div class="empty-state text-center mt-5">
             <i class="bi bi-emoji-neutral display-6 d-block mb-2 text-secondary"></i>
-            <p class="fw-semibold text-muted">Belum ada kelas yang Anda ajarkan tahun ini.</p>
+            <p class="fw-semibold text-muted mb-0">
+                Belum ada kelas yang Anda ajarkan tahun ini.
+            </p>
         </div>
     @else
 
@@ -50,7 +54,7 @@
 
             @if(isset($kelompok[$grade]) && count($kelompok[$grade]) > 0)
 
-                <h4 class="fw-bold mb-3 ms-1">Kelas {{ $grade }}</h4>
+                <h4 class="fw-bold mb-3 ms-1 mt-4">Kelas {{ $grade }}</h4>
 
                 <div class="kelas-tiles">
 
@@ -68,7 +72,8 @@
                                 <h5 class="nama-kelas">{{ $kelas['kelas'] }}</h5>
 
                                 <p class="wali">
-                                    <strong>Wali:</strong> {{ $kelas['guru'] ?? 'Tidak ada data guru' }}
+                                    <strong>Wali:</strong>
+                                    {{ $kelas['guru'] ?? 'Tidak ada data guru' }}
                                 </p>
 
                                 <p class="desc">
@@ -88,5 +93,29 @@
     @endif
 
 </div>
+
+{{-- =========================================
+   CSS PENYESUAIAN POSISI HEADER (LOKAL)
+========================================= --}}
+<style>
+/* Naikkan seluruh konten (override py-5) */
+.semua-kelas-wrapper{
+    padding-top: 1.25rem !important; /* default py-5 ≈ 3rem */
+}
+
+/* Header lebih rapat & sejajar navbar */
+.header-kelas-ajaran{
+    margin-top: -6px;
+}
+
+.header-kelas-ajaran .title-page{
+    margin-bottom: 6px;
+}
+
+.header-kelas-ajaran .subtitle{
+    font-size: .9rem;
+    color: #6b7280;
+}
+</style>
 
 @endsection

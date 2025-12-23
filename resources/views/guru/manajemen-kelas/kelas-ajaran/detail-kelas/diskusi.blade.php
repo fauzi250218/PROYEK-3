@@ -1,6 +1,6 @@
 {{-- =====================================================
 RUANG DISKUSI – FULL STABLE VERSION
-NO FUNCTION REMOVED
+FIXED 403 FORBIDDEN (NO FEATURE REMOVED)
 ===================================================== --}}
 
 @php
@@ -58,7 +58,6 @@ KOLOM SESI
     </div>
 
     <div class="session-content">
-
         @if($item->topik)
             <div class="topic">{{ $item->topik }}</div>
         @endif
@@ -77,7 +76,6 @@ KOLOM SESI
                 </span>
             @endif
         @endif
-
     </div>
 
     <div class="session-footer">
@@ -102,7 +100,7 @@ KOLOM MODUL
 @foreach($sesi as $s)
 @php $modSesi = $modul->where('sesi_id', $s->id); @endphp
 
-@if($modSesi->count() > 0)
+@if($modSesi->count())
 
 <div class="module-card">
 
@@ -128,12 +126,11 @@ KOLOM MODUL
     </div>
 
     <div class="module-list">
-
         @foreach($modSesi as $m)
         <div class="module-item modul-card-click"
              data-edit="{{ route('guru.kelas.ajaran.modul.edit', $m->id) }}">
 
-            <div class="file-name">
+            <div class="file-name" title="{{ basename($m->file) }}">
                 {{ basename($m->file) }}
             </div>
 
@@ -152,7 +149,6 @@ KOLOM MODUL
 
         </div>
         @endforeach
-
     </div>
 
 </div>
@@ -164,39 +160,62 @@ KOLOM MODUL
 </div>
 
 {{-- =====================================================
-MODAL PREVIEW PDF (LAMA – TIDAK DIUBAH)
+MODAL PREVIEW PDF
+===================================================== --}}
+{{-- =====================================================
+MODAL PREVIEW PDF (FULL WIDTH + ACTION)
 ===================================================== --}}
 <div id="previewModulOverlay" class="preview-overlay">
-    <div class="preview-modal">
-        <iframe id="pdfView" width="100%" height="520" style="border:none;"></iframe>
-        <div class="text-end mt-3">
-            <button class="btn btn-sm btn-secondary"
-                    onclick="closePreviewModal()">Tutup</button>
+    <div class="preview-modal-full">
+
+        {{-- HEADER --}}
+        <div class="preview-header">
+            <span class="preview-title">Pratinjau Dokumen PDF</span>
+
+            <div class="preview-actions">
+                <a id="downloadPdfBtn"
+                   href="#"
+                   target="_blank"
+                   download
+                   class="btn btn-success btn-sm">
+                    Unduh
+                </a>
+
+                <button class="btn btn-secondary btn-sm"
+                        onclick="closePreviewModal()">
+                    Tutup
+                </button>
+            </div>
         </div>
+
+        {{-- PDF --}}
+        <iframe id="pdfView"></iframe>
+
     </div>
 </div>
 
+
 {{-- =====================================================
-MODAL BAGIKAN MATERI – PRO UI (FUNCTION TETAP)
+MODAL UPLOAD MODUL (FIXED)
 ===================================================== --}}
 <div id="bagikanMateriModal" class="upload-overlay">
-    <div class="upload-modal pro">
+    <div class="upload-modal modern">
 
-        <div class="upload-header pro">
+        <div class="upload-header">
             <div>
                 <h5>Bagikan Materi Pembelajaran</h5>
-                <small>Unggah modul PDF untuk siswa</small>
+                <small>Upload materi untuk siswa</small>
             </div>
             <button class="btn-close" onclick="closeBagikanMateriModal()"></button>
         </div>
 
         <div class="stepper">
             <div class="step active" id="step-indicator-1">
-                <span>1</span><label>Informasi</label>
+                <span>1</span><label>Sesi & Topik</label>
             </div>
             <div class="line"></div>
             <div class="step" id="step-indicator-2">
-                <span>2</span><label>Upload</label>
+                <span>2</span><label>Materi</label>
             </div>
         </div>
 
@@ -204,6 +223,9 @@ MODAL BAGIKAN MATERI – PRO UI (FUNCTION TETAP)
               action="{{ route('guru.kelas.ajaran.upload-modul') }}"
               enctype="multipart/form-data">
             @csrf
+
+            {{-- FIX WAJIB (ANTI 403) --}}
+            <input type="hidden" name="kelas_id" value="{{ $kelas_id }}">
 
             {{-- STEP 1 --}}
             <div class="materi-step active" id="materi-step-1">
@@ -216,53 +238,56 @@ MODAL BAGIKAN MATERI – PRO UI (FUNCTION TETAP)
                     @endforeach
                 </select>
 
-                <label>Judul Materi</label>
+                <label>Topik Pembelajaran</label>
                 <input type="text"
-                       name="judul"
-                       class="form-control mb-3"
+                       name="topik"
+                       class="form-control mb-4"
                        required>
 
                 <div class="text-end">
                     <button type="button"
-                            class="btn btn-primary btn-sm"
-                            onclick="nextMateriStepPro()">
-                        Lanjut →
-                    </button>
+                            class="btn btn-primary btn-sm px-4"
+                            onclick="nextMateriStepPro()">Lanjut</button>
                 </div>
             </div>
 
             {{-- STEP 2 --}}
             <div class="materi-step" id="materi-step-2">
-                <label>File PDF</label>
+                <label>Judul Materi</label>
+                <input type="text"
+                       name="judul_materi"
+                       class="form-control mb-3"
+                       required>
 
+                <label>File PDF</label>
                 <div class="dropzone mb-3">
                     <input type="file"
-                           name="file"
+                           name="file_materi"
                            accept="application/pdf"
-                           required>
+                           required
+                           onchange="handleFileSelect(this)">
+
                     <div class="drop-content">
-                        <strong>Tarik & lepas file PDF</strong>
-                        <span>atau klik untuk memilih</span>
+                        <strong id="drop-title">Tarik & lepas PDF</strong>
+                        <span id="drop-subtitle">atau klik untuk memilih</span>
                     </div>
                 </div>
 
-                <label>Catatan</label>
+                <label>Catatan (Opsional)</label>
                 <textarea name="catatan"
-                          class="form-control mb-3"
+                          class="form-control mb-4"
                           rows="3"></textarea>
 
                 <div class="d-flex justify-content-between">
                     <button type="button"
                             class="btn btn-light btn-sm"
-                            onclick="prevMateriStepPro()">← Kembali</button>
-
+                            onclick="prevMateriStepPro()">Kembali</button>
                     <button type="submit"
-                            class="btn btn-success btn-sm">
-                        📤 Bagikan Materi
+                            class="btn btn-success btn-sm px-4">
+                        Upload Materi
                     </button>
                 </div>
             </div>
-
         </form>
     </div>
 </div>
@@ -307,7 +332,14 @@ align-items:center;padding:14px;border-radius:12px;
 background:#f8fafc;border:1px solid #e5e7eb;
 margin-bottom:10px;cursor:pointer}
 
-.file-name{font-size:13px;max-width:70%;overflow:hidden}
+.file-name{
+font-size:13px;
+max-width:70%;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis
+}
+
 .file-actions{display:flex;gap:8px}
 .btn-preview,.btn-download{
 font-size:11px;padding:6px 12px;border-radius:8px;border:none;color:#fff}
@@ -325,8 +357,7 @@ align-items:center;justify-content:center}
 background:#fff;padding:22px;border-radius:14px;
 max-width:95%}
 
-.preview-modal{width:920px}
-.upload-modal.pro{width:560px}
+.upload-modal.modern{width:560px}
 
 .stepper{display:flex;align-items:center;margin:18px 0}
 .step{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#94a3b8}
@@ -337,14 +368,54 @@ display:flex;align-items:center;justify-content:center}
 .step.active span{background:#2563eb;color:#fff;border-color:#2563eb}
 .line{flex:1;height:2px;background:#e5e7eb}
 
+.materi-step{display:none}
+.materi-step.active{display:block}
+
 .dropzone{
 border:2px dashed #c7d2fe;border-radius:14px;
 padding:30px;position:relative;text-align:center;background:#f8fafc}
 .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+.preview-modal-full{
+    width:75vw;
+    height:83vh;
+     max-width:1200px;
+    background:#fff;
+    border-radius:16px;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 25px 70px rgba(0,0,0,.35);
+}
+
+.preview-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 20px;
+    border-bottom:1px solid #e5e7eb;
+    background:#f8fafc;
+}
+
+.preview-title{
+    font-weight:600;
+    font-size:14px;
+}
+
+.preview-actions{
+    display:flex;
+    gap:8px;
+}
+
+.preview-modal-full iframe{
+    flex:1;
+    width:100%;
+    height:100%;
+    border:none;
+}   
 </style>
 
 {{-- =====================================================
-JS – SEMUA FUNGSI LAMA TETAP ADA
+JS
 ===================================================== --}}
 <script>
 function toggleDesc(id){
@@ -355,12 +426,24 @@ function toggleDesc(id){
         ?"Baca selengkapnya":"Sembunyikan";
 }
 
-/* PREVIEW */
+// ===============================
+// PREVIEW PDF (FIXED + DOWNLOAD)
+// ===============================
 document.querySelectorAll('.preview-btn').forEach(btn=>{
-    btn.addEventListener('click',e=>{
+    btn.addEventListener('click', e => {
         e.stopPropagation();
-        document.getElementById('pdfView').src=btn.dataset.file;
-        document.getElementById('previewModulOverlay').style.display='flex';
+
+        const fileUrl = btn.dataset.file;
+
+        // tampilkan PDF
+        document.getElementById('pdfView').src =
+            fileUrl + '#toolbar=1&navpanes=0&scrollbar=1';
+
+        // SET LINK DOWNLOAD (INI YANG KURANG)
+        document.getElementById('downloadPdfBtn').href = fileUrl;
+
+        // buka modal
+        document.getElementById('previewModulOverlay').style.display = 'flex';
     });
 });
 function closePreviewModal(){
@@ -368,7 +451,6 @@ function closePreviewModal(){
     document.getElementById('pdfView').src='';
 }
 
-/* CLICK EDIT */
 document.querySelectorAll('.modul-card-click').forEach(card=>{
     card.addEventListener('click',function(e){
         if(e.target.closest('.edit-ignore')) return;
@@ -376,28 +458,51 @@ document.querySelectorAll('.modul-card-click').forEach(card=>{
     });
 });
 
-/* MODAL */
 function openBagikanMateriModal(){
-    document.getElementById('materi-step-1').classList.add('active');
-    document.getElementById('materi-step-2').classList.remove('active');
+    materiStepSwitch(1);
     document.getElementById('bagikanMateriModal').classList.add('active');
 }
 function closeBagikanMateriModal(){
     document.getElementById('bagikanMateriModal').classList.remove('active');
 }
 
-/* STEP PRO */
-function nextMateriStepPro(){
-    materiStepSwitch(2);
-}
-function prevMateriStepPro(){
-    materiStepSwitch(1);
-}
-function materiStepSwitch(step){
-    document.querySelectorAll('.materi-step').forEach(s=>s.classList.remove('active'));
-    document.getElementById('materi-step-'+step).classList.add('active');
+function nextMateriStepPro(){ materiStepSwitch(2); }
+function prevMateriStepPro(){ materiStepSwitch(1); }
 
-    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-    document.getElementById('step-indicator-'+step).classList.add('active');
+function materiStepSwitch(step){
+    document.querySelectorAll('.materi-step')
+        .forEach(s=>s.classList.remove('active'));
+    document.getElementById('materi-step-'+step)
+        .classList.add('active');
+
+    document.querySelectorAll('.step')
+        .forEach(s=>s.classList.remove('active'));
+    document.getElementById('step-indicator-'+step)
+        .classList.add('active');
 }
+
+function handleFileSelect(input){
+    if(!input.files || !input.files.length) return;
+
+    const fullName  = input.files[0].name;
+    const maxLength = 32; // aman, tidak jebol form
+
+    let displayName = fullName;
+
+    if(fullName.length > maxLength){
+        const dot  = fullName.lastIndexOf('.');
+        const ext  = dot !== -1 ? fullName.substring(dot) : '';
+        const base = fullName.substring(0, maxLength - ext.length - 3);
+        displayName = base + '...' + ext;
+    }
+
+    const title = document.getElementById('drop-title');
+    const sub   = document.getElementById('drop-subtitle');
+
+    title.textContent = displayName;
+    title.title       = fullName; // hover = nama asli
+    title.style.color = '#16a34a';
+    sub.textContent   = 'File siap diunggah';
+}
+
 </script>

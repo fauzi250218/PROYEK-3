@@ -8,80 +8,105 @@
 
     <div class="card shadow-sm p-4 rounded-4">
 
-        <h4 class="fw-bold mb-3">Edit Aktivitas Pembelajaran</h4>
+        <h4 class="fw-bold mb-4">Edit Aktivitas Pembelajaran</h4>
+
+        {{-- ERROR --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- SUCCESS --}}
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <form action="{{ route('guru.kelas.ajaran.sesi.update', $sesi->id) }}" method="POST">
             @csrf
             @method('PUT')
 
+            {{-- KELAS ID (DIKIRIM DARI CONTROLLER) --}}
             <input type="hidden" name="kelas_id" value="{{ $kelas_id }}">
 
-            {{-- Judul --}}
-            <label class="fw-semibold small">Judul Sesi</label>
-            <input 
-                type="text"
-                name="judul_sesi"
-                class="form-control mb-3"
-                value="{{ $sesi->judul_sesi }}"
-                required
-            >
+            {{-- JUDUL SESI --}}
+            <div class="mb-3">
+                <label class="fw-semibold small">Judul Sesi</label>
+                <input
+                    type="text"
+                    name="judul_sesi"
+                    class="form-control"
+                    value="{{ old('judul_sesi', $sesi->judul_sesi) }}"
+                    required
+                >
+            </div>
 
-            {{-- Topik --}}
-            <label class="fw-semibold small">Topik</label>
-            <input 
-                type="text"
-                name="topik"
-                class="form-control mb-3"
-                placeholder="Tuliskan topik..."
-                value="{{ $sesi->topik }}"
-            >
+            {{-- TOPIK --}}
+            <div class="mb-3">
+                <label class="fw-semibold small">Topik</label>
+                <input
+                    type="text"
+                    name="topik"
+                    class="form-control"
+                    value="{{ old('topik', $sesi->topik) }}"
+                >
+            </div>
 
-            {{-- Tujuan Pembelajaran (TEXTAREA BIASA) --}}
-            <label class="fw-semibold small">Tujuan Pembelajaran</label>
-            <textarea 
-                name="deskripsi"
-                class="form-control mb-3"
-                rows="5"
-                placeholder="Tuliskan tujuan pembelajaran..."
-            >{{ $sesi->deskripsi }}</textarea>
+            {{-- DESKRIPSI --}}
+            <div class="mb-3">
+                <label class="fw-semibold small">Tujuan Pembelajaran</label>
+                <textarea
+                    name="deskripsi"
+                    class="form-control"
+                    rows="5"
+                >{{ old('deskripsi', $sesi->deskripsi) }}</textarea>
+            </div>
 
-            {{-- Tanggal --}}
-            <label class="fw-semibold small">Tanggal Sesi</label>
-            <input 
-                type="date" 
-                name="tanggal"
-                class="form-control mb-3"
-                value="{{ $sesi->tanggal }}"
-                required
-            >
+            {{-- TANGGAL --}}
+            <div class="mb-3">
+                <label class="fw-semibold small">Tanggal</label>
+                <input
+                    type="date"
+                    name="tanggal"
+                    class="form-control"
+                    value="{{ old('tanggal', $sesi->tanggal) }}"
+                    required
+                >
+            </div>
 
-            {{-- Jam --}}
+            {{-- JAM --}}
             <div class="row">
-                <div class="col-6 mb-3">
+                <div class="col-md-6 mb-3">
                     <label class="fw-semibold small">Jam Mulai</label>
-                    <input 
+                    <input
                         type="time"
                         name="jam_mulai"
                         class="form-control"
-                        value="{{ $sesi->jam_mulai }}"
+                        value="{{ old('jam_mulai', $sesi->jam_mulai) }}"
                         required
                     >
                 </div>
 
-                <div class="col-6 mb-3">
+                <div class="col-md-6 mb-3">
                     <label class="fw-semibold small">Jam Selesai</label>
-                    <input 
+                    <input
                         type="time"
                         name="jam_selesai"
                         class="form-control"
-                        value="{{ $sesi->jam_selesai }}"
+                        value="{{ old('jam_selesai', $sesi->jam_selesai) }}"
                         required
                     >
                 </div>
             </div>
 
-            {{-- Aksi --}}
-            <div class="d-flex justify-content-end gap-2 mt-3">
+            {{-- ACTION --}}
+            <div class="d-flex justify-content-end gap-2 mt-4">
                 <a href="{{ route('guru.kelas.ajaran.detail', $kelas_id) }}" class="btn btn-light">
                     Batal
                 </a>
