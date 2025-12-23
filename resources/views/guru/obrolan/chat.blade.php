@@ -213,7 +213,7 @@ function markAsRead() {
 }
 
 .chat-read.readed {
-    color: #faf7f7; /* ✓✓ biru */
+    color: #1DA1F2; /* ✓✓ biru */
 }
 
 /* ===== BUTTON BACK ===== */

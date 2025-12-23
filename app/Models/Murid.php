@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Murid extends Model
+class Murid extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     protected $table = 'murids';
 
@@ -20,6 +21,13 @@ class Murid extends Model
         'kata_sandi',
         'nomer_whatsapp',
         'foto_profil',
+    ];
+
+    /**
+     * Sembunyikan field sensitif
+     */
+    protected $hidden = [
+        'kata_sandi',
     ];
 
     /**
@@ -71,9 +79,8 @@ class Murid extends Model
     }
 
     /**
-     * Relasi ke TagihanSPP
+     * Relasi ke Tagihan SPP
      */
-
     public function tagihanSPP()
     {
         return $this->hasMany(TagihanSPP::class, 'murid_id');

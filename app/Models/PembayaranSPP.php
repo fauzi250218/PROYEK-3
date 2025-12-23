@@ -11,6 +11,7 @@ class PembayaranSPP extends Model
     protected $fillable = [
         'tagihan_id',
         'order_id',
+        'nominal',
         'gross_amount',
         'snap_token',
         'payment_type',
