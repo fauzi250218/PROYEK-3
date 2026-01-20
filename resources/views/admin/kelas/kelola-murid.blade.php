@@ -2,99 +2,166 @@
 
 @section('title', 'Kelola Siswa di Kelas ' . $kelas->nama_kelas)
 
+@section('extra-css')
+<link rel="stylesheet" href="{{ asset('css/admin/kelas/kelola-murid.css') }}">
+@endsection
+
 @section('content')
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="page-title">Kelola Siswa - Kelas {{ $kelas->nama_kelas }}</h4>
-        <a href="{{ route('admin.kelas.index') }}" class="btn btn-secondary">
+<div class="container-fluid kelola-siswa-page py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 header-section">
+        <h3 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-people-fill text-primary me-2"></i> Kelola Siswa - {{ $kelas->nama_kelas }}
+        </h3>
+        <a href="{{ route('admin.kelas.index') }}" class="btn btn-outline-secondary rounded-3 px-4 shadow-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
 
-    <div class="card mb-4 shadow-sm">
+    <!-- Informasi Kelas -->
+    <div class="card info-card mb-4 shadow-sm border-0 rounded-4">
         <div class="card-body">
-            <p><strong>Nama Kelas:</strong> {{ $kelas->nama_kelas }}</p>
-            <p><strong>Wali Kelas:</strong> {{ $kelas->wali->name ?? '-' }}</p>
-            <p><strong>Deskripsi:</strong> {{ $kelas->deskripsi ?? '-' }}</p>
+            <h5 class="fw-semibold text-primary mb-3 d-flex align-items-center">
+                <i class="bi bi-info-circle-fill me-2"></i> Informasi Kelas
+            </h5>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="info-item">
+                        <p class="label">Nama Kelas</p>
+                        <h6 class="value">{{ $kelas->nama_kelas }}</h6>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-item">
+                        <p class="label">Wali Kelas</p>
+                        <h6 class="value">
+                            {{ $kelas->guru && $kelas->guru->user ? $kelas->guru->user->name : '-' }}
+                        </h6>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-item">
+                        <p class="label">Deskripsi</p>
+                        <h6 class="value">{{ $kelas->deskripsi ?? '-' }}</h6>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Tambahkan Siswa -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-white">
-            Tambahkan Siswa ke Kelas
+    <!-- Jadwal Pelajaran -->
+    <div class="card jadwal-card mb-4 border-0 shadow-md rounded-4 overflow-hidden">
+        <div class="card-header gradient-header text-white py-3 px-4 d-flex align-items-center">
+            <i class="bi bi-calendar3-week me-2 fs-5"></i>
+            <h5 class="fw-semibold mb-0">Jadwal Pelajaran Kelas {{ $kelas->nama_kelas }}</h5>
         </div>
-        <div class="card-body">
-            <form action="{{ route('admin.kelas.tambahMurid', $kelas->id) }}" method="POST">
-                @csrf
 
-                <ul class="nav nav-tabs mb-3" id="jenjangTab" role="tablist">
-                    @foreach ($muridBelumMasukKelas as $jenjang => $list)
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ $loop->first ? 'active' : '' }}" id="tab-{{ $jenjang }}"
-                                data-bs-toggle="tab" data-bs-target="#content-{{ $jenjang }}" type="button" role="tab">
-                                Kelas {{ $jenjang }}
-                            </button>
-                        </li>
-                    @endforeach
-                </ul>
+        <div class="card-body px-4 pb-4 bg-white">
 
-                <div class="tab-content">
-                    @foreach ($muridBelumMasukKelas as $jenjang => $list)
-                        <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="content-{{ $jenjang }}" role="tabpanel">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th><input type="checkbox" id="selectAll{{ $jenjang }}"></th>
-                                            <th>No</th>
-                                            <th>NIS</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Jenis Kelamin</th>
-                                            <th>No. WhatsApp</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($list as $index => $murid)
-                                            <tr>
-                                                <td><input type="checkbox" name="murid_ids[]" value="{{ $murid->id }}"></td>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $murid->nis }}</td>
-                                                <td>{{ $murid->nama }}</td>
-                                                <td>{{ $murid->email }}</td>
-                                                <td>{{ $murid->jenis_kelamin }}</td>
-                                                <td>{{ $murid->nomer_whatsapp }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr><td colspan="7" class="text-center text-muted py-3">Tidak ada siswa tersedia</td></tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    @endforeach
+            @php
+                use Carbon\Carbon;
+
+                // Urutan nama hari secara umum
+                $urutanHari = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+
+                // PROSES: dari tanggal → jadwal unik → grup per hari
+                $jadwalPerKelas = $jadwalKelas
+                    ->where('kelas_id', $kelas->id)
+
+                    // Mengubah tanggal → hari
+                    ->map(function ($item) {
+                        $hari = Carbon::parse($item->tanggal)
+                                      ->locale('id')
+                                      ->translatedFormat('l');
+
+                        $item->hari = ucfirst($hari);
+                        return $item;
+                    })
+
+                    // Hilangkan jadwal yang sama (perwakilan saja)
+                    ->unique(function ($item) {
+                        return $item->hari
+                            . '|' . $item->mata_pelajaran
+                            . '|' . $item->guru
+                            . '|' . $item->jam_mulai
+                            . '|' . $item->jam_selesai;
+                    })
+
+                    // Kelompokkan berdasarkan hari
+                    ->groupBy('hari')
+
+                    // Sort by hari
+                    ->sortBy(function ($_, $hari) use ($urutanHari) {
+                        return array_search($hari, $urutanHari);
+                    });
+            @endphp
+
+            @if($jadwalPerKelas->count())
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover clean-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Hari</th>
+                                <th>Mata Pelajaran</th>
+                                <th>Guru</th>
+                                <th>Jam Pelajaran</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach($jadwalPerKelas as $hari => $items)
+                                @php $isFirst = true; @endphp
+
+                                @foreach($items as $jadwal)
+                                    <tr>
+                                        {{-- Tampilkan nama hari sekali saja --}}
+                                        @if($isFirst)
+                                            <td class="text-center fw-semibold text-dark align-middle" 
+                                                rowspan="{{ count($items) }}">
+                                                {{ $hari }}
+                                            </td>
+                                            @php $isFirst = false; @endphp
+                                        @endif
+
+                                        <td class="fw-semibold">{{ $jadwal->mata_pelajaran }}</td>
+                                        <td>{{ $jadwal->guru }}</td>
+                                        <td>
+                                            {{ substr($jadwal->jam_mulai, 0, 5) }}
+                                            -
+                                            {{ substr($jadwal->jam_selesai, 0, 5) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
+                        </tbody>
+
+                    </table>
                 </div>
-
-                <div class="mt-3 text-end">
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-plus-circle"></i> Tambah ke Kelas
-                    </button>
+            @else
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-calendar-x display-6 d-block mb-2"></i>
+                    <p class="mb-0">Belum ada jadwal untuk kelas ini.</p>
                 </div>
-            </form>
+            @endif
+
         </div>
     </div>
 
-    <!-- Daftar Siswa di Kelas -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-light">
-            <strong>Daftar Siswa di Kelas {{ $kelas->nama_kelas }}</strong>
+    <!-- Daftar Siswa -->
+    <div class="card siswa-card border-0 shadow-md rounded-4 overflow-hidden">
+        <div class="card-header gradient-header text-white py-3 px-4 d-flex align-items-center">
+            <i class="bi bi-list-ul me-2 fs-5"></i>
+            <h5 class="fw-semibold mb-0">Daftar Siswa Kelas {{ $kelas->nama_kelas }}</h5>
         </div>
-        <div class="card-body">
+
+        <div class="card-body px-4 pb-4 bg-white">
+
             @if($muridDalamKelas->count())
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                    <table class="table align-middle table-hover clean-table">
+                        <thead>
                             <tr>
                                 <th>No</th>
                                 <th>NIS</th>
@@ -102,23 +169,34 @@
                                 <th>Email</th>
                                 <th>Jenis Kelamin</th>
                                 <th>No. WhatsApp</th>
-                                <th>Aksi</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach($muridDalamKelas as $index => $murid)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $murid->nis }}</td>
-                                    <td>{{ $murid->nama }}</td>
+                                    <td class="fw-semibold">{{ $murid->nama }}</td>
                                     <td>{{ $murid->email }}</td>
                                     <td>{{ $murid->jenis_kelamin }}</td>
-                                    <td>{{ $murid->nomer_whatsapp }}</td>
-                                    <td>
-                                        <form action="{{ route('admin.kelas.hapusMurid', ['kelas_id' => $kelas->id, 'murid_id' => $murid->id]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus siswa ini dari kelas?')">
+                                    <td>{{ $murid->nomer_whatsapp ?? '-' }}</td>
+
+                                    <td class="text-center">
+                                        <form action="{{ route('admin.kelas.hapusMurid', [
+                                            'kelas_id' => $kelas->id,
+                                            'murid_id' => $murid->id
+                                        ]) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus siswa ini dari kelas?')"
+                                        class="d-inline">
+
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">
+
+                                            <button type="submit"
+                                                class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm">
                                                 <i class="bi bi-trash"></i> Hapus
                                             </button>
                                         </form>
@@ -126,22 +204,20 @@
                                 </tr>
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
-            @else
-                <div class="text-center text-muted py-4">Belum ada siswa di kelas ini.</div>
-            @endif
-        </div>
-    </div>
-</div>
 
-<script>
-document.querySelectorAll('[id^="selectAll"]').forEach(chk => {
-    chk.addEventListener('change', e => {
-        const tab = e.target.id.replace('selectAll', '');
-        document.querySelectorAll(`#content-${tab} input[type="checkbox"][name="murid_ids[]"]`)
-            .forEach(box => box.checked = e.target.checked);
-    });
-});
-</script>
+            @else
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-person-x display-6 d-block mb-2"></i>
+                    <p class="mb-0">Belum ada siswa di kelas ini.</p>
+                </div>
+            @endif
+
+        </div>
+
+    </div>
+
+</div>
 @endsection

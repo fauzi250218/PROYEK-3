@@ -13,24 +13,40 @@
   <link rel="stylesheet" href="{{ asset('css/guru/guru.css') }}">
   @yield('extra-css')
 </head>
-<body class="guru">
 
+<body class="guru">
 <div class="d-flex" id="app">
-  <!-- Sidebar -->
+
+  <!-- ================= SIDEBAR ================= -->
   <nav class="sidebar" id="sidebar">
+
+    {{-- ================= FOTO PROFIL (DIPERBAIKI) ================= --}}
+    @php
+        $guru     = Auth::user()->guru ?? null;
+        $foto     = $guru->foto_profil ?? null;
+        $nama     = $guru->nama_lengkap ?? Auth::user()->name ?? 'Guru';
+        $inisial  = strtoupper(substr($nama, 0, 1));
+    @endphp
+
     <div class="logo-wrapper text-center">
-      <div class="logo-circle bg-white mx-auto mb-2">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="img-fluid">
+      <div class="profile-circle mx-auto mb-2">
+        @if($foto)
+          <img src="{{ asset('storage/'.$foto) }}" alt="Foto Guru">
+        @else
+          <span>{{ $inisial }}</span>
+        @endif
       </div>
-      <h6 class="logo-title">Guru</h6>
+
+      <h6 class="logo-title">{{ $nama }}</h6>
       <hr class="sidebar-divider">
     </div>
+    {{-- ================= END FOTO PROFIL ================= --}}
 
     <ul class="nav flex-column">
 
-      <!-- Beranda -->
+      <!-- Dashboard -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}" 
+        <a class="nav-link main-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"
            href="{{ route('guru.dashboard') }}">
           <i class="bi bi-house-fill me-2"></i> Beranda
         </a>
@@ -50,13 +66,13 @@
         <div class="collapse {{ request()->routeIs('guru.kelas.*') ? 'show' : '' }} submenu" id="kelasMenu">
           <ul class="nav flex-column mt-1">
             <li class="nav-item">
-              <a class="nav-link {{ request()->routeIs('guru.kelas.binaan.index') ? 'active' : '' }}"
+              <a class="nav-link {{ request()->routeIs('guru.kelas.binaan.*') ? 'active' : '' }}"
                  href="{{ route('guru.kelas.binaan.index') }}">
                 <i class="bi bi-circle me-2"></i> Kelas Binaan
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {{ request()->routeIs('guru.kelas.ajaran.index') ? 'active' : '' }}"
+              <a class="nav-link {{ request()->routeIs('guru.kelas.ajaran.*') ? 'active' : '' }}"
                  href="{{ route('guru.kelas.ajaran.index') }}">
                 <i class="bi bi-circle me-2"></i> Kelas Ajaran
               </a>
@@ -65,72 +81,54 @@
         </div>
       </li>
 
-      <!-- Pembayaran -->
+      <!-- Manajemen Nilai -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.pembayaran.*') ? 'active' : '' }}" 
-           href="{{ route('guru.pembayaran.index') }}">
-          <i class="bi bi-cash-stack me-2"></i> Pembayaran
+        <a class="nav-link main-link {{ request()->routeIs('guru.nilai.*') ? 'active' : '' }}"
+           href="{{ route('guru.nilai.semuaKelas') }}">
+          <i class="bi bi-journal-check me-2"></i> Manajemen Nilai
         </a>
       </li>
 
-      <!-- Perkembangan -->
+      <!-- Obrolan -->
       <li class="nav-item">
-        <a class="nav-link main-link {{ request()->routeIs('guru.perkembangan.*') ? 'active' : '' }}" 
-           href="{{ route('guru.perkembangan.index') }}">
-          <i class="bi bi-bar-chart-line me-2"></i> Perkembangan
+        <a class="nav-link main-link {{ request()->routeIs('guru.obrolan.*') ? 'active' : '' }}"
+           href="{{ route('guru.obrolan.index') }}">
+          <i class="bi bi-chat-dots-fill me-2"></i> Obrolan
         </a>
       </li>
+
     </ul>
   </nav>
 
-  <!-- Main Content -->
+  <!-- ================= MAIN CONTENT ================= -->
   <div class="flex-grow-1 p-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4 header-top">
       <div class="d-flex align-items-center">
-        <button class="btn btn-outline-primary me-3" id="sidebarToggle">
+        <button class="sidebar-toggle-btn me-3" id="sidebarToggle">
           <i class="bi bi-list"></i>
         </button>
         <div>
-          <h4 class="mb-0">Selamat datang, {{ Auth::user()->name ?? 'Guru' }}</h4>
+          <h4 class="mb-0">Selamat datang, {{ $nama }}</h4>
           <small class="text-muted">SMP Negeri 1 Mars</small>
         </div>
       </div>
-      <div class="d-flex align-items-center">
-        <form action="{{ route('logout') }}" method="POST" class="ms-2">
-          @csrf
-          <button type="submit" class="btn btn-primary">Keluar</button>
-        </form>
-      </div>
+
+      <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="btn btn-primary">Keluar</button>
+      </form>
     </div>
 
     @yield('content')
   </div>
+
 </div>
 
+<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- caret animasi dan hover fix -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const links = document.querySelectorAll('.main-link');
-    links.forEach(link => {
-      link.addEventListener('click', () => {
-        links.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-      });
-    });
-
-    // caret rotation animation
-    const collapseEl = document.getElementById('kelasMenu');
-    const caretIcon = document.querySelector('.caret-icon');
-    collapseEl.addEventListener('show.bs.collapse', () => {
-      caretIcon.style.transform = 'rotate(180deg)';
-    });
-    collapseEl.addEventListener('hide.bs.collapse', () => {
-      caretIcon.style.transform = 'rotate(0deg)';
-    });
-  });
-</script>
+<script src="{{ asset('js/guru/sidebar.js') }}"></script>
+@yield('extra-js')
 
 </body>
 </html>

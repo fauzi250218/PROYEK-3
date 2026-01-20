@@ -4,21 +4,23 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\Guru;
 use Illuminate\Support\Facades\Auth;
 
 class DataSiswaController extends Controller
 {
     public function index()
     {
-        // Ambil nama guru login
-        $guruNama = Auth::user()->nama;
+        $guru = Guru::where('user_id', Auth::id())->first();
 
-        // Cari kelas binaan guru (di mana dia jadi wali_kelas)
+        if (!$guru) {
+            return back()->with('error', 'Data guru belum diatur oleh admin.');
+        }
+
         $kelas = Kelas::with('murids')
-            ->where('wali_kelas', $guruNama)
+            ->where('guru_id', $guru->id)
             ->first();
 
-        // Kirim ke view
         return view('guru.manajemen-siswa.data-siswa', compact('kelas'));
     }
 }

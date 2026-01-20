@@ -1,0 +1,111 @@
+/* ======================================================
+   DATA KELAS — DASHBOARD STYLE (FINAL CLEAN VERSION)
+   ====================================================== */
+
+body {
+    background-color: #f7f9fb !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ================= UTIL ================= */
+.text-main { color:#3b5cff !important; }
+.bg-main   { background:#3b5cff !important; }
+
+/* ================= BUTTON ================= */
+.btn-main{
+    background:#3b5cff !important;
+    color:#fff !important;
+    border-radius:10px !important;
+    transition:.25s ease;
+}
+.btn-main:hover{
+    background:#2446e1 !important;
+    transform:translateY(-2px);
+}
+
+.btn-outline-main{
+    border:1px solid #3b5cff;
+    color:#3b5cff;
+    border-radius:10px;
+    transition:.25s ease;
+}
+.btn-outline-main:hover{
+    background:#3b5cff;
+    color:#fff;
+}
+
+/* ================= PAGE ================= */
+.kelas-index-page{
+    padding-top:-2rem;      /* ⬅️ DINAIKKAN */
+    padding-bottom:3rem;
+    animation:fadeIn .4s ease;
+}
+
+/* ================= HEADER ================= */
+.kelas-header{
+    margin-bottom:2rem;    /* ⬅️ LEBIH DEKAT KE KONTEN */
+}
+
+/* ================= SECTION ================= */
+.kelas-section{
+    margin-bottom:3rem;
+}
+
+/* ================= CARD ================= */
+.kelas-card{
+    border-radius:18px;
+    transition:.3s ease;
+    overflow:hidden;
+}
+.kelas-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 12px 25px rgba(0,0,0,.09);
+}
+
+.kelas-card-body{
+    padding:24px;
+}
+
+/* ================= ICON ================= */
+.kelas-icon{
+    width:48px;
+    height:48px;
+    border-radius:12px;
+    background:#eef3ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.kelas-icon i{
+    color:#3b5cff;
+    font-size:1.4rem;
+}
+
+/* ================= BADGE ================= */
+.badge.bg-main-light{
+    background:#e6eeff !important;
+    color:#3b5cff !important;
+    border-radius:8px;
+    font-size:.75rem;
+}
+
+/* ================= BUTTON SMALL ================= */
+.btn-outline-warning,
+.btn-outline-danger{
+    border-radius:8px !important;
+}
+
+/* ================= ANIM ================= */
+@keyframes fadeIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:none; }
+}
+
+/* ================= RESPONSIVE ================= */
+@media(max-width:991px){
+    .kelas-card-body{ padding:20px; }
+    .kelas-icon{ width:42px;height:42px; }
+}
+@media(max-width:576px){
+    h2{ font-size:1.4rem !important; }
+}

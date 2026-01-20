@@ -20,10 +20,22 @@ class Jadwal extends Model
         'jam_selesai',
         'tanggal',
         'keterangan',
+        'semester_group_id',
     ];
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    // Opsional — bantu tampilkan nama kelas & guru secara cepat di view
+    public function getNamaKelasAttribute()
+    {
+        return $this->kelas->nama_kelas ?? '-';
+    }
+
+    public function getNamaGuruAttribute()
+    {
+        return $this->guru ?? '-';
     }
 }

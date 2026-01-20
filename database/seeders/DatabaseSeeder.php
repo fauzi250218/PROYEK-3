@@ -32,5 +32,11 @@ class DatabaseSeeder extends Seeder
                 'role' => 'guru',
             ]
         );
+
+        // 🔹 Panggil Validasi kelas dan Murid Seeder
+        $this->call([
+            KelasSeeder::class,
+            ValidasiMuridSeeder::class,
+        ]);
     }
 }

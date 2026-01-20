@@ -1,0 +1,102 @@
+/* Wrapper */
+.nilai-page {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Card utama */
+.nilai-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+/* Header Siswa */
+.nilai-header h2 {
+    font-weight: 700;
+}
+
+.nilai-header p {
+    font-size: 14px;
+}
+
+/* Tabel */
+.table-custom th {
+    background: #f4f6f9;
+    font-weight: 600;
+    padding: 16px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.table-custom td {
+    padding: 16px;
+    vertical-align: middle;
+}
+
+/* Input Style */
+.input-mini {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.6px solid #dcdcdc;
+    font-size: 14px;
+    background: #fcfcfc;
+}
+
+.input-mini:focus {
+    border-color: #198754;
+    outline: none;
+}
+
+/* Button Simpan */
+.btn-save {
+    background: #198754;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.btn-save:hover {
+    background: #157347;
+}
+
+/* Button Aksi */
+.btn-edit {
+    background: #ffc107;
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 10px;
+}
+
+.btn-delete {
+    background: #dc3545;
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 10px;
+}
+
+/* Floating row untuk tambah nilai */
+.row-add {
+    background: #f9fafb;
+    border-radius: 12px;
+}
+
+.row-add td {
+    padding: 14px 10px !important;
+}
+
+.table-custom tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Kembali Button */
+.btn-back {
+    background: #0d6efd;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+}

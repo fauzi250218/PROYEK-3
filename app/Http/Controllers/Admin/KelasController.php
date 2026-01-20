@@ -6,21 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Kelas;
 use App\Models\Murid;
-use App\Models\User;
+use App\Models\Guru;
+use App\Models\Jadwal;
 
 class KelasController extends Controller
 {
     /**
-     * 🔹 Menampilkan daftar semua kelas (dikelompokkan per jenjang)
+     * 🔹 Tampilkan daftar kelas (group per jenjang) + JADWAL
      */
     public function index()
     {
-        // Ambil semua kelas dengan wali dan muridnya
-        $kelas = Kelas::with(['wali', 'murids'])
+        // Ambil guru + murid + JADWAL kelas
+        $kelas = Kelas::with([
+                'guru.user',
+                'murids',
+                'jadwals' => function ($q) {
+                    $q->orderBy('tanggal')->orderBy('jam_mulai');
+                }
+            ])
             ->get()
             ->groupBy(function ($item) {
-                // Ambil jenjang dari nama kelas (contoh: "7A" → 7)
-                return substr($item->nama_kelas, 0, 1);
+                return substr($item->nama_kelas, 0, 1); // group berdasarkan angka awal (7,8,9)
             });
 
         return view('admin.kelas.index', compact('kelas'));
@@ -31,32 +37,39 @@ class KelasController extends Controller
      */
     public function create()
     {
-        // Ambil semua user dengan role guru yang belum menjadi wali kelas
-        $guru = User::where('role', 'guru')
-                    ->whereDoesntHave('kelas') // butuh relasi di User.php -> kelas()
-                    ->get();
-
+        // Guru yang belum punya kelas
+        $guru = Guru::whereDoesntHave('kelas')->with('user')->get();
         return view('admin.kelas.create', compact('guru'));
     }
 
     /**
-     * 🔹 Simpan Kelas Baru
+     * 🔹 Simpan Data Kelas Baru
      */
     public function store(Request $request)
     {
         $request->validate([
             'nama_kelas' => 'required|string|max:255',
-            'user_id'    => 'nullable|exists:users,id',
+            'guru_id'    => 'nullable|exists:guru,id',
             'deskripsi'  => 'nullable|string',
         ]);
 
-        Kelas::create([
+        // Simpan kelas
+        $kelas = Kelas::create([
             'nama_kelas' => $request->nama_kelas,
-            'user_id'    => $request->user_id,
+            'guru_id'    => $request->guru_id,
             'deskripsi'  => $request->deskripsi,
         ]);
 
-        return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
+        // Jika guru dipilih → jadikan wali kelas
+        if ($request->guru_id) {
+            $guru = Guru::find($request->guru_id);
+            if ($guru) {
+                $guru->kelas()->save($kelas);
+            }
+        }
+
+        return redirect()->route('admin.kelas.index')
+            ->with('success', 'Kelas berhasil ditambahkan.');
     }
 
     /**
@@ -66,34 +79,44 @@ class KelasController extends Controller
     {
         $kelas = Kelas::findOrFail($id);
 
-        // Guru yang bisa dipilih: guru tanpa kelas atau yang sudah jadi wali kelas ini
-        $guru = User::where('role', 'guru')
-                    ->whereDoesntHave('kelas')
-                    ->orWhere('id', $kelas->user_id)
-                    ->get();
+        // Guru yg belum punya kelas + wali kelas sekarang
+        $guru = Guru::whereDoesntHave('kelas')
+            ->orWhere('id', $kelas->guru_id)
+            ->with('user')
+            ->get();
 
         return view('admin.kelas.edit', compact('kelas', 'guru'));
     }
 
     /**
-     * 🔹 Update Data Kelas
+     * 🔹 Update Kelas
      */
     public function update(Request $request, $id)
     {
         $request->validate([
             'nama_kelas' => 'required|string|max:255',
-            'user_id'    => 'nullable|exists:users,id',
+            'guru_id'    => 'nullable|exists:guru,id',
             'deskripsi'  => 'nullable|string',
         ]);
 
         $kelas = Kelas::findOrFail($id);
+
         $kelas->update([
             'nama_kelas' => $request->nama_kelas,
-            'user_id'    => $request->user_id,
+            'guru_id'    => $request->guru_id,
             'deskripsi'  => $request->deskripsi,
         ]);
 
-        return redirect()->route('admin.kelas.index')->with('success', 'Data kelas berhasil diperbarui.');
+        // Update wali kelas bila berubah
+        if ($request->guru_id) {
+            $guru = Guru::find($request->guru_id);
+            if ($guru) {
+                $guru->kelas()->save($kelas);
+            }
+        }
+
+        return redirect()->route('admin.kelas.index')
+            ->with('success', 'Data kelas berhasil diperbarui.');
     }
 
     /**
@@ -102,34 +125,48 @@ class KelasController extends Controller
     public function destroy($id)
     {
         $kelas = Kelas::findOrFail($id);
+
+        // Hapus kelas (murid tetap aman)
         $kelas->delete();
 
-        return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil dihapus.');
+        return redirect()->route('admin.kelas.index')
+            ->with('success', 'Kelas berhasil dihapus.');
     }
 
     /**
-     * 🔹 Halaman Kelola Murid per Kelas
+     * 🔹 Halaman Kelola Siswa & Jadwal pada kelas
      */
     public function kelolaMurid($id)
     {
-        $kelas = Kelas::with(['murids', 'wali'])->findOrFail($id);
+        // Ambil kelas + guru + murid + jadwal
+        $kelas = Kelas::with(['murids', 'guru.user', 'jadwals'])->findOrFail($id);
 
-        // Ambil murid yang belum masuk kelas
+        // Murid yang belum masuk kelas manapun
         $muridBelumMasukKelas = Murid::whereNull('kelas_id')
             ->orderBy('nama')
             ->get()
             ->groupBy(function ($murid) {
-                // Kelompokkan berdasarkan jenjang (misal dari NIS: 7XXXX → kelas 7)
                 return substr($murid->nis, 0, 1);
             });
 
+        // Murid dalam kelas
         $muridDalamKelas = $kelas->murids;
 
-        return view('admin.kelas.kelola-murid', compact('kelas', 'muridBelumMasukKelas', 'muridDalamKelas'));
+        // Sort jadwal berdasarkan hari & jam
+        $jadwalKelas = $kelas->jadwals
+            ->sortBy(['tanggal', 'jam_mulai'])
+            ->values();
+
+        return view('admin.kelas.kelola-murid', compact(
+            'kelas',
+            'muridBelumMasukKelas',
+            'muridDalamKelas',
+            'jadwalKelas'
+        ));
     }
 
     /**
-     * 🔹 Tambahkan Murid ke Kelas
+     * 🔹 Tambahkan murid ke kelas
      */
     public function tambahMurid(Request $request, $id)
     {
@@ -143,11 +180,12 @@ class KelasController extends Controller
     }
 
     /**
-     * 🔹 Hapus Murid dari Kelas
+     * 🔹 Hapus murid dari kelas
      */
     public function hapusMurid($kelas_id, $murid_id)
     {
         $murid = Murid::findOrFail($murid_id);
+
         $murid->update(['kelas_id' => null]);
 
         return redirect()->back()->with('success', 'Siswa berhasil dihapus dari kelas.');
